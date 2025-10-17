@@ -11,7 +11,7 @@ martian-sdk-python
 *__pycache__/
 
 # Dataset (large pickle files not stored in git)
-dataset/*.pkl
+# dataset/*.pkl
 
 # Results directory
 results/full_experiments/*/
