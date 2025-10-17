@@ -1,0 +1,48 @@
+# Environment and secrets
+.env
+.env.local
+
+# Dependencies
+martian-sdk-python
+.venv/
+
+# System files
+*.DS_Store
+*__pycache__/
+
+# Dataset (large pickle files not stored in git)
+dataset/*.pkl
+
+# Results directory
+results/full_experiments/*/
+!results/full_experiments/main_experiment_results/
+# But exclude large pickle files even in main results
+results/full_experiments/main_experiment_results/data/*.pkl
+
+# Hyperparameter search results are now organized within experiment folders
+# results/hyperparameter_search/*/ (deprecated - now in experiment folders)
+results/quick_tests/*/
+results/single_configs/*/
+
+# Always include summary files and configs from all experiments
+!results/**/config.json
+!results/**/analysis_summary.json
+
+!results/.gitkeep
+
+# Include important results (uncomment specific ones you want to keep)
+# !results/full_experiments/your_important_experiment/
+# !results/full_experiments/your_important_experiment/**
+# Hyperparameter results are now within experiment folders:
+# !results/full_experiments/your_experiment/hyperparameter_tuning/
+# !results/full_experiments/your_experiment/hyperparameter_tuning/**
+
+# Legacy result directories (to be cleaned up)
+full_experiment_runs/
+hyperparameter_tuning_results/
+
+# Generated plots and configs in root (legacy)
+# *.png
+*.log
+rapid_tune_*.json
+hyperparameter_*.json
