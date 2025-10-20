@@ -30,96 +30,31 @@ except ImportError:
     logging.warning("PyGAM not installed. GAM training will not be available.")
 
 from pipeline.utils.judge_rubrics import JUDGE_RUBRICS
+from pipeline.config import DEFAULT_10_JUDGES
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Feature labels for interpretability - Updated for current 10 judges
-FEATURE_LABELS = [
-    "Truthfulness / Factual Accuracy",
-    "Harmlessness / Safety",
-    "Helpfulness / Utility",
-    "Honesty / Transparency", 
-    "Explanatory Depth / Detail",
-    "Instruction Following / Compliance",
-    "Clarity / Understandability",
-    "Conciseness / Efficiency",
-    "Logical Consistency / Reasoning",
-    "Creativity / Originality"
-]
-
-# Current judge order for reference
-CURRENT_JUDGES = [
-    "truthfulness-judge",
-    "harmlessness-judge", 
-    "helpfulness-judge",
-    "honesty-judge",
-    "explanatory-depth-judge",
-    "instruction-following-judge",
-    "clarity-judge",
-    "conciseness-judge",
-    "logical-consistency-judge",
-    "creativity-judge"
-]
-
-
-def load_training_config(config_path: Optional[Path] = None) -> Dict[str, Any]:
-    """Load training configuration from JSON file."""
-    if config_path is None:
-        # Default config path
-        config_path = Path(__file__).parent.parent.parent / "config" / "training_config.json"
-    
-    try:
-        with open(config_path, 'r') as f:
-            config = json.load(f)
-        logger.info(f"Loaded training config from {config_path}")
-        return config
-    except FileNotFoundError:
-        logger.warning(f"Config file not found at {config_path}, using defaults")
-        return get_default_config()
-    except Exception as e:
-        logger.error(f"Error loading config: {e}, using defaults")
-        return get_default_config()
-
-
-def get_default_config() -> Dict[str, Any]:
-    """Get default training configuration if config file is not available."""
-    return {
-        "mlp_training": {
-            "medium_scale": {
-                "hidden_dim": 64,
-                "learning_rate": 0.005,
-                "batch_size": 16,
-                "n_epochs": 100,
-                "early_stopping_patience": 15
-            }
-        }
-    }
-
-
-def determine_training_scale(n_samples: int) -> str:
-    """Determine appropriate training scale based on number of samples."""
-    if n_samples <= 100:
-        return "small_scale"
-    elif n_samples <= 1000:
-        return "medium_scale"  
-    elif n_samples <= 10000:
-        return "large_scale"
-    else:
-        return "enterprise_scale"
-
 
 class SingleLayerMLP(nn.Module):
     """Single hidden layer MLP for aggregating judge scores with dropout and regularization."""
-    
-    def __init__(self, n_judges: int = 10, hidden_dim: int = 64, dropout: float = 0.0):
+
+    def __init__(self, n_features: int, hidden_dim: int = 64, dropout: float = 0.0):
+        """
+        Initialize MLP.
+
+        Args:
+            n_features: Number of input features (number of judges)
+            hidden_dim: Hidden layer dimension
+            dropout: Dropout probability
+        """
         super(SingleLayerMLP, self).__init__()
-        self.fc1 = nn.Linear(n_judges, hidden_dim)
+        self.fc1 = nn.Linear(n_features, hidden_dim)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(dropout) if dropout > 0 else nn.Identity()
         self.fc2 = nn.Linear(hidden_dim, 1)
-    
+
     def forward(self, x):
         x = self.fc1(x)
         x = self.relu(x)
@@ -130,18 +65,27 @@ class SingleLayerMLP(nn.Module):
 
 class GAMAggregator:
     """Generalized Additive Model aggregator for interpretable judge score combination."""
-    
-    def __init__(self, n_splines: int = 10, lam: float = 0.6):
+
+    def __init__(
+        self,
+        feature_names: Optional[List[str]] = None,
+        n_splines: int = 10,
+        lam: float = 0.6
+    ):
         """
         Initialize GAM aggregator.
-        
+
         Args:
+            feature_names: Names of features/judges for interpretability
+                          (None = use DEFAULT_10_JUDGES.judge_names)
             n_splines: Number of splines for each feature
             lam: Lambda regularization parameter
         """
         if not HAS_GAM:
             raise ImportError("PyGAM is required for GAM aggregator. Install with: pip install pygam")
-        
+
+        self.feature_names = feature_names if feature_names is not None else DEFAULT_10_JUDGES.judge_names
+        self.n_features = len(self.feature_names) if feature_names is not None else None
         self.n_splines = n_splines
         self.lam = lam
         self.model = None
@@ -149,11 +93,20 @@ class GAMAggregator:
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
         Fit the GAM model.
-        
+
         Args:
-            X: Judge scores array (n_samples, n_judges)
-            y: Human preference scores (n_samples,)
+            X: Judge scores array (n_samples, n_features)
+            y: Target scores (n_samples,)
         """
+        # Update n_features from data if not set
+        if self.n_features is None:
+            self.n_features = X.shape[1]
+            # If feature_names were defaults and don't match, truncate/pad
+            if len(self.feature_names) != self.n_features:
+                logger.warning(f"Feature names length ({len(self.feature_names)}) doesn't match "
+                             f"n_features ({self.n_features}). Using generic names.")
+                self.feature_names = [f"Feature_{i+1}" for i in range(self.n_features)]
+
         # Create GAM with splines for each feature
         terms = sum([s(i, n_splines=self.n_splines, lam=self.lam) for i in range(X.shape[1])])
         self.model = LinearGAM(terms)
@@ -173,16 +126,16 @@ class GAMAggregator:
         return self.model.score(X, y)
     
     def get_feature_importance(self) -> Dict[str, float]:
-        """Get feature importance scores for each judge."""
+        """Get feature importance scores for each judge/feature."""
         if self.model is None:
             raise ValueError("Model must be fitted first")
-        
+
         importance = {}
-        for i, label in enumerate(FEATURE_LABELS):
+        for i, label in enumerate(self.feature_names):
             # Use p-value as inverse importance (lower p-value = more important)
             p_value = self.model.statistics_['p_values'][i] if i < len(self.model.statistics_['p_values']) else 1.0
             importance[label] = 1.0 - p_value
-        
+
         return importance
 
 
@@ -249,7 +202,7 @@ class MLPTrainer:
         
         # Initialize model
         n_features = X_train.shape[1]
-        self.model = SingleLayerMLP(n_judges=n_features, hidden_dim=self.hidden_dim, dropout=self.dropout).to(self.device)
+        self.model = SingleLayerMLP(n_features=n_features, hidden_dim=self.hidden_dim, dropout=self.dropout).to(self.device)
         
         # Loss and optimizer with L2 regularization
         criterion = nn.MSELoss()
@@ -339,19 +292,21 @@ class MLPTrainer:
         """Save model checkpoint."""
         if self.model is None:
             raise ValueError("No model to save")
-        
+
         torch.save({
             'model_state_dict': self.model.state_dict(),
             'hidden_dim': self.hidden_dim,
-            'n_judges': self.model.fc1.in_features
+            'n_features': self.model.fc1.in_features  # Number of input features
         }, path)
         logger.info(f"Model saved to {path}")
-    
+
     def load_model(self, path: Path):
         """Load model checkpoint."""
         checkpoint = torch.load(path, map_location=self.device)
+        # Support both old 'n_judges' key and new 'n_features' key
+        n_features = checkpoint.get('n_features', checkpoint.get('n_judges', 10))
         self.model = SingleLayerMLP(
-            n_judges=checkpoint['n_judges'],
+            n_features=n_features,
             hidden_dim=checkpoint['hidden_dim']
         ).to(self.device)
         self.model.load_state_dict(checkpoint['model_state_dict'])
@@ -494,7 +449,9 @@ def plot_partial_dependence(
                 fontsize=10, verticalalignment='top', horizontalalignment='right',
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
         
-        ax.set_title(f'{FEATURE_LABELS[feature_idx]}', fontsize=10)
+        # Get feature name from GAM model
+        feature_name = gam_model.feature_names[feature_idx] if feature_idx < len(gam_model.feature_names) else f'Feature {feature_idx}'
+        ax.set_title(f'{feature_name}', fontsize=10)
         ax.set_xlabel('Judge Score')
         ax.set_ylabel('Effect on Prediction')
         ax.grid(True, alpha=0.3)
@@ -518,58 +475,83 @@ def plot_partial_dependence(
 
 def load_and_prepare_data(
     data_path: Path,
-    human_score_col: str = 'human_score',
+    target_col: str = 'target',
     judge_scores_col: str = 'judge_scores'
 ) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
     """
     Load and prepare data for training.
-    
+
+    REQUIRES standardized format with 'target' and 'judge_scores' columns.
+    Use dataset standardization utilities to convert old formats first.
+
     Args:
         data_path: Path to pickle file with data
-        human_score_col: Column name for human scores
-        judge_scores_col: Column name for judge scores
-        
+        target_col: Column name for target scores (default: 'target')
+        judge_scores_col: Column name for judge scores (default: 'judge_scores')
+
     Returns:
         Tuple of (dataframe, X features, y labels)
+
+    Raises:
+        ValueError: If required columns are missing or data format is invalid
     """
     logger.info(f"Loading data from {data_path}")
-    
+
     with open(data_path, 'rb') as f:
         data = pickle.load(f)
-    
+
     # Convert to DataFrame if needed
     if not isinstance(data, pd.DataFrame):
         data = pd.DataFrame(data)
-    
-    # Handle different data formats
-    if 'human_feedback' in data.columns and human_score_col not in data.columns:
-        # Extract score from human_feedback dict
-        data[human_score_col] = data['human_feedback'].apply(
-            lambda x: x['score'] if isinstance(x, dict) and 'score' in x else None
+
+    # Validate standardized format - no auto-detection
+    required_columns = [target_col, judge_scores_col]
+    missing_columns = [col for col in required_columns if col not in data.columns]
+
+    if missing_columns:
+        raise ValueError(
+            f"Data must be in standardized format with columns: {required_columns}. "
+            f"Missing columns: {missing_columns}. "
+            f"Available columns: {data.columns.tolist()}. "
+            f"Use dataset standardization utilities to convert old formats first."
         )
-    
-    # Filter valid data
-    data = data[data[human_score_col].notna()]
-    
-    # Extract features and labels
-    if judge_scores_col in data.columns:
-        # Judge scores are in a single column as lists
-        X = np.array(data[judge_scores_col].tolist())
-    elif 'scores' in data.columns:
-        # Alternative naming
-        X = np.array(data['scores'].tolist())
-    else:
-        # Look for individual score columns
-        score_cols = [col for col in data.columns if col.startswith('score_')]
-        if score_cols:
-            X = data[score_cols].values
-        else:
-            raise ValueError(f"Could not find judge scores in data. Available columns: {data.columns.tolist()}")
-    
-    y = data[human_score_col].values
-    
+
+    logger.info(f"Using standardized format: target='{target_col}', judge_scores='{judge_scores_col}'")
+
+    # Validate target column has numeric data
+    if not pd.api.types.is_numeric_dtype(data[target_col]):
+        raise ValueError(
+            f"Target column '{target_col}' must contain numeric values. "
+            f"Found dtype: {data[target_col].dtype}"
+        )
+
+    # Filter valid data (remove rows with null targets)
+    initial_count = len(data)
+    data = data[data[target_col].notna()]
+    if len(data) < initial_count:
+        logger.warning(f"Removed {initial_count - len(data)} rows with null target values")
+
+    # Extract features (judge scores)
+    if not isinstance(data[judge_scores_col].iloc[0], (list, np.ndarray)):
+        raise ValueError(
+            f"Judge scores column '{judge_scores_col}' must contain lists or arrays of scores. "
+            f"Found type: {type(data[judge_scores_col].iloc[0])}"
+        )
+
+    X = np.array(data[judge_scores_col].tolist())
+
+    # Validate judge scores shape
+    if X.ndim != 2:
+        raise ValueError(
+            f"Judge scores must be 2D array (n_samples, n_judges). "
+            f"Found shape: {X.shape}"
+        )
+
+    # Extract labels (target scores)
+    y = data[target_col].values
+
     logger.info(f"Loaded {len(data)} samples with {X.shape[1]} features")
-    
+
     return data, X, y
 
 
