@@ -243,8 +243,8 @@ Rate the answer as you see fit and output the JSON object above."""
     async def simulate_dataset(
         self,
         data: pd.DataFrame,
-        question_col: str = "instruction",
-        answer_col: str = "answer",
+        question_col: str = 'question',
+        answer_col: str = 'response',
         concurrency: int = DEFAULT_CONCURRENCY,
         checkpoint_interval: int = DEFAULT_CHECKPOINT_INTERVAL,
         checkpoint_dir: Optional[Path] = None,
@@ -252,19 +252,41 @@ Rate the answer as you see fit and output the JSON object above."""
     ) -> pd.DataFrame:
         """
         Simulate human feedback for an entire dataset.
-        
+
+        REQUIRES standardized format with 'question' and 'response' columns.
+        Use dataset standardization utilities to convert old formats first.
+        Fills 'target' column with average persona score.
+
         Args:
-            data: DataFrame with questions and answers
-            question_col: Column name for questions
-            answer_col: Column name for answers
+            data: DataFrame with questions and answers in standardized format
+            question_col: Column name for questions (default: 'question')
+            answer_col: Column name for answers (default: 'response')
             concurrency: Number of concurrent requests
             checkpoint_interval: Save checkpoint every N samples
             checkpoint_dir: Directory for checkpoint files
             resume_from: Resume from specific index
-            
+
         Returns:
-            DataFrame with human feedback added
+            DataFrame with persona feedback added
         """
+        # Validate standardized format
+        if question_col is None:
+            question_col = 'question'
+
+        if answer_col is None:
+            answer_col = 'response'
+
+        # Check required columns exist
+        missing = [col for col in [question_col, answer_col] if col not in data.columns]
+        if missing:
+            raise ValueError(
+                f"Data missing required columns: {missing}. "
+                f"Standardized format requires 'question' and 'response' columns. "
+                f"Available columns: {data.columns.tolist()}. "
+                f"Use dataset standardization utilities to convert old formats first."
+            )
+
+        logger.info(f"Using columns: question={question_col}, answer={answer_col}")
         if checkpoint_dir:
             checkpoint_dir = Path(checkpoint_dir)
             checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -318,6 +340,26 @@ Rate the answer as you see fit and output the JSON object above."""
         
         # Add results to dataframe
         data['human_feedback'] = results
+
+        # Extract target scores (average persona scores) for model training
+        target_scores = []
+        for result in results:
+            if result and 'score' in result:
+                target_scores.append(result['score'])
+            elif result and 'average_score' in result:
+                target_scores.append(result['average_score'])
+            else:
+                target_scores.append(None)
+
+        data['target'] = target_scores
+
+        # Set target metadata if not already present
+        if 'target_type' not in data.columns or data['target_type'].isna().all():
+            data['target_type'] = 'persona'
+        if 'target_score_range' not in data.columns or data['target_score_range'].isna().all():
+            data['target_score_range'] = [(1.0, 10.0)] * len(data)
+
+        logger.info(f"Added persona feedback and target scores to {len(data)} samples")
         return data
 
 
