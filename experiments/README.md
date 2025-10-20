@@ -1,163 +1,154 @@
 # Experiments Directory
 
-This directory contains all research experiments for the Multi-Judge Interpretability project. Each experiment is self-contained with its own source code, configuration, and results.
+This directory contains all research experiments for the Multi-Judge Interpretability project.
 
-## Experiment Naming Convention
+## Structure
+
+### Fellowship Experiments (Current Phase)
+
+Fellowship experiments are organized by research track:
+
+- **`track1_baseline_performance/`** (PRIMARY - 25% effort)
+  - Validate aggregator performance against baselines
+  - Real human data vs. synthetic personas
+  - See [Track 1 README](track1_baseline_performance/README.md)
+
+- **`track2_judge_interpretability/`** (PRIMARY - 40% effort)
+  - Main research contribution
+  - Which judges matter and why
+  - Cross-task and persona-specific analysis
+  - See [Track 2 README](track2_judge_interpretability/README.md)
+
+- **`track3_automated_selection/`** (SECONDARY - 15% effort)
+  - Systematic judge selection pipeline
+  - Generalizable heuristics
+  - See [Track 3 README](track3_automated_selection/README.md)
+
+- **`track4_aggregator_validation/`** (SECONDARY - 15% effort)
+  - Validate interpretability claims
+  - Synthetic ground truth recovery
+  - See [Track 4 README](track4_aggregator_validation/README.md)
+
+### Workshop Experiments (Completed)
+
+- **`workshop_experiments/`**
+  - Experiments from hackathon and workshop papers
+  - Track 5 (Robustness) experiments completed here
+  - See [Workshop README](workshop_experiments/README.md)
+
+## Research Timeline
+
+**Phase 1** (Dec 2024): Hackathon - 2nd place at Apart x Martian
+**Phase 2** (Early 2025): Workshop papers accepted to 2 venues
+**Phase 3** (Current): Fellowship - Full paper development
+
+Target: ICML submission (Jan 2025 deadline TBD)
+
+## Track Dependencies
 
 ```
-[track]_[id]_[descriptive_name]/
+Track 1.1 (Persona Data)
+    ↓
+Track 2.3 (Persona Variation)
+
+Track 1.3 (JUDGE-BENCH)
+    ↓
+Track 2.2 (Cross-Task Heatmap)
+
+Track 2 (All) → Judge Importance Rankings
+    ↓
+Track 3 (Automated Selection)
+
+Track 1 + Track 2
+    ↓
+Track 4 (Validation)
 ```
 
-Examples:
-- `1a_judge_contamination/` - Track 1, Experiment A
-- `1b_persona_poisoning/` - Track 1, Experiment B
-- `2_ultrafeedback_validation/` - Track 2, Main experiment
-- `3_moj_comparison/` - Track 3, Mixture of Judges comparison
-- `4_interpretability/` - Track 4, Interpretability analysis
+## Experiment Structure
 
-## Standard Experiment Structure
-
-Each experiment follows this structure:
+Each fellowship experiment follows this structure:
 
 ```
-experiment_folder/
-├── src/                    # Experiment-specific source code
-│   ├── main_logic.py      # Core experiment implementation
-│   └── utils.py           # Helper functions
-├── configs/               # Configuration files
-│   └── default_config.yaml
-├── results/               # Output directory (auto-created)
-│   ├── models/           # Trained models
-│   ├── data/             # Generated datasets
-│   └── reports/          # Analysis reports
-├── run_experiment.py      # Main entry point
-└── README.md             # Experiment documentation
+track{N}_{name}/{X}.{Y}_{experiment}/
+├── README.md              # Detailed methodology
+├── run_experiment.py      # Execution script
+├── config.yaml            # Optional configuration (can use programmatic config)
+├── data/                  # Experiment-specific data
+└── results/               # Outputs, figures, tables
 ```
 
-## Creating a New Experiment
+## Quick Start
 
-1. **Copy the template**:
-   ```bash
-   cp -r experiments/experiment_template experiments/[your_experiment_name]
-   ```
-
-2. **Update the runner**:
-   - Edit `run_experiment.py` with your experiment logic
-   - Update the docstring and experiment name
-
-3. **Add source files**:
-   - Place experiment-specific code in `src/`
-   - Import pipeline components as needed
-
-4. **Configure**:
-   - Edit `configs/default_config.yaml`
-   - Add experiment-specific parameters
-
-5. **Document**:
-   - Update the README.md with experiment details
-   - Include expected results and research questions
-
-## Experiment Tracks (from APART Proposal)
-
-### Track 1: Robustness Analysis (Priority)
-- **1a_judge_contamination**: Test with deliberately flawed judges
-- **1b_persona_poisoning**: Include troll personas in training ✅
-- **1c_rubric_sensitivity**: Evaluate semantic robustness
-
-### Track 2: Ground Truth Validation (Priority)
-- **2_ultrafeedback_validation**: Use UltraFeedback multi-dimensional ratings
-
-### Track 3: Architectural Comparisons (Secondary)
-- **3_moj_comparison**: Compare against Mixture of Judges
-- **3b_self_bias**: Test if LLM judges favor same model family
-
-### Track 4: Interpretability Deep Dive (Secondary)
-- **4_interpretability**: Systematic interpretability analysis
-- **4b_distillation**: Sparse additive model distillation
-
-## Running Experiments
-
-### Quick Test Mode
-Most experiments support a `--quick` flag for rapid testing:
+### Running a Fellowship Experiment
 
 ```bash
-cd experiments/1b_persona_poisoning
-python run_experiment.py --data ../../dataset/data_with_judge_scores.pkl --quick
+# Navigate to specific experiment
+cd experiments/track1_baseline_performance/1.1_persona_synthetic/
+
+# Read methodology
+cat README.md
+
+# Run experiment
+python run_experiment.py
+
+# Results saved to results/ directory
 ```
 
-### Full Experiment
-Run without `--quick` for complete analysis:
+### Creating a New Experiment
 
-```bash
-python run_experiment.py --data ../../dataset/data_with_judge_scores.pkl
-```
+1. Create directory: `experiments/track{N}_{name}/{X}.{Y}_{experiment}/`
+2. Write `README.md` with methodology (see track READMEs for templates)
+3. Implement `run_experiment.py` (can import from `pipeline/` and `analysis/`)
+4. Create git branch: `experiment/{track}.{number}-{short-name}`
+5. Create GitHub issue for tracking
 
-### With Custom Config
-Use a specific configuration:
+## Configuration System
 
-```bash
-python run_experiment.py --data ../../dataset/data_with_judge_scores.pkl --config configs/custom.yaml
-```
-
-## Accessing Pipeline Components
-
-All experiments can import the core pipeline:
+Fellowship experiments use the new flexible configuration system:
 
 ```python
-from pipeline.core.aggregator_training import train_model
+from pipeline.config import ExperimentConfig, JudgeConfig
+from pipeline.core.dataset_loader import DatasetLoader
 from pipeline.core.judge_evaluation import JudgeEvaluator
-from pipeline.utils.data_merger import DataMerger
+
+# Load or create config
+config = ExperimentConfig.from_yaml("config.yaml")
+# Or: config = create_default_config(name="my-experiment", dataset="ultrafeedback")
+
+# Load dataset (automatically standardized)
+loader = DatasetLoader()
+data = loader.load(config.dataset, **config.dataset_kwargs)
+
+# Evaluate with judges
+evaluator = JudgeEvaluator(judge_ids=config.judges.judge_ids)
+data = evaluator.evaluate_dataset(data)
+
+# Train models
+# ... (see REFACTORING_GUIDE.md for details)
 ```
 
-## Results Organization
+See `docs/REFACTORING_GUIDE.md` for full configuration system documentation.
 
-Results are saved in each experiment's `results/` directory:
+## Key Datasets
 
-```
-results/
-├── [timestamp]_results.json    # Raw experimental data
-├── experiment_report.md        # Human-readable report
-├── models/                     # Trained models
-├── plots/                      # Generated visualizations
-└── data/                       # Intermediate datasets
-```
+**UltraFeedback** (Track 1.1, 2.3, 4.2):
+- 2000 samples from workshop
+- Synthetic persona annotations (8 personas)
+- Question-answer pairs with preference scores
 
-## Best Practices
+**JUDGE-BENCH** (Track 1.3, 2.2):
+- 20 NLP tasks with real human annotations
+- External dataset, need to define task subsets
+- Used for cross-task generalization
 
-1. **Self-Contained**: Each experiment should be runnable independently
-2. **Reproducible**: Use fixed random seeds and save configurations
-3. **Well-Documented**: Include clear README with research questions
-4. **Pipeline Integration**: Reuse core components, don't duplicate
-5. **Version Control**: Commit experiment code before running
-6. **Results Tracking**: Save all outputs with timestamps
+**MAJ-Eval** (Track 1.2):
+- Multi-agent debate benchmark
+- Have their code for comparison
+- Head-to-head baseline validation
 
-## Current Experiments Status
+## Related Documentation
 
-| Experiment | Status | Priority | Key Finding |
-|------------|--------|----------|-------------|
-| 1b_persona_poisoning | ✅ Ready | High | Tests robustness to troll feedback |
-| 1a_judge_contamination | 🔄 Planned | High | - |
-| 2_ultrafeedback_validation | 🔄 Planned | High | - |
-| 3_moj_comparison | 📝 Design | Medium | - |
-| 4_interpretability | 📝 Design | Low | - |
-
-## Dependencies
-
-All experiments share common dependencies:
-- Core pipeline (`pipeline/`)
-- Shared datasets (`dataset/`)
-- Common models (`models/`)
-
-Experiment-specific dependencies should be documented in each experiment's README.
-
-## Contributing New Experiments
-
-1. Follow the standard structure
-2. Document research questions clearly
-3. Include expected results
-4. Add to the experiments table above
-5. Test with `--quick` mode first
-
-## Paper Integration
-
-Results from these experiments will be synthesized for the NeurIPS Interpretability Workshop submission (deadline: August 22, 2025).
+- `docs/methodology_proposals.md` - Detailed track descriptions and research questions
+- `docs/REFACTORING_GUIDE.md` - Configuration system and migration guide
+- `CLAUDE.md` - Project overview and quick start
+- `docs/literature_review.md` - Related work catalog
