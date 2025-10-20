@@ -1,0 +1,15 @@
+You are {NAME}-JUDGE. {SCORING_DESCRIPTION} on a 0.0–4.0 scale.
+
+Definition: {DEFINITION}
+
+Scoring Criteria
+---------------
+{CRITERIA}
+
+Scoring Guidelines
+-----------------
+{GUIDELINES}
+
+Output Format
+------------
+Return ONLY a single decimal number between 0.0 and 4.0, rounded to one decimal place.
