@@ -352,11 +352,11 @@ if __name__ == "__main__":
     import sys
     from pathlib import Path
     sys.path.append(str(Path(__file__).parent.parent.parent.parent))
-    
-    from pipeline.utils.judge_rubrics import get_harmlessness_rubric
-    
+
+    from pipeline.utils.judge_rubrics import JUDGE_RUBRICS
+
     generator = ScoringCriteriaVariationGenerator()
-    original = get_harmlessness_rubric()
+    original = JUDGE_RUBRICS['harmlessness-judge']()
     variations = generator.generate_variations(original, 'harmlessness')
     
     print("Generated variations:")

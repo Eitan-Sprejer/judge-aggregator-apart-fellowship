@@ -19,7 +19,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root))
 
-from pipeline.core.aggregator_training import GAMAggregator, MLPTrainer, compute_metrics, load_training_config, determine_training_scale
+from pipeline.core.aggregator_training import GAMAggregator, MLPTrainer, compute_metrics
 
 
 def calculate_variance_stats(X: np.ndarray, y: np.ndarray) -> Dict[str, float]:
@@ -185,18 +185,20 @@ def train_mlp_baseline_config(
         X_test = scaler.transform(X_test)
     
     try:
-        # Load training config and determine scale
-        training_config = load_training_config()
-        scale = determine_training_scale(len(X_train))
-        mlp_config = training_config["mlp_training"].get(scale, training_config["mlp_training"]["medium_scale"])
-        
+        # Use default MLP parameters
+        hidden_dim = 64
+        learning_rate = 0.005
+        batch_size = 16
+        n_epochs = 100
+        early_stopping_patience = 15
+
         # Train MLP with baseline configuration
         mlp_trainer = MLPTrainer(
-            hidden_dim=mlp_config["hidden_dim"],
-            learning_rate=mlp_config["learning_rate"],
-            batch_size=min(mlp_config["batch_size"], max(2, len(X_train) // 2)),
-            n_epochs=mlp_config["n_epochs"],
-            early_stopping_patience=mlp_config.get("early_stopping_patience", 15)
+            hidden_dim=hidden_dim,
+            learning_rate=learning_rate,
+            batch_size=min(batch_size, max(2, len(X_train) // 2)),
+            n_epochs=n_epochs,
+            early_stopping_patience=early_stopping_patience
         )
         
         # Train with early stopping using validation set
@@ -229,8 +231,11 @@ def train_mlp_baseline_config(
             'train_losses': train_losses,
             'val_losses': val_losses,
             'config': {
-                **mlp_config,
-                'scale': scale,
+                'hidden_dim': hidden_dim,
+                'learning_rate': learning_rate,
+                'batch_size': batch_size,
+                'n_epochs': n_epochs,
+                'early_stopping_patience': early_stopping_patience,
                 'normalize': normalize,
                 'test_size': test_size,
                 'random_seed': random_seed

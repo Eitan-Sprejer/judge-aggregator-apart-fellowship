@@ -21,7 +21,7 @@ import seaborn as sns
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 
 # Import training components
-from pipeline.core.aggregator_training import MLPTrainer, GAMAggregator, load_training_config, determine_training_scale
+from pipeline.core.aggregator_training import MLPTrainer, GAMAggregator
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -74,10 +74,7 @@ class RobustnessAnalyzer:
         
         # Parse judge variants
         self.variant_groups = self._parse_variant_groups()
-        
-        # Load training configuration
-        self.training_config = load_training_config()
-        
+
         # Storage for trained models per variant
         self.trained_models = {}
     
@@ -212,36 +209,34 @@ class RobustnessAnalyzer:
             
             logger.info(f"Training {self.model_type} model for variant '{variant_name}' "
                        f"with {len(X_train)} training and {len(X_val)} validation samples")
-            
+
             if self.model_type == 'mlp':
-                # Determine training scale and config
-                scale = determine_training_scale(len(X_train))
-                mlp_config = self.training_config["mlp_training"].get(
-                    scale, self.training_config["mlp_training"]["medium_scale"]
-                )
-                
+                # Use default MLP parameters
+                hidden_dim = 64
+                learning_rate = 0.005
+                batch_size = 16
+                n_epochs = 100
+
                 # Create and train MLP
                 trainer = MLPTrainer(
-                    hidden_dim=mlp_config["hidden_dim"],
-                    learning_rate=mlp_config["learning_rate"],
-                    batch_size=min(mlp_config["batch_size"], max(2, len(X_train) // 2)),
-                    n_epochs=mlp_config["n_epochs"]
+                    hidden_dim=hidden_dim,
+                    learning_rate=learning_rate,
+                    batch_size=min(batch_size, max(2, len(X_train) // 2)),
+                    n_epochs=n_epochs
                 )
-                
+
                 train_losses, val_losses = trainer.fit(X_train, y_train, X_val, y_val)
                 logger.info(f"MLP training completed for {variant_name}, final val loss: {val_losses[-1]:.4f}")
                 return trainer
-                
+
             elif self.model_type == 'gam':
-                # Create and train GAM
-                gam_config = self.training_config.get("gam_training", {
-                    "n_splines": 10,
-                    "lam": 0.6
-                })
-                
+                # Use default GAM parameters
+                n_splines = 10
+                lam = 0.6
+
                 model = GAMAggregator(
-                    n_splines=gam_config["n_splines"],
-                    lam=gam_config["lam"]
+                    n_splines=n_splines,
+                    lam=lam
                 )
                 
                 model.fit(X_train, y_train)

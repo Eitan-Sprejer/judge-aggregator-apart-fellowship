@@ -4,6 +4,8 @@ The main document's methodology section has a broad range of different ideas for
 
 This document serves the purpose of proposing more narrowed-down and cohesive methodology proposals. In other words, this is a filtered version of the methodology section as it stands today.
 
+**Fellowship Focus**: We are focusing on **Tracks 1-4** for the fellowship stage. Track 5 (Robustness) was mostly completed for the workshop paper, and Track 6 (Architecture) is future work.
+
 # Eitan:
 
 As discussed, I think we all agree that the main novelties from our approach are:

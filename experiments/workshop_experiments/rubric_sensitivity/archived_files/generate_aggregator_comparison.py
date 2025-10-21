@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Import training components
-from pipeline.core.aggregator_training import MLPTrainer, load_training_config, determine_training_scale
+from pipeline.core.aggregator_training import MLPTrainer
 
 
 def train_aggregator_for_variant(scores_df, variant_cols, ground_truth, variant_name):
@@ -44,17 +44,18 @@ def train_aggregator_for_variant(scores_df, variant_cols, ground_truth, variant_
     # Train/test split
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Load config and train
-    config = load_training_config()
-    scale = determine_training_scale(len(X_train))
-    mlp_config = config["mlp_training"].get(scale, config["mlp_training"]["medium_scale"])
-    
+
+    # Use default MLP parameters
+    hidden_dim = 64
+    learning_rate = 0.005
+    batch_size = 16
+    n_epochs = 100
+
     trainer = MLPTrainer(
-        hidden_dim=mlp_config["hidden_dim"],
-        learning_rate=mlp_config["learning_rate"],
-        batch_size=min(mlp_config["batch_size"], max(2, len(X_train) // 2)),
-        n_epochs=mlp_config["n_epochs"]
+        hidden_dim=hidden_dim,
+        learning_rate=learning_rate,
+        batch_size=min(batch_size, max(2, len(X_train) // 2)),
+        n_epochs=n_epochs
     )
     
     try:

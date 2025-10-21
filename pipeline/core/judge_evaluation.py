@@ -1,8 +1,10 @@
 """
 Judge Evaluation Pipeline
 
-Evaluates question-answer pairs using the 10 specialized judges.
+Evaluates question-response pairs using configurable sets of specialized judges.
 Handles parallel evaluation, rate limiting, and checkpoint saving.
+
+Now supports dynamic judge selection for fellowship experiments.
 """
 
 import logging
@@ -26,56 +28,65 @@ from pipeline.utils.judge_rubrics import JUDGE_RUBRICS
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Judge IDs
-JUDGE_IDS = list(JUDGE_RUBRICS.keys())
-
 # Default configuration
 DEFAULT_MAX_WORKERS = 10  # Use all judges in parallel for true speedup
 DEFAULT_CHECKPOINT_INTERVAL = 100
 DEFAULT_MAX_RETRIES = 5
 DEFAULT_INITIAL_DELAY = 1.0
 
+# Default judge set (all 10 judges for backward compatibility)
+DEFAULT_JUDGE_IDS = list(JUDGE_RUBRICS.keys())
+
 
 class JudgeEvaluator:
-    """Handles evaluation of Q&A pairs using multiple judges."""
-    
-    def __init__(self, config_path: Optional[str] = None):
+    """Handles evaluation of Q&A pairs using configurable sets of judges."""
+
+    def __init__(
+        self,
+        judge_ids: Optional[List[str]] = None,
+        config_path: Optional[str] = None
+    ):
         """
         Initialize the evaluator with Martian API client.
-        
+
         Args:
+            judge_ids: List of Martian judge IDs to use (None = use all 10 judges)
             config_path: Optional path to configuration file
         """
+        # Set judge IDs (use all 10 if not specified)
+        self.judge_ids = judge_ids if judge_ids is not None else DEFAULT_JUDGE_IDS
+        logger.info(f"Initializing evaluator with {len(self.judge_ids)} judges")
+
         # Load configuration
         if config_path:
             logger.info(f"Loading config from {config_path}")
             config = utils.load_config()  # TODO: implement custom config loading
         else:
             config = utils.load_config()
-        
+
         # Initialize client
         self.client = martian_client.MartianClient(
             api_url=config.api_url,
             api_key=config.api_key,
         )
-        
+
         # Load judges
         self.judges = self._load_judges()
         
     def _load_judges(self) -> Dict[str, Any]:
-        """Load all judges from the Martian API."""
+        """Load configured judges from the Martian API."""
         judges = {}
-        for judge_id in JUDGE_IDS:
+        for judge_id in self.judge_ids:
             try:
                 judge = self.client.judges.get(judge_id=judge_id)
                 judges[judge_id] = judge
                 logger.info(f"✅ Loaded judge {judge_id}")
             except Exception as e:
                 logger.error(f"❌ Failed to load judge {judge_id}: {e}")
-        
-        if len(judges) != len(JUDGE_IDS):
-            logger.warning(f"Only loaded {len(judges)}/{len(JUDGE_IDS)} judges")
-        
+
+        if len(judges) != len(self.judge_ids):
+            logger.warning(f"Only loaded {len(judges)}/{len(self.judge_ids)} judges")
+
         return judges
     
     def evaluate_single(self, question: str, answer: str, judge_id: str) -> float:
@@ -137,18 +148,18 @@ class JudgeEvaluator:
     ) -> Tuple[int, float]:
         """
         Evaluate with exponential backoff on failure.
-        
+
         Args:
             args: Tuple of (question, answer, judge_id)
             max_retries: Maximum number of retry attempts
             initial_delay: Initial delay in seconds
-            
+
         Returns:
             Tuple of (judge_index, score)
         """
         question, answer, judge_id = args
-        judge_index = JUDGE_IDS.index(judge_id)
-        
+        judge_index = self.judge_ids.index(judge_id)
+
         delay = initial_delay
         for attempt in range(max_retries):
             try:
@@ -161,7 +172,7 @@ class JudgeEvaluator:
                 logger.warning(f"Attempt {attempt + 1} failed for {judge_id}, retrying in {delay}s...")
                 time.sleep(delay)
                 delay *= 2
-        
+
         # Should not reach here
         raise RuntimeError(f"Failed to evaluate with {judge_id}")
     
@@ -172,29 +183,29 @@ class JudgeEvaluator:
         max_workers: Optional[int] = None
     ) -> List[float]:
         """
-        Evaluate a Q&A pair with all judges in parallel.
-        
+        Evaluate a Q&A pair with all configured judges in parallel.
+
         Args:
             question: The user's question/instruction
             answer: The model's response
             max_workers: Number of parallel workers
-            
+
         Returns:
             List of scores in judge order
         """
         import time
         from concurrent.futures import as_completed
-        
+
         start_time = time.time()
-        
-        scores = [0.0] * len(JUDGE_IDS)
-        eval_args = [(question, answer, judge_id) for judge_id in JUDGE_IDS]
-        
+
+        scores = [0.0] * len(self.judge_ids)
+        eval_args = [(question, answer, judge_id) for judge_id in self.judge_ids]
+
         # Use submit() and as_completed() for true parallel execution
-        with ThreadPoolExecutor(max_workers=max_workers or DEFAULT_MAX_WORKERS) as executor:
+        with ThreadPoolExecutor(max_workers=max_workers or min(len(self.judge_ids), DEFAULT_MAX_WORKERS)) as executor:
             # Submit all tasks simultaneously
             future_to_args = {executor.submit(self._evaluate_with_retry, args): args for args in eval_args}
-            
+
             # Collect results as they complete (not in order)
             for future in as_completed(future_to_args):
                 try:
@@ -204,17 +215,17 @@ class JudgeEvaluator:
                     args = future_to_args[future]
                     logger.error(f"Failed to evaluate with {args[2]}: {e}")
                     # Keep default score of 0.0 for failed judges
-        
+
         elapsed = time.time() - start_time
-        logger.info(f"Parallel evaluation took {elapsed:.2f}s for {len(JUDGE_IDS)} judges")
-        
+        logger.info(f"Parallel evaluation took {elapsed:.2f}s for {len(self.judge_ids)} judges")
+
         return scores
     
     def evaluate_dataset(
         self,
         data: pd.DataFrame,
-        question_col: str = "instruction",
-        answer_col: str = "answer",
+        question_col: str = 'question',
+        answer_col: str = 'response',
         output_path: Optional[Path] = None,
         checkpoint_dir: Optional[Path] = None,
         checkpoint_interval: int = DEFAULT_CHECKPOINT_INTERVAL,
@@ -222,21 +233,42 @@ class JudgeEvaluator:
         resume_from: Optional[int] = None
     ) -> pd.DataFrame:
         """
-        Evaluate an entire dataset with all judges.
-        
+        Evaluate an entire dataset with all configured judges.
+
+        REQUIRES standardized format with 'question' and 'response' columns.
+        Use dataset standardization utilities to convert old formats first.
+
         Args:
-            data: DataFrame with questions and answers
-            question_col: Name of question column
-            answer_col: Name of answer column
+            data: DataFrame with questions and answers in standardized format
+            question_col: Name of question column (default: 'question')
+            answer_col: Name of answer column (default: 'response')
             output_path: Path to save final results
             checkpoint_dir: Directory for checkpoint files
             checkpoint_interval: Save checkpoint every N rows
             max_workers: Number of parallel workers
             resume_from: Resume from specific row index
-            
+
         Returns:
             DataFrame with judge scores added
         """
+        # Validate standardized format
+        if question_col is None:
+            question_col = 'question'
+
+        if answer_col is None:
+            answer_col = 'response'
+
+        # Check required columns exist
+        missing = [col for col in [question_col, answer_col] if col not in data.columns]
+        if missing:
+            raise ValueError(
+                f"Data missing required columns: {missing}. "
+                f"Standardized format requires 'question' and 'response' columns. "
+                f"Available columns: {data.columns.tolist()}. "
+                f"Use dataset standardization utilities to convert old formats first."
+            )
+
+        logger.info(f"Using columns: question={question_col}, answer={answer_col}")
         if checkpoint_dir:
             checkpoint_dir = Path(checkpoint_dir)
             checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -363,9 +395,10 @@ def main():
     
     # Print summary statistics
     if 'judge_scores' in results.columns:
-        scores_df = pd.DataFrame(results['judge_scores'].tolist(), columns=JUDGE_IDS)
+        scores_df = pd.DataFrame(results['judge_scores'].tolist(), columns=evaluator.judge_ids)
         print("\nScore Statistics:")
         print(scores_df.describe())
+        print(f"\nUsed {len(evaluator.judge_ids)} judges: {', '.join(evaluator.judge_ids[:3])}{'...' if len(evaluator.judge_ids) > 3 else ''}")
 
 
 if __name__ == "__main__":

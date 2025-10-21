@@ -33,8 +33,9 @@ except ImportError:
     exit(1)
 
 # Import project modules
-from pipeline.core.aggregator_training import GAMAggregator, compute_metrics, FEATURE_LABELS
+from pipeline.core.aggregator_training import GAMAggregator, compute_metrics
 from pipeline.core.persona_simulation import PERSONAS
+from pipeline.config import DEFAULT_10_JUDGES
 
 
 class GAMHyperparameterTuner:
@@ -47,7 +48,8 @@ class GAMHyperparameterTuner:
         experiment_data_path: str,
         output_dir: str = "gam_hyperparameter_tuning_results",
         test_size: float = 0.2,
-        random_seed: int = 42
+        random_seed: int = 42,
+        feature_names: Optional[List[str]] = None
     ):
         self.experiment_data_path = experiment_data_path
         self.output_dir = Path(output_dir) if not str(output_dir).startswith("results/") else Path(output_dir)
@@ -56,17 +58,20 @@ class GAMHyperparameterTuner:
             self.output_dir = Path("results/gam_hyperparameter_search")
         self.test_size = test_size
         self.random_seed = random_seed
-        
+        self.feature_names = feature_names if feature_names is not None else DEFAULT_10_JUDGES.judge_names
+        self.n_features = len(self.feature_names)
+
         # Set random seeds
         random.seed(random_seed)
         np.random.seed(random_seed)
-        
+
         # Create output directory
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.run_dir = self.output_dir / f"gam_tuning_run_{timestamp}"
         self.run_dir.mkdir(parents=True, exist_ok=True)
-        
+
         print(f"🔧 GAM hyperparameter tuning output: {self.run_dir}")
+        print(f"📊 Using {self.n_features} judges: {', '.join(self.feature_names[:3])}{'...' if self.n_features > 3 else ''}")
     
     def load_and_prepare_data(self) -> Tuple[np.ndarray, np.ndarray]:
         """Load data from completed experiment and prepare for GAM training."""
@@ -125,8 +130,8 @@ class GAMHyperparameterTuner:
             
             selected_score = personas_feedback[assigned_persona]['score']
             judge_scores = row['judge_scores']
-            
-            if selected_score is None or len(judge_scores) != 10:
+
+            if selected_score is None or len(judge_scores) != self.n_features:
                 continue
             
             X_list.append(judge_scores)
@@ -189,9 +194,9 @@ class GAMHyperparameterTuner:
         """Create GAM model with specified configuration."""
         # Build terms for each feature
         terms = []
-        
+
         # Add individual spline terms for each judge
-        for i in range(10):  # 10 judges
+        for i in range(self.n_features):
             terms.append(s(i, n_splines=config['n_splines'], lam=config['lam']))
         
         # Add interaction terms if specified
@@ -282,7 +287,7 @@ class GAMHyperparameterTuner:
             try:
                 p_values = gam.statistics_['p_values']
                 feature_importance = {}
-                for i, label in enumerate(FEATURE_LABELS):
+                for i, label in enumerate(self.feature_names):
                     if i < len(p_values):
                         # Convert p-value to importance (lower p-value = higher importance)
                         feature_importance[label] = max(0, 1.0 - p_values[i])
@@ -598,9 +603,9 @@ class GAMHyperparameterTuner:
             return
         
         gam_model = best_result['model']
-        
+
         # Create partial dependence plots for all features
-        n_features = 10
+        n_features = self.n_features
         n_cols = 3
         n_rows = (n_features + n_cols - 1) // n_cols
         
@@ -650,7 +655,7 @@ class GAMHyperparameterTuner:
                         fontsize=10, verticalalignment='top', horizontalalignment='right',
                         bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
                 
-                ax.set_title(f'{FEATURE_LABELS[i]}', fontsize=10)
+                ax.set_title(f'{self.feature_names[i]}', fontsize=10)
                 ax.set_xlabel('Judge Score')
                 ax.set_ylabel('Effect on Prediction')
                 ax.grid(True, alpha=0.3)
@@ -661,7 +666,7 @@ class GAMHyperparameterTuner:
             except Exception as e:
                 ax.text(0.5, 0.5, f'Error: {str(e)}', transform=ax.transAxes,
                        ha='center', va='center')
-                ax.set_title(f'{FEATURE_LABELS[i]} (Error)', fontsize=10)
+                ax.set_title(f'{self.feature_names[i]} (Error)', fontsize=10)
         
         # Hide unused subplots
         for i in range(n_features, len(axes_flat)):

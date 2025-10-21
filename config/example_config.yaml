@@ -1,0 +1,60 @@
+# Example Experiment Configuration
+# This shows the full structure of an experiment config
+
+name: "example-experiment"
+dataset: "ultrafeedback"
+
+dataset_kwargs:
+  n_samples: 2000
+  random_seed: 42
+  with_personas: true
+
+judges:
+  judge_ids:
+    - "truthfulness-judge"
+    - "harmlessness-judge"
+    - "helpfulness-judge"
+    - "honesty-judge"
+    - "explanatory-depth-judge"
+    - "instruction-following-judge"
+    - "clarity-judge"
+    - "conciseness-judge"
+    - "logical-consistency-judge"
+    - "creativity-judge"
+
+  judge_names:
+    - "Truthfulness"
+    - "Harmlessness"
+    - "Helpfulness"
+    - "Honesty"
+    - "Explanatory Depth"
+    - "Instruction Following"
+    - "Clarity"
+    - "Conciseness"
+    - "Logical Consistency"
+    - "Creativity"
+
+  score_range: [0.0, 4.0]
+
+models:
+  train_gam: true
+  train_mlp: true
+  test_size: 0.2
+  val_size: 0.15
+
+  gam:
+    n_splines: 10
+    lam: 0.6
+    max_iter: 100
+
+  mlp:
+    hidden_dim: 64
+    learning_rate: 0.005
+    batch_size: 16
+    n_epochs: 100
+    dropout: 0.0
+    l2_reg: 0.0
+    early_stopping_patience: 15
+    min_delta: 0.0001
+
+random_seed: 42

@@ -36,7 +36,8 @@ class HyperparameterTuner:
         experiment_data_path: str,
         output_dir: str = "hyperparameter_tuning_results",
         test_size: float = 0.2,
-        random_seed: int = 42
+        random_seed: int = 42,
+        n_features: Optional[int] = None
     ):
         self.experiment_data_path = experiment_data_path
         self.output_dir = Path(output_dir) if not str(output_dir).startswith("results/") else Path(output_dir)
@@ -45,16 +46,17 @@ class HyperparameterTuner:
             self.output_dir = Path("results/hyperparameter_tuning")
         self.test_size = test_size
         self.random_seed = random_seed
-        
+        self.n_features = n_features  # Will be set dynamically from data if None
+
         # Set random seeds
         random.seed(random_seed)
         np.random.seed(random_seed)
-        
+
         # Create output directory
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.run_dir = self.output_dir / f"tuning_run_{timestamp}"
         self.run_dir.mkdir(parents=True, exist_ok=True)
-        
+
         print(f"🔧 Hyperparameter tuning output: {self.run_dir}")
     
     def load_experiment_data(self) -> pd.DataFrame:
@@ -102,8 +104,13 @@ class HyperparameterTuner:
             
             selected_score = personas_feedback[assigned_persona]['score']
             judge_scores = row['judge_scores']
-            
-            if selected_score is None or len(judge_scores) != 10:
+
+            # Set n_features dynamically from first sample if not set
+            if self.n_features is None:
+                self.n_features = len(judge_scores)
+                print(f"📊 Detected {self.n_features} features from judge scores")
+
+            if selected_score is None or len(judge_scores) != self.n_features:
                 continue
             
             X_list.append(judge_scores)
