@@ -195,7 +195,7 @@ print(data.columns)
 
 #### `pipeline/core/judge_evaluation.py`
 - **New parameter**: `judge_ids` - list of judges to use
-- **Auto-detection**: Column names (question/instruction, response/answer)
+- **Requires standardized format**: Data must have `question` and `response` columns
 
 **Example**:
 ```python
@@ -206,14 +206,14 @@ evaluator = JudgeEvaluator(
     judge_ids=["truthfulness-judge", "clarity-judge", "helpfulness-judge"]
 )
 
-# Auto-detects column names
-data = evaluator.evaluate_dataset(data)  # Works with both old and new formats
+# Requires standardized format with 'question' and 'response' columns
+data = evaluator.evaluate_dataset(data)
 ```
 
 #### `pipeline/core/aggregator_training.py`
-- **GAM**: Accepts `feature_names` parameter
+- **GAM**: Accepts `feature_names` parameter (defaults to `DEFAULT_10_JUDGES.judge_names`)
 - **MLP**: Uses `n_features` instead of hardcoded `n_judges=10`
-- **Data loading**: Auto-detects target column (target/human_score)
+- **Data loading**: Requires standardized format with `target` and `judge_scores` columns
 
 **Example**:
 ```python
@@ -238,11 +238,11 @@ mlp_trainer.fit(X_train, y_train, X_val, y_val)
 
 ### Migrating Workshop Experiments
 
-Workshop experiments **don't need migration**. They'll be moved to `experiments/workshop_experiments/` and continue using:
-- Old column names (instruction/answer)
-- Hardcoded 10 judges
-- `training_config.json`
-- Legacy `load_training_config()` function
+Workshop experiments have been updated to use the new structure. They're located in `experiments/workshop_experiments/` and now use:
+- Standardized column names (question/response)
+- Config-based judge selection
+- Hardcoded MLP defaults (no config file)
+- Direct imports from `pipeline.config`
 
 ### Creating New Fellowship Experiments
 
@@ -380,27 +380,31 @@ best_gam = tuner.tune(X_train, y_train, X_val, y_val)
 
 ---
 
-## Backward Compatibility
+## Breaking Changes
 
-### What Still Works?
+### What Was Removed?
 
-1. **Workshop experiments**: All code in `experiments/workshop_experiments/`
-2. **Old column names**: Judge evaluator auto-detects instruction/answer
-3. **training_config.json**: Still loaded by legacy function (deprecated)
-4. **run_full_experiment.py**: Updated to use new system with backward compat
+1. **`load_training_config()`**: Deleted - use `ExperimentConfig` or hardcoded defaults
+2. **`training_config.json`**: Deleted - use YAML configs or hardcoded values
+3. **Auto-detection logic**: Removed - data must use standardized column names
+4. **`load_existing_personas()`**: Removed - use `DatasetLoader.load()` instead
+5. **Individual judge getters**: Removed - use `JUDGE_RUBRICS` dictionary
+6. **`DEFAULT_FEATURE_LABELS`**: Removed - use `DEFAULT_10_JUDGES.judge_names`
 
-### What's Deprecated?
+### Migration Required For
 
-1. **`load_training_config()`**: Use `ExperimentConfig` instead
-2. **`training_config.json`**: Use YAML configs
-3. **Hardcoded judge assumptions**: Pass `judge_ids` explicitly
+**Old data with non-standard columns**:
+- Must preprocess to standardized format (`question`, `response`, `target`, `judge_scores`)
+- No auto-detection - data must have exact column names
 
-### What Breaks?
+**Code using removed functions**:
+- Replace `load_training_config()` with hardcoded defaults or config objects
+- Replace `get_*_judge_rubric()` with `JUDGE_RUBRICS['judge-id']()`
+- Replace `load_existing_personas()` with `DatasetLoader.load()`
 
-**If you have custom code that**:
-- Assumes exactly 10 judges → Update to use config.judges.n_judges
-- Hardcodes column names → Use standardized names or auto-detection
-- Relies on specific `FEATURE_LABELS` order → Pass feature_names explicitly
+**Code assuming 10 judges**:
+- Update to use `config.judges.n_judges` dynamically
+- Pass `feature_names` explicitly to GAM
 
 ---
 
@@ -409,8 +413,7 @@ best_gam = tuner.tune(X_train, y_train, X_val, y_val)
 ### Configuration Files
 ```
 config/
-├── example_config.yaml          # NEW: Template for fellowship experiments
-└── training_config.json         # DEPRECATED: For workshop experiments only
+└── example_config.yaml          # Template for fellowship experiments
 ```
 
 ### Pipeline Components
@@ -450,17 +453,17 @@ experiments/
 
 ## Troubleshooting
 
-### "Could not find judge scores in data"
-**Cause**: Data missing 'judge_scores' column
-**Fix**: Run judge evaluation first or check column name
+### "Data missing required columns: ['question', 'response']"
+**Cause**: Data not in standardized format
+**Fix**: Use `DatasetLoader.load()` to preprocess data, or manually rename columns to standardized format
+
+### "Data must have 'target' and 'judge_scores' columns"
+**Cause**: Missing required columns for training
+**Fix**: Run persona simulation (sets 'target') and judge evaluation (sets 'judge_scores') first
 
 ### "Judge names length doesn't match n_features"
 **Cause**: Provided feature_names list doesn't match number of judges
 **Fix**: Ensure config.judges.judge_names has same length as config.judges.judge_ids
-
-### "Could not find target column"
-**Cause**: Data missing target scores
-**Fix**: For UltraFeedback, add `with_personas=True`. For other datasets, ensure preprocessing sets 'target' column.
 
 ### Import errors with `pipeline.config`
 **Cause**: Module not in path
