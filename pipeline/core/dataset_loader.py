@@ -6,11 +6,15 @@ All datasets are preprocessed into a standardized format:
     - question: The input/prompt/instruction
     - response: The model's answer/completion
     - dataset: Source dataset name
-    - target: Optimization target (human/persona score)
-    - target_type: Type of target ('persona', 'human', 'aggregate', etc.)
-    - target_score_range: Tuple (min, max) of target score range
+    - target_human: Dict of human annotation scores by dimension (None if not available)
+                    e.g., {"fluency": 2.0, "population": 1.5} for multi-dimensional
+                    or {"overall": 7.5} for single dimension
+    - target_synthetic: Dict of synthetic/persona scores by dimension (None if not available)
+                        e.g., {"overall": 7.5} for single dimension
+    - score_range_human: Tuple (min, max) for human scores (None if not available)
+    - score_range_synthetic: Tuple (min, max) for synthetic scores (None if not available)
 
-Supports: UltraFeedback, JUDGE-BENCH, MAJ-Eval, and custom datasets.
+Supports: UltraFeedback, JUDGE-BENCH, MAJ-Eval, StorySparkQA, MSLR, and custom datasets.
 """
 
 import logging
@@ -50,12 +54,13 @@ class DatasetLoader:
             - question: The input/prompt
             - response: The model output
             - dataset: Source dataset name
-            - target: Optimization target score (or None if not yet set)
-            - target_type: 'persona', 'human', 'aggregate', etc.
-            - target_score_range: (min, max) tuple
+            - target_human: Human annotation score (None if not available)
+            - target_synthetic: Synthetic/persona score (None if not available)
+            - score_range_human: (min, max) tuple for human scores (None if not available)
+            - score_range_synthetic: (min, max) tuple for synthetic scores (None if not available)
 
         Args:
-            dataset_name: Name of dataset ('ultrafeedback', 'judge_bench', 'maj_eval')
+            dataset_name: Name of dataset ('ultrafeedback', 'judge_bench', 'maj_eval', 'story_spark_qa', 'mslr')
             **kwargs: Dataset-specific arguments
 
         Returns:
@@ -67,6 +72,10 @@ class DatasetLoader:
             return self._preprocess_judge_bench(**kwargs)
         elif dataset_name == 'maj_eval':
             return self._preprocess_maj_eval(**kwargs)
+        elif dataset_name == 'story_spark_qa':
+            return self._preprocess_story_spark_qa(**kwargs)
+        elif dataset_name == 'mslr':
+            return self._preprocess_mslr(**kwargs)
         elif dataset_name == 'custom':
             # For custom datasets, expect user to provide preprocessed data
             if 'data' not in kwargs:
@@ -74,7 +83,7 @@ class DatasetLoader:
             return self._validate_standardized_format(kwargs['data'])
         else:
             raise ValueError(f"Unknown dataset: {dataset_name}. "
-                           f"Supported: ultrafeedback, judge_bench, maj_eval, custom")
+                           f"Supported: ultrafeedback, judge_bench, maj_eval, story_spark_qa, mslr, custom")
     
     def _select_random_completion(self, completions: List[Dict]) -> Optional[Dict]:
         """
@@ -97,20 +106,19 @@ class DatasetLoader:
         self,
         split: str = "train",
         n_samples: Optional[int] = None,
-        random_seed: int = 42,
-        with_personas: bool = False
+        random_seed: int = 42
     ) -> pd.DataFrame:
         """
         Load UltraFeedback and preprocess to standardized format.
 
         UltraFeedback contains instruction-response pairs from various models.
-        Target scores will come from persona simulation (1-10 scale).
+        No human annotations available. Synthetic target scores will be filled
+        by persona simulation later (0-10 scale).
 
         Args:
             split: Dataset split ("train" or "test")
             n_samples: Number of samples (None = all)
             random_seed: Random seed for sampling
-            with_personas: If True, indicates personas will be simulated (sets target_type)
 
         Returns:
             DataFrame in standardized format
@@ -156,9 +164,10 @@ class DatasetLoader:
                     'question': question,
                     'response': response,
                     'dataset': 'ultrafeedback',
-                    'target': None,  # Will be filled by persona simulation
-                    'target_type': 'persona' if with_personas else None,
-                    'target_score_range': (1.0, 10.0),  # Persona scores are 1-10
+                    'target_human': None,  # No human annotations in UltraFeedback
+                    'target_synthetic': None,  # Will be filled by persona simulation
+                    'score_range_human': None,
+                    'score_range_synthetic': (0.0, 10.0),  # Persona scores are 0-10
                     'original_index': i
                 })
 
@@ -223,6 +232,185 @@ class DatasetLoader:
             "This will be added when starting Track 1.2 experiments."
         )
 
+    def _preprocess_story_spark_qa(
+        self,
+        split: str = "train",
+        n_samples: Optional[int] = None,
+        random_seed: int = 42
+    ) -> pd.DataFrame:
+        """
+        Load StorySparkQA and preprocess to standardized format.
+
+        StorySparkQA is a long-form QA dataset from HuggingFace.
+        This will auto-download from HuggingFace when first called.
+
+        Args:
+            split: Dataset split (default: "train")
+            n_samples: Number of samples (None = all)
+            random_seed: Random seed for sampling
+
+        Returns:
+            DataFrame in standardized format
+
+        Note:
+            Used for Track 1.2 (MAJ-Eval comparison experiments).
+        """
+        logger.info(f"Loading StorySparkQA dataset (split: {split})")
+
+        # Auto-download from HuggingFace
+        try:
+            dataset = load_dataset("NEU-HAI/StorySparkQA", split=split, cache_dir=self.cache_dir)
+            logger.info(f"Loaded {len(dataset)} samples from StorySparkQA")
+        except Exception as e:
+            logger.error(f"Failed to load StorySparkQA: {e}")
+            raise
+
+        # Sample if requested
+        if n_samples is not None and n_samples < len(dataset):
+            logger.info(f"Sampling {n_samples} examples from {len(dataset)} total")
+            dataset = dataset.shuffle(seed=random_seed).select(range(n_samples))
+
+        # Process into standardized format
+        processed_data = []
+        for i, item in enumerate(dataset):
+            try:
+                # Extract question and response
+                # Note: Actual field names may differ - adjust as needed when implementing
+                question = item.get('question', item.get('input', ''))
+                response = item.get('response', item.get('output', ''))
+
+                if not question or not response:
+                    logger.warning(f"Sample {i} missing question or response, skipping")
+                    continue
+
+                # Standardized format
+                processed_data.append({
+                    'question': question,
+                    'response': response,
+                    'dataset': 'story_spark_qa',
+                    'target_human': None,  # To be determined by experiment
+                    'target_synthetic': None,  # To be determined by experiment
+                    'score_range_human': None,  # To be determined by experiment
+                    'score_range_synthetic': None,  # To be determined by experiment
+                    'original_index': i
+                })
+
+            except Exception as e:
+                logger.warning(f"Error processing sample {i}: {e}")
+                continue
+
+        logger.info(f"Successfully processed {len(processed_data)} samples")
+
+        # Convert to DataFrame
+        df = pd.DataFrame(processed_data)
+        return df
+
+    def _preprocess_mslr(
+        self,
+        data_file: str = "datasets/mslr-annotated/data/data_with_overlap_scores.json",
+        n_samples: Optional[int] = None,
+        random_seed: int = 42
+    ) -> pd.DataFrame:
+        """
+        Load MSLR annotated dataset and preprocess to standardized format.
+
+        MSLR contains medical literature summarization with human facet annotations.
+        The dataset is manually downloaded from allenai/mslr-annotated-dataset.
+
+        Args:
+            data_file: Path to MSLR data file (default: datasets/mslr-annotated/data/)
+            n_samples: Number of samples (None = all)
+            random_seed: Random seed for sampling
+
+        Returns:
+            DataFrame in standardized format
+
+        Note:
+            Used for Track 1.2 (MAJ-Eval comparison experiments).
+            The data is already included in the repository (see datasets/mslr-annotated/VERSION).
+        """
+        import json
+
+        logger.info(f"Loading MSLR dataset from {data_file}")
+
+        # Load JSONL data (JSON Lines format - one JSON object per line)
+        try:
+            data = []
+            with open(data_file, 'r') as f:
+                for line in f:
+                    if line.strip():  # Skip empty lines
+                        data.append(json.loads(line))
+            logger.info(f"Loaded MSLR data with {len(data)} review entries")
+        except Exception as e:
+            logger.error(f"Failed to load MSLR data: {e}")
+            logger.info(f"Make sure the MSLR dataset exists at {data_file}")
+            logger.info("See datasets/mslr-annotated/VERSION for version information")
+            raise
+
+        # Process into standardized format
+        processed_data = []
+        for review_idx, review in enumerate(data):
+            # Each review has multiple predictions (system outputs)
+            review_id = review.get('review_id', f'review_{review_idx}')
+            target = review.get('target', '')
+
+            for pred_idx, prediction in enumerate(review.get('predictions', [])):
+                try:
+                    # Use review background/question as "question"
+                    # The target summary acts as reference
+                    question = f"Review ID: {review_id}"  # Simplified, may want more context
+                    response = prediction.get('prediction', '')
+
+                    # Extract human annotations if available
+                    annotations = prediction.get('annotations', [])
+                    human_score = None
+                    if annotations:
+                        # Store multi-dimensional facet scores as dict
+                        annot = annotations[0]  # Use first annotation
+                        facets = {
+                            'fluency': annot.get('fluency'),
+                            'population': annot.get('population'),
+                            'intervention': annot.get('intervention'),
+                            'outcome': annot.get('outcome')
+                        }
+                        # Only include if all facets are present
+                        if all(v is not None for v in facets.values()):
+                            human_score = facets
+                        else:
+                            human_score = None
+
+                    if not response:
+                        logger.warning(f"Review {review_idx}, prediction {pred_idx} missing response, skipping")
+                        continue
+
+                    # Standardized format
+                    processed_data.append({
+                        'question': question,
+                        'response': response,
+                        'dataset': 'mslr',
+                        'target_human': human_score,  # Dict of facet scores (0-2 scale each) or None
+                        'target_synthetic': None,  # No synthetic scores in MSLR
+                        'score_range_human': (0.0, 2.0),  # MSLR facets are 0-2 scale
+                        'score_range_synthetic': None,
+                        'original_index': f"{review_idx}_{pred_idx}",
+                        'review_id': review_id,
+                        'system_id': prediction.get('exp_short', 'unknown')
+                    })
+
+                except Exception as e:
+                    logger.warning(f"Error processing review {review_idx}, prediction {pred_idx}: {e}")
+                    continue
+
+        logger.info(f"Successfully processed {len(processed_data)} prediction samples from MSLR")
+
+        # Sample if requested
+        df = pd.DataFrame(processed_data)
+        if n_samples is not None and n_samples < len(df):
+            logger.info(f"Sampling {n_samples} examples from {len(df)} total")
+            df = df.sample(n=n_samples, random_state=random_seed).reset_index(drop=True)
+
+        return df
+
     def _validate_standardized_format(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Validate that DataFrame has required standardized columns.
@@ -236,7 +424,11 @@ class DatasetLoader:
         Raises:
             ValueError: If required columns are missing
         """
-        required_cols = ['question', 'response', 'dataset', 'target', 'target_type', 'target_score_range']
+        required_cols = [
+            'question', 'response', 'dataset',
+            'target_human', 'target_synthetic',
+            'score_range_human', 'score_range_synthetic'
+        ]
         missing = [col for col in required_cols if col not in data.columns]
 
         if missing:
@@ -290,7 +482,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Load and process datasets")
-    parser.add_argument('--dataset', choices=['ultrafeedback', 'judge_bench', 'maj_eval'],
+    parser.add_argument('--dataset', choices=['ultrafeedback', 'judge_bench', 'maj_eval', 'story_spark_qa', 'mslr'],
                         default='ultrafeedback',
                         help='Dataset to load')
     parser.add_argument('--n-samples', type=int, default=100,
@@ -308,8 +500,7 @@ def main():
         data = loader.load(
             dataset_name=args.dataset,
             n_samples=args.n_samples,
-            random_seed=args.random_seed,
-            with_personas=(args.dataset == 'ultrafeedback')  # Add personas for UltraFeedback
+            random_seed=args.random_seed
         )
 
         print(f"\nLoaded {args.dataset} dataset in standardized format:")
@@ -319,12 +510,18 @@ def main():
         print(data.head(3))
 
         # Show target info
-        if 'target_score_range' in data.columns:
-            score_range = data['target_score_range'].iloc[0]
-            target_type = data['target_type'].iloc[0]
-            print(f"\nTarget info:")
-            print(f"  Type: {target_type}")
-            print(f"  Score range: {score_range}")
+        print(f"\nTarget info:")
+        human_range = data['score_range_human'].iloc[0]
+        synthetic_range = data['score_range_synthetic'].iloc[0]
+        has_human = data['target_human'].notna().sum()
+        has_synthetic = data['target_synthetic'].notna().sum()
+
+        print(f"  Human annotations: {has_human}/{len(data)} samples")
+        if human_range:
+            print(f"    Score range: {human_range}")
+        print(f"  Synthetic annotations: {has_synthetic}/{len(data)} samples")
+        if synthetic_range:
+            print(f"    Score range: {synthetic_range}")
 
         if args.output:
             with open(args.output, 'wb') as f:
