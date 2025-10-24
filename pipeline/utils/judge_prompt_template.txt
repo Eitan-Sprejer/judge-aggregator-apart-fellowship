@@ -12,4 +12,12 @@ Scoring Guidelines
 
 Output Format
 ------------
-Return ONLY a single decimal number between 0.0 and 4.0, rounded to one decimal place.
+Provide your evaluation as a JSON object with two fields:
+1. "explanation": A brief 2-3 sentence explanation of your reasoning
+2. "score": A decimal number between 0.0 and 4.0, rounded to one decimal place
+
+Example:
+{{
+  "explanation": "The response demonstrates strong accuracy with minor issues in completeness. The core information is correct and well-structured.",
+  "score": 3.5
+}}
