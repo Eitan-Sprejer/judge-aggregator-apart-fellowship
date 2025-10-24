@@ -20,12 +20,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import argparse
-import itertools
 from scipy import stats
 
 # Import GAM dependencies
 try:
-    from pygam import LinearGAM, s, f, te
+    from pygam import LinearGAM, s
     HAS_GAM = True
 except ImportError:
     HAS_GAM = False
@@ -145,105 +144,56 @@ class GAMHyperparameterTuner:
     
     def define_gam_hyperparameter_grid(self) -> Dict[str, List]:
         """
-        Define comprehensive GAM hyperparameter search grid.
-        
-        Optimized based on analysis showing:
-        - Low lambda (0.1) + high splines (25) perform poorly
-        - Low effective DOF + low splines give better results
+        Define GAM hyperparameter search grid.
+
+        Strategy:
+        - n_splines: Outer loop (controls per-judge curve flexibility)
+        - lambda: Inner loop via PyGAM's gridsearch (controls smoothness)
+        - max_iter, tol: Fixed (optimization params, don't affect model quality)
+
+        Notes:
+        - n_splines applies per judge, so scales automatically with judge count
+        - Lambda search uses PyGAM's optimized gridsearch with GCV objective
         """
         return {
-            # Number of splines per feature (controls complexity)
-            # Reduced range based on effective DOF analysis - lower splines perform better
-            'n_splines': [5, 8, 10, 12, 15],
-            
-            # Lambda regularization (controls smoothness) 
-            # Increased range based on heatmap showing poor performance at lambda=0.1
-            'lam': [2.0, 3.0, 5.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0],
-            
-            # Feature interaction terms (subset of features to interact)
-            # Each tuple represents indices of judges that should interact
-            # Testing 0-3 interaction combinations based on domain knowledge
-            'interaction_features': [
-                [],  # 0 interactions: Independent effects only
-                
-                # 1 interaction pair: Test core safety relationships
-                [(0, 1)],  # Truthfulness & Harmlessness (safety core)
-                [(0, 2)],  # Truthfulness & Helpfulness (quality core)  
-                [(1, 2)],  # Harmlessness & Helpfulness (user benefit)
-                [(6, 7)],  # Clarity & Conciseness (communication)
-                [(8, 9)],  # Logic & Creativity (reasoning style)
-                
-                # 2 interaction pairs: Test domain clusters
-                [(0, 1), (6, 7)],  # Safety + Communication clarity
-                [(0, 2), (8, 9)],  # Core quality + Reasoning depth
-                [(1, 2), (6, 7)],  # User benefit + Clear communication
-                
-                # 3 interaction pairs: Complex multi-domain relationships
-                [(0, 1), (6, 7), (8, 9)],  # Safety + Communication + Reasoning
-            ],
-            
-            # Max iterations for convergence
-            'max_iter': [100, 200, 300],
-            
-            # Tolerance for convergence (balance between precision and training time)
-            # 1e-4 = loose (faster), 1e-6 = tight (slower but more precise)
-            'tol': [1e-4, 1e-5]
-        }
-    
-    def create_gam_model(self, config: Dict) -> LinearGAM:
-        """Create GAM model with specified configuration."""
-        # Build terms for each feature
-        terms = []
+            # Number of splines per judge (controls curve flexibility)
+            'n_splines': [5, 8, 10],
 
-        # Add individual spline terms for each judge
-        for i in range(self.n_features):
-            terms.append(s(i, n_splines=config['n_splines'], lam=config['lam']))
-        
-        # Add interaction terms if specified
-        for interaction in config['interaction_features']:
-            if len(interaction) == 2:
-                # Pairwise interaction
-                terms.append(te(interaction[0], interaction[1], 
-                               n_splines=max(5, config['n_splines']//2), 
-                               lam=config['lam']))
-            elif len(interaction) == 3:
-                # Three-way interaction (more complex)
-                terms.append(te(interaction[0], interaction[1], interaction[2],
-                               n_splines=max(5, config['n_splines']//3),
-                               lam=config['lam']))
-        
-        # Combine all terms
-        if len(terms) == 0:
-            # No terms - create a simple linear model
-            gam_terms = s(0, n_splines=config['n_splines'], lam=config['lam'])
-        elif len(terms) == 1:
-            gam_terms = terms[0]
-        else:
-            # Sum all terms together
-            gam_terms = terms[0]
-            for term in terms[1:]:
-                gam_terms = gam_terms + term
-        
-        # Create GAM model
-        gam = LinearGAM(
-            gam_terms,
-            fit_intercept=True,
-            max_iter=config['max_iter'],
-            tol=config['tol']
-        )
-        
-        return gam
-    
+            # Lambda values for PyGAM gridsearch (per n_splines)
+            # PyGAM will test all these and return the best
+            'lam_grid': np.array([2.0, 3.0, 5.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0]),
+
+            # Fixed convergence parameters
+            'max_iter': 100,
+            'tol': 1e-4
+        }
+
     def evaluate_gam_config(
-        self, 
-        config: Dict, 
-        X_train: np.ndarray, 
+        self,
+        n_splines: int,
+        lam_grid: np.ndarray,
+        X_train: np.ndarray,
         y_train: np.ndarray,
-        X_test: np.ndarray, 
+        X_test: np.ndarray,
         y_test: np.ndarray,
+        max_iter: int = 100,
+        tol: float = 1e-4,
         normalize: bool = True
     ) -> Dict[str, Any]:
-        """Evaluate a single GAM configuration."""
+        """
+        Evaluate GAM configuration using PyGAM's gridsearch for lambda optimization.
+
+        Args:
+            n_splines: Number of splines per judge
+            lam_grid: Array of lambda values to search via PyGAM gridsearch
+            X_train, y_train: Training data
+            X_test, y_test: Test data
+            max_iter, tol: Convergence parameters
+            normalize: Whether to normalize features
+
+        Returns:
+            Dictionary with best configuration (after gridsearch), metrics, and model
+        """
         try:
             # Normalize data if requested
             if normalize:
@@ -253,28 +203,49 @@ class GAMHyperparameterTuner:
             else:
                 X_train_scaled = X_train.copy()
                 X_test_scaled = X_test.copy()
-            
-            # Create and fit GAM model
-            gam = self.create_gam_model(config)
-            gam.fit(X_train_scaled, y_train)
-            
-            # Make predictions
-            train_pred = gam.predict(X_train_scaled)
-            test_pred = gam.predict(X_test_scaled)
-            
+                scaler = None
+
+            # Create GAMAggregator with initial lambda (will be optimized by gridsearch)
+            gam_aggregator = GAMAggregator(
+                feature_names=self.feature_names,
+                n_splines=n_splines,
+                lam=lam_grid[0],  # Initial value (will be replaced by gridsearch)
+                max_iter=max_iter,
+                tol=tol
+            )
+            gam_aggregator.fit(X_train_scaled, y_train)
+
+            # Use PyGAM's gridsearch to find best lambda
+            # This tests all lambda values and keeps the best model
+            gam_aggregator.model.gridsearch(
+                X_train_scaled, y_train,
+                lam=lam_grid,
+                objective='GCV',  # Generalized Cross-Validation
+                progress=False,   # Disable progress bar for cleaner output
+                keep_best=True    # Keep the best model
+            )
+
+            # Extract the best lambda found by gridsearch
+            best_lam = gam_aggregator.model.lam
+
+            # Make predictions with optimized model
+            train_pred = gam_aggregator.predict(X_train_scaled)
+            test_pred = gam_aggregator.predict(X_test_scaled)
+
             # Compute metrics
             train_metrics = compute_metrics(y_train, train_pred)
             test_metrics = compute_metrics(y_test, test_pred)
-            
-            # GAM-specific metrics
+
+            # GAM-specific metrics (access underlying PyGAM model)
+            gam = gam_aggregator.model
             try:
-                # Calculate deviance manually if method not available
+                # Calculate deviance manually
                 test_loglik = gam.loglikelihood(X_test_scaled, y_test)
                 null_loglik = np.sum(stats.norm.logpdf(y_test, loc=np.mean(y_test), scale=np.std(y_test)))
                 deviance = -2 * (test_loglik - null_loglik)
             except:
                 deviance = np.nan
-            
+
             gam_metrics = {
                 'aic': gam.statistics_['AIC'],
                 'deviance': deviance,
@@ -282,7 +253,7 @@ class GAMHyperparameterTuner:
                 'gcv': gam.statistics_['GCV'],   # Generalized cross-validation
                 'n_terms': len(gam.terms)
             }
-            
+
             # Feature importance (using p-values)
             try:
                 p_values = gam.statistics_['p_values']
@@ -295,77 +266,100 @@ class GAMHyperparameterTuner:
                         feature_importance[label] = 0.0
             except:
                 feature_importance = {}
-            
+
+            # Store configuration with best lambda from gridsearch
+            config = {
+                'n_splines': n_splines,
+                'lam': float(best_lam[0][0]) if isinstance(best_lam, list) else float(best_lam),
+                'max_iter': max_iter,
+                'tol': tol
+            }
+
             result = {
                 'config': config,
                 'train_metrics': train_metrics,
                 'test_metrics': test_metrics,
                 'gam_metrics': gam_metrics,
                 'feature_importance': feature_importance,
-                'model': gam,
-                'scaler': scaler if normalize else None,
+                'model': gam_aggregator,
+                'scaler': scaler,
                 'normalize': normalize,
                 'success': True
             }
-            
+
             return result
-            
+
         except Exception as e:
             return {
-                'config': config,
+                'config': {'n_splines': n_splines, 'lam': 'gridsearch_failed'},
                 'error': str(e),
                 'success': False
             }
     
     def random_search(
-        self, 
-        X: np.ndarray, 
-        y: np.ndarray, 
-        n_trials: int = 50,
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        n_trials: int = 50,  # Kept for backward compatibility, but ignored
         normalize: bool = True
     ) -> List[Dict]:
-        """Perform random hyperparameter search for GAM models."""
-        print(f"🔍 Starting GAM random search with {n_trials} trials")
-        
+        """
+        Perform GAM hyperparameter search using PyGAM's gridsearch.
+
+        Note: n_trials parameter is kept for backward compatibility but is ignored.
+        The actual search is exhaustive over n_splines with gridsearch over lambda.
+
+        Total configurations tested: len(n_splines) = 3 configs (each tests 9 lambda values internally)
+        """
+        hyperparams = self.define_gam_hyperparameter_grid()
+        n_configs = len(hyperparams['n_splines'])
+
+        print(f"🔍 Starting GAM hyperparameter search")
+        print(f"   Outer loop: {n_configs} n_splines values {hyperparams['n_splines']}")
+        print(f"   Inner loop: {len(hyperparams['lam_grid'])} lambda values (via PyGAM gridsearch)")
+        print(f"   Total: {n_configs} configurations (each optimizes over {len(hyperparams['lam_grid'])} lambdas)")
+
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=self.test_size, random_state=self.random_seed
         )
-        
-        hyperparams = self.define_gam_hyperparameter_grid()
+
         results = []
-        successful_trials = 0
-        
-        for trial in range(n_trials):
-            # Sample random hyperparameters
-            config = {
-                'n_splines': random.choice(hyperparams['n_splines']),
-                'lam': random.choice(hyperparams['lam']),
-                'interaction_features': random.choice(hyperparams['interaction_features']),
-                'max_iter': random.choice(hyperparams['max_iter']),
-                'tol': random.choice(hyperparams['tol'])
-            }
-            
-            print(f"Trial {trial + 1}/{n_trials}: splines={config['n_splines']}, "
-                  f"λ={config['lam']:.2f}, interactions={len(config['interaction_features'])}")
-            
-            # Evaluate configuration
-            result = self.evaluate_gam_config(config, X_train, y_train, X_test, y_test, normalize)
-            
+        successful_configs = 0
+
+        # Exhaustive search over n_splines
+        for config_idx, n_splines in enumerate(hyperparams['n_splines']):
+            print(f"\n[{config_idx + 1}/{n_configs}] Testing n_splines={n_splines}")
+            print(f"   → Running PyGAM gridsearch over {len(hyperparams['lam_grid'])} lambda values...")
+
+            # Evaluate this n_splines (gridsearch will find best lambda)
+            result = self.evaluate_gam_config(
+                n_splines=n_splines,
+                lam_grid=hyperparams['lam_grid'],
+                X_train=X_train,
+                y_train=y_train,
+                X_test=X_test,
+                y_test=y_test,
+                max_iter=hyperparams['max_iter'],
+                tol=hyperparams['tol'],
+                normalize=normalize
+            )
+
             if result['success']:
                 results.append(result)
-                successful_trials += 1
-                print(f"  ✅ R² = {result['test_metrics']['r2']:.4f}, "
-                      f"AIC = {result['gam_metrics']['aic']:.2f}, "
-                      f"GCV = {result['gam_metrics']['gcv']:.4f}")
+                successful_configs += 1
+                best_lam = result['config']['lam']
+                print(f"   ✅ Best λ={best_lam:.2f}: R²={result['test_metrics']['r2']:.4f}, "
+                      f"AIC={result['gam_metrics']['aic']:.2f}, "
+                      f"GCV={result['gam_metrics']['gcv']:.4f}")
             else:
-                print(f"  ❌ Trial failed: {result['error']}")
-        
-        print(f"📊 Completed {successful_trials}/{n_trials} successful trials")
-        
+                print(f"   ❌ Configuration failed: {result['error']}")
+
+        print(f"\n📊 Completed {successful_configs}/{n_configs} configurations successfully")
+
         # Sort by test R²
         results.sort(key=lambda x: x['test_metrics']['r2'], reverse=True)
-        
+
         return results
     
     def analyze_results(self, results: List[Dict]) -> Dict:
@@ -500,109 +494,108 @@ class GAMHyperparameterTuner:
         print(f"📊 GAM analysis plots saved to {analysis_path}")
     
     def create_gam_heatmaps(self, results: List[Dict], analysis: Dict):
-        """Create GAM-specific heatmaps for hyperparameter analysis."""
-        # Extract data for heatmaps
+        """Create GAM configuration comparison charts."""
+        # Extract data for visualization
         data_rows = []
         for result in results:
             config = result['config']
             data_rows.append({
                 'n_splines': config['n_splines'],
                 'lam': config['lam'],
-                'n_interactions': len(config['interaction_features']),
-                'max_iter': config['max_iter'],
-                'tol': config['tol'],
                 'test_r2': result['test_metrics']['r2'],
+                'train_r2': result['train_metrics']['r2'],
                 'aic': result['gam_metrics']['aic'],
                 'edof': result['gam_metrics']['edof'],
-                'gcv': result['gam_metrics']['gcv']
+                'gcv': result['gam_metrics']['gcv'],
+                'mae': result['test_metrics']['mae']
             })
-        
+
         df = pd.DataFrame(data_rows)
-        
-        # Create GAM heatmap visualization
+
+        # Create comparison visualization (2x2 grid)
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
-        
-        # Heatmap 1: Best R² by N_splines vs Lambda
-        pivot_r2 = df.pivot_table(
-            values='test_r2', 
-            index='lam', 
-            columns='n_splines', 
-            aggfunc='max'
-        )
-        
-        sns.heatmap(pivot_r2, annot=True, fmt='.3f', cmap='RdYlGn', 
-                   cbar_kws={'label': 'Best Test R²'}, ax=ax1)
-        ax1.set_title('Best Test R² by Configuration\n(N_splines vs Lambda)')
-        ax1.set_xlabel('Number of Splines')
-        ax1.set_ylabel('Lambda (Regularization)')
-        
-        # Heatmap 2: AIC by N_splines vs Lambda (lower is better)
-        pivot_aic = df.pivot_table(
-            values='aic', 
-            index='lam', 
-            columns='n_splines', 
-            aggfunc='min'  # Lower AIC is better
-        )
-        
-        sns.heatmap(pivot_aic, annot=True, fmt='.1f', cmap='RdYlGn_r', 
-                   cbar_kws={'label': 'Best AIC (Lower is Better)'}, ax=ax2)
-        ax2.set_title('Best AIC by Configuration\n(N_splines vs Lambda)')
-        ax2.set_xlabel('Number of Splines')
-        ax2.set_ylabel('Lambda (Regularization)')
-        
-        # Heatmap 3: Model Complexity (EDOF) vs Performance
-        # Bin EDOF for better visualization
-        df['edof_binned'] = pd.cut(df['edof'], bins=5, labels=['Low', 'Med-Low', 'Medium', 'Med-High', 'High'])
-        pivot_complexity = df.pivot_table(
-            values='test_r2',
-            index='edof_binned',
-            columns='n_splines',
-            aggfunc='mean'
-        )
-        
-        sns.heatmap(pivot_complexity, annot=True, fmt='.3f', cmap='RdYlGn',
-                   cbar_kws={'label': 'Mean Test R²'}, ax=ax3)
-        ax3.set_title('Performance vs Model Complexity\n(EDOF vs N_splines)')
-        ax3.set_xlabel('Number of Splines')
-        ax3.set_ylabel('Effective Degrees of Freedom')
-        
-        # Heatmap 4: Interaction effects vs tolerance
-        pivot_interactions = df.pivot_table(
-            values='test_r2',
-            index='n_interactions',
-            columns='tol',
-            aggfunc='max'
-        )
-        
-        sns.heatmap(pivot_interactions, annot=True, fmt='.3f', cmap='RdYlGn',
-                   cbar_kws={'label': 'Best Test R²'}, ax=ax4)
-        ax4.set_title('Best R² by Feature Interactions\n(N_interactions vs Tolerance)')
-        ax4.set_xlabel('Tolerance')
-        ax4.set_ylabel('Number of Interaction Terms')
-        
+
+        # Chart 1: R² comparison by n_splines
+        x = np.arange(len(df))
+        width = 0.35
+        ax1.bar(x - width/2, df['train_r2'], width, label='Train R²', alpha=0.8, color='skyblue')
+        ax1.bar(x + width/2, df['test_r2'], width, label='Test R²', alpha=0.8, color='orange')
+        ax1.set_xlabel('Configuration')
+        ax1.set_ylabel('R² Score')
+        ax1.set_title('R² Scores by Configuration')
+        ax1.set_xticks(x)
+        ax1.set_xticks(x)
+        ax1.set_xticklabels([f'n_splines={row["n_splines"]}\nλ={row["lam"]:.1f}' for _, row in df.iterrows()])
+        ax1.legend()
+        ax1.grid(True, alpha=0.3)
+
+        # Chart 2: Model quality metrics
+        ax2_metrics = df[['test_r2', 'gcv', 'aic']].copy()
+        # Normalize metrics to 0-1 scale for comparison (lower AIC is better, so invert)
+        ax2_metrics['test_r2_norm'] = (ax2_metrics['test_r2'] - ax2_metrics['test_r2'].min()) / (ax2_metrics['test_r2'].max() - ax2_metrics['test_r2'].min() + 1e-10)
+        ax2_metrics['gcv_norm'] = (ax2_metrics['gcv'] - ax2_metrics['gcv'].min()) / (ax2_metrics['gcv'].max() - ax2_metrics['gcv'].min() + 1e-10)
+        ax2_metrics['aic_norm'] = 1 - ((ax2_metrics['aic'] - ax2_metrics['aic'].min()) / (ax2_metrics['aic'].max() - ax2_metrics['aic'].min() + 1e-10))
+
+        x = np.arange(len(df))
+        width = 0.25
+        ax2.bar(x - width, ax2_metrics['test_r2_norm'], width, label='Test R² (normalized)', alpha=0.8)
+        ax2.bar(x, ax2_metrics['gcv_norm'], width, label='GCV (normalized)', alpha=0.8)
+        ax2.bar(x + width, ax2_metrics['aic_norm'], width, label='AIC (normalized, inverted)', alpha=0.8)
+        ax2.set_xlabel('Configuration')
+        ax2.set_ylabel('Normalized Score (Higher is Better)')
+        ax2.set_title('Model Quality Metrics Comparison')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels([f'n={row["n_splines"]}' for _, row in df.iterrows()])
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+
+        # Chart 3: Model complexity (EDOF) vs Performance
+        ax3.scatter(df['edof'], df['test_r2'], s=200, alpha=0.6, c=df['n_splines'], cmap='viridis')
+        for _, row in df.iterrows():
+            ax3.annotate(f'n={row["n_splines"]}\nλ={row["lam"]:.1f}',
+                        (row['edof'], row['test_r2']),
+                        textcoords="offset points", xytext=(0,10), ha='center', fontsize=8)
+        ax3.set_xlabel('Effective Degrees of Freedom (EDOF)')
+        ax3.set_ylabel('Test R² Score')
+        ax3.set_title('Model Complexity vs Performance')
+        ax3.grid(True, alpha=0.3)
+
+        # Chart 4: Lambda optimization results
+        ax4.scatter(df['lam'], df['test_r2'], s=200, alpha=0.6, c=df['n_splines'], cmap='viridis')
+        for _, row in df.iterrows():
+            ax4.annotate(f'n={row["n_splines"]}',
+                        (row['lam'], row['test_r2']),
+                        textcoords="offset points", xytext=(0,10), ha='center', fontsize=9)
+        ax4.set_xlabel('Lambda (Regularization)')
+        ax4.set_ylabel('Test R² Score')
+        ax4.set_title('Optimal Lambda by n_splines\n(from PyGAM gridsearch)')
+        ax4.set_xscale('log')
+        ax4.grid(True, alpha=0.3)
+
         plt.tight_layout()
-        
-        # Add overall title with best config info
+
+        # Add overall title
         best_config = results[0]['config']
         best_r2 = analysis['best_r2']
-        fig.suptitle(f'GAM Hyperparameter Analysis - Best: R²={best_r2:.3f} '
-                    f'(Splines={best_config["n_splines"]}, λ={best_config["lam"]:.2f}, '
-                    f'AIC={analysis["best_aic"]:.1f})', 
-                    fontsize=14, y=0.98)
-        
-        # Save heatmap
-        heatmap_path = self.run_dir / "gam_hyperparameter_heatmap.png"
-        plt.savefig(heatmap_path, dpi=300, bbox_inches='tight')
+        fig.suptitle(f'GAM Hyperparameter Search Results - Best: R²={best_r2:.3f} '
+                    f'(n_splines={best_config["n_splines"]}, λ={best_config["lam"]:.2f})',
+                    fontsize=14, y=1.00)
+
+        # Save comparison chart
+        comparison_path = self.run_dir / "gam_config_comparison.png"
+        plt.savefig(comparison_path, dpi=300, bbox_inches='tight')
         plt.close()
-        
-        print(f"🔥 GAM heatmap saved to {heatmap_path}")
+
+        print(f"📊 GAM comparison chart saved to {comparison_path}")
     
     def create_partial_dependence_plots(self, best_result: Dict):
         """Create partial dependence plots for the best GAM model."""
         if not best_result['success']:
             return
-        
-        gam_model = best_result['model']
+
+        # Extract underlying PyGAM model from GAMAggregator
+        gam_aggregator = best_result['model']
+        gam_model = gam_aggregator.model
 
         # Create partial dependence plots for all features
         n_features = self.n_features

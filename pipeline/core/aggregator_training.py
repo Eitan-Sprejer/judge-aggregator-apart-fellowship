@@ -70,7 +70,9 @@ class GAMAggregator:
         self,
         feature_names: Optional[List[str]] = None,
         n_splines: int = 10,
-        lam: float = 0.6
+        lam: float = 0.6,
+        max_iter: int = 100,
+        tol: float = 1e-4
     ):
         """
         Initialize GAM aggregator.
@@ -80,6 +82,8 @@ class GAMAggregator:
                           (None = use DEFAULT_10_JUDGES.judge_names)
             n_splines: Number of splines for each feature
             lam: Lambda regularization parameter
+            max_iter: Maximum iterations for convergence
+            tol: Convergence tolerance
         """
         if not HAS_GAM:
             raise ImportError("PyGAM is required for GAM aggregator. Install with: pip install pygam")
@@ -88,6 +92,8 @@ class GAMAggregator:
         self.n_features = len(self.feature_names) if feature_names is not None else None
         self.n_splines = n_splines
         self.lam = lam
+        self.max_iter = max_iter
+        self.tol = tol
         self.model = None
     
     def fit(self, X: np.ndarray, y: np.ndarray):
@@ -108,8 +114,18 @@ class GAMAggregator:
                 self.feature_names = [f"Feature_{i+1}" for i in range(self.n_features)]
 
         # Create GAM with splines for each feature
-        terms = sum([s(i, n_splines=self.n_splines, lam=self.lam) for i in range(X.shape[1])])
-        self.model = LinearGAM(terms)
+        # Build term list by summing spline terms (start with first term to avoid sum() starting with 0)
+        term_list = [s(i, n_splines=self.n_splines, lam=self.lam) for i in range(X.shape[1])]
+        if len(term_list) == 0:
+            raise ValueError("No features to model")
+        elif len(term_list) == 1:
+            terms = term_list[0]
+        else:
+            terms = term_list[0]
+            for term in term_list[1:]:
+                terms = terms + term
+
+        self.model = LinearGAM(terms, max_iter=self.max_iter, tol=self.tol)
         self.model.fit(X, y)
         return self
     
