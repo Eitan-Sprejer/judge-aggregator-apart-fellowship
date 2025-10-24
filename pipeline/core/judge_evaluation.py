@@ -15,14 +15,8 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
 import pandas as pd
 
-from martian_apart_hack_sdk import martian_client, utils
-from martian_apart_hack_sdk.models import llm_models
-from openai.types.chat import (
-    chat_completion,
-    chat_completion_message,
-)
-
 from pipeline.utils.judge_rubrics import JUDGE_RUBRICS
+from pipeline.utils.martian_client import MartianClient
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -50,39 +44,32 @@ class JudgeEvaluator:
         Initialize the evaluator with Martian API client.
 
         Args:
-            judge_ids: List of Martian judge IDs to use (None = use all 10 judges)
-            config_path: Optional path to configuration file
+            judge_ids: List of judge IDs to use (None = use all 10 judges)
+            config_path: Optional path to configuration file (kept for compatibility)
         """
         # Set judge IDs (use all 10 if not specified)
         self.judge_ids = judge_ids if judge_ids is not None else DEFAULT_JUDGE_IDS
         logger.info(f"Initializing evaluator with {len(self.judge_ids)} judges")
 
-        # Load configuration
-        if config_path:
-            logger.info(f"Loading config from {config_path}")
-            config = utils.load_config()  # TODO: implement custom config loading
-        else:
-            config = utils.load_config()
+        # Initialize Martian client
+        self.client = MartianClient()
 
-        # Initialize client
-        self.client = martian_client.MartianClient(
-            api_url=config.api_url,
-            api_key=config.api_key,
-        )
-
-        # Load judges
+        # Load judge rubrics
         self.judges = self._load_judges()
         
-    def _load_judges(self) -> Dict[str, Any]:
-        """Load configured judges from the Martian API."""
+    def _load_judges(self) -> Dict[str, str]:
+        """Load judge rubrics from local definitions."""
         judges = {}
         for judge_id in self.judge_ids:
-            try:
-                judge = self.client.judges.get(judge_id=judge_id)
-                judges[judge_id] = judge
-                logger.info(f"✅ Loaded judge {judge_id}")
-            except Exception as e:
-                logger.error(f"❌ Failed to load judge {judge_id}: {e}")
+            if judge_id not in JUDGE_RUBRICS:
+                logger.error(f"❌ Judge {judge_id} not found in JUDGE_RUBRICS")
+                continue
+
+            # Get rubric function and call it to get rubric text
+            rubric_func = JUDGE_RUBRICS[judge_id]
+            rubric = rubric_func()
+            judges[judge_id] = rubric
+            logger.info(f"✅ Loaded judge {judge_id}")
 
         if len(judges) != len(self.judge_ids):
             logger.warning(f"Only loaded {len(judges)}/{len(self.judge_ids)} judges")
@@ -92,53 +79,29 @@ class JudgeEvaluator:
     def evaluate_single(self, question: str, answer: str, judge_id: str) -> float:
         """
         Evaluate a single Q&A pair with a specific judge.
-        
+
         Args:
             question: The user's question/instruction
             answer: The model's response
             judge_id: ID of the judge to use
-            
+
         Returns:
             Score from the judge (0.0-4.0)
         """
         if judge_id not in self.judges:
             raise ValueError(f"Judge {judge_id} not loaded")
-        
-        judge = self.judges[judge_id]
-        
-        # Create the completion request
-        completion_request = {
-            "model": llm_models.GPT_4O_MINI,
-            "messages": [{"role": "user", "content": question}],
-        }
-        
-        # Create the completion response
-        chat_completion_response = chat_completion.ChatCompletion(
-            id="eval",
-            choices=[
-                chat_completion.Choice(
-                    finish_reason="stop",
-                    index=0,
-                    message=chat_completion_message.ChatCompletionMessage(
-                        role="assistant",
-                        content=answer,
-                    ),
-                )
-            ],
-            created=0,
-            model=llm_models.GPT_4O_MINI,
-            object="chat.completion",
-            service_tier=None,
+
+        # Get judge rubric
+        rubric = self.judges[judge_id]
+
+        # Evaluate using Martian client
+        result = self.client.evaluate_with_rubric(
+            rubric=rubric,
+            question=question,
+            answer=answer
         )
-        
-        # Evaluate with the judge
-        evaluation_result = self.client.judges.evaluate(
-            judge,
-            completion_request=completion_request,
-            completion_response=chat_completion_response,
-        )
-        
-        return evaluation_result.score
+
+        return result["score"]
     
     def _evaluate_with_retry(
         self,

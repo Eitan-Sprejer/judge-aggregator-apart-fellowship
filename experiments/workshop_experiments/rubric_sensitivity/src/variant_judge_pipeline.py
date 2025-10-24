@@ -17,14 +17,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-# Martian SDK imports
-from martian_apart_hack_sdk import martian_client, utils
-from martian_apart_hack_sdk.judge_specs import RubricJudgeSpec
-from martian_apart_hack_sdk.models import llm_models
-from openai.types.chat import (
-    chat_completion,
-    chat_completion_message,
-)
+# Martian client import
+from pipeline.utils.martian_client import MartianClient
 
 # Import rubric utilities
 from pipeline.utils.judge_rubrics import JUDGE_RUBRICS
@@ -44,59 +38,56 @@ class VariantJudgePipeline:
         config_path: Optional[str] = None,
         max_workers: int = 5,  # Parallelization level
         max_retries: int = 3,
-        cleanup_judges: bool = True  # Whether to delete created judges after
+        cleanup_judges: bool = True  # Kept for compatibility, no longer needed
     ):
         """
         Initialize the variant judge pipeline.
-        
+
         Args:
             data_path: Path to dataset with existing judge scores
-            config_path: Optional path to configuration file
+            config_path: Optional path to configuration file (kept for compatibility)
             max_workers: Number of parallel workers for API calls
             max_retries: Maximum retries for failed API calls
-            cleanup_judges: Whether to delete created variant judges after evaluation
+            cleanup_judges: Kept for compatibility (no API resources to clean)
         """
         self.data_path = Path(data_path)
         self.max_workers = max_workers
         self.max_retries = max_retries
         self.cleanup_judges = cleanup_judges
-        
+
         # Load data
         logger.info(f"Loading data from {self.data_path}")
         with open(self.data_path, 'rb') as f:
             data_loaded = pickle.load(f)
-            
+
         # Ensure we have a DataFrame
         if hasattr(data_loaded, 'to_dict'):
             self.df = data_loaded.copy()
         else:
             self.df = pd.DataFrame(data_loaded)
-            
+
         logger.info(f"Loaded dataset with {len(self.df)} examples")
-        
+
         # Initialize Martian client
-        config = utils.load_config() if not config_path else utils.load_config(config_path)
-        self.client = martian_client.MartianClient(
-            api_url=config.api_url,
-            api_key=config.api_key,
-        )
-        
-        # Track created variant judges for cleanup
-        self.created_judge_ids = []
-        
+        self.client = MartianClient()
+
+        # Cache for variant rubrics (no API creation needed)
+        self.variant_rubrics = {}
+
         # Initialize variation generator
         self.variation_generator = ScoringCriteriaVariationGenerator()
-        
+
         # Load original judges
         self.original_judges = self._load_original_judges()
         
-    def _load_original_judges(self) -> Dict[str, Any]:
-        """Load original judges from Martian API."""
+    def _load_original_judges(self) -> Dict[str, str]:
+        """Load original judge rubrics from local definitions."""
         judges = {}
         for judge_id in JUDGE_RUBRICS.keys():
             try:
-                judge = self.client.judges.get(judge_id=judge_id)
-                judges[judge_id] = judge
+                rubric_func = JUDGE_RUBRICS[judge_id]
+                rubric = rubric_func()
+                judges[judge_id] = rubric
                 logger.info(f"✅ Loaded original judge {judge_id}")
             except Exception as e:
                 logger.warning(f"⚠️ Could not load judge {judge_id}: {e}")
@@ -109,74 +100,44 @@ class VariantJudgePipeline:
         variant_suffix: str = None
     ) -> Optional[str]:
         """
-        Create a variant judge with modified rubric.
-        
+        Create a variant judge rubric with modified criteria.
+
         Args:
             base_judge_name: Name of the base judge (e.g., 'truthfulness-judge')
             variant_type: Type of variant ('strict', 'lenient', 'bottom_heavy', 'top_heavy')
             variant_suffix: Optional suffix for the variant judge ID
-            
+
         Returns:
-            ID of the created variant judge, or None if creation failed
+            ID of the variant judge, or None if creation failed
         """
         # Get original rubric
         original_rubric_func = JUDGE_RUBRICS.get(base_judge_name)
         if not original_rubric_func:
             logger.error(f"Judge {base_judge_name} not found in JUDGE_RUBRICS")
             return None
-            
+
         original_rubric = original_rubric_func()
-        
+
         # Generate variant rubric
         variations = self.variation_generator.generate_variations(
             original_rubric, base_judge_name
         )
-        
+
         if variant_type not in variations:
             logger.error(f"Variant type {variant_type} not found for {base_judge_name}")
             return None
-            
+
         variant_rubric = variations[variant_type]
-        
+
         # Create unique ID for variant judge
         suffix = variant_suffix or f"{variant_type}_{int(time.time())}"
         variant_judge_id = f"{base_judge_name}_{suffix}"
-        
-        try:
-            # Check if judge already exists
-            existing_judge = None
-            try:
-                existing_judge = self.client.judges.get(judge_id=variant_judge_id)
-            except:
-                pass  # Judge doesn't exist, which is what we want
-                
-            if existing_judge:
-                logger.info(f"Judge {variant_judge_id} already exists, using existing")
-                return variant_judge_id
-            
-            # Create judge spec with variant rubric
-            judge_spec = RubricJudgeSpec(
-                model_type="rubric_judge",
-                rubric=variant_rubric,
-                model=llm_models.GPT_4O_MINI,  # Use same model as original
-                min_score=0.0,
-                max_score=4.0,
-            )
-            
-            # Create the variant judge
-            variant_judge = self.client.judges.create_judge(
-                judge_id=variant_judge_id,
-                judge_spec=judge_spec,
-                description=f"Variant ({variant_type}) of {base_judge_name}"
-            )
-            
-            logger.info(f"✅ Created variant judge: {variant_judge_id}")
-            self.created_judge_ids.append(variant_judge_id)
-            return variant_judge_id
-            
-        except Exception as e:
-            logger.error(f"❌ Failed to create variant judge {variant_judge_id}: {e}")
-            return None
+
+        # Cache the variant rubric (no API creation needed)
+        self.variant_rubrics[variant_judge_id] = variant_rubric
+
+        logger.info(f"✅ Created variant judge rubric: {variant_judge_id}")
+        return variant_judge_id
     
     def evaluate_with_judge(
         self,
@@ -187,54 +148,35 @@ class VariantJudgePipeline:
     ) -> float:
         """
         Evaluate a Q&A pair with a specific judge.
-        
+
         Args:
             question: The user's question/instruction
             answer: The model's response
-            judge_id: ID of the judge to use
+            judge_id: ID of the judge to use (original or variant)
             retry_count: Current retry attempt
-            
+
         Returns:
             Score from the judge (0.0-4.0)
         """
         try:
-            # Get the judge
-            judge = self.client.judges.get(judge_id=judge_id)
-            
-            # Create the completion request
-            completion_request = {
-                "model": llm_models.GPT_4O_MINI,
-                "messages": [{"role": "user", "content": question}],
-            }
-            
-            # Create the completion response
-            chat_completion_response = chat_completion.ChatCompletion(
-                id="eval",
-                choices=[
-                    chat_completion.Choice(
-                        finish_reason="stop",
-                        index=0,
-                        message=chat_completion_message.ChatCompletionMessage(
-                            role="assistant",
-                            content=answer,
-                        ),
-                    )
-                ],
-                created=0,
-                model=llm_models.GPT_4O_MINI,
-                object="chat.completion",
-                service_tier=None,
+            # Get the rubric (from original judges or variant cache)
+            if judge_id in self.variant_rubrics:
+                rubric = self.variant_rubrics[judge_id]
+            elif judge_id in self.original_judges:
+                rubric = self.original_judges[judge_id]
+            else:
+                logger.error(f"Judge {judge_id} not found")
+                return 2.0  # Default fallback score
+
+            # Evaluate using Martian client
+            result = self.client.evaluate_with_rubric(
+                rubric=rubric,
+                question=question,
+                answer=answer
             )
-            
-            # Evaluate with the judge
-            evaluation_result = self.client.judges.evaluate(
-                judge,
-                completion_request=completion_request,
-                completion_response=chat_completion_response,
-            )
-            
-            return evaluation_result.score
-            
+
+            return result["score"]
+
         except Exception as e:
             if retry_count < self.max_retries:
                 logger.warning(f"Retry {retry_count + 1} for {judge_id}: {e}")
@@ -383,22 +325,15 @@ class VariantJudgePipeline:
         return results_df
     
     def cleanup_variant_judges(self):
-        """Delete all created variant judges to clean up."""
+        """Clean up variant judges (no-op since they're just cached rubrics)."""
         if not self.cleanup_judges:
-            logger.info("Cleanup disabled, keeping variant judges")
+            logger.info("Cleanup disabled")
             return
-            
-        logger.info(f"Cleaning up {len(self.created_judge_ids)} variant judges")
-        
-        for judge_id in self.created_judge_ids:
-            try:
-                # Note: Martian API doesn't have a delete method in the SDK
-                # You might need to implement this or manually clean up
-                logger.info(f"Would delete judge {judge_id} (delete not implemented in SDK)")
-            except Exception as e:
-                logger.error(f"Failed to delete judge {judge_id}: {e}")
-        
-        self.created_judge_ids.clear()
+
+        # Clear variant rubric cache
+        num_variants = len(self.variant_rubrics)
+        self.variant_rubrics.clear()
+        logger.info(f"Cleared {num_variants} variant rubrics from cache")
 
 
 async def run_variant_experiment(
