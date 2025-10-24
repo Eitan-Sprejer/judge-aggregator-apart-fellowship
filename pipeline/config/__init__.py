@@ -5,7 +5,8 @@ from .experiment_config import (
     ModelConfig,
     GAMConfig,
     MLPConfig,
-    ExperimentConfig
+    ExperimentConfig,
+    DEFAULT_10_JUDGES
 )
 
 __all__ = [
@@ -13,5 +14,6 @@ __all__ = [
     'ModelConfig',
     'GAMConfig',
     'MLPConfig',
-    'ExperimentConfig'
+    'ExperimentConfig',
+    'DEFAULT_10_JUDGES'
 ]

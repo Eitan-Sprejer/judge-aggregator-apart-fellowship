@@ -67,6 +67,10 @@ class DatasetLoader:
             return self._preprocess_judge_bench(**kwargs)
         elif dataset_name == 'maj_eval':
             return self._preprocess_maj_eval(**kwargs)
+        elif dataset_name == 'story_spark_qa':
+            return self._preprocess_story_spark_qa(**kwargs)
+        elif dataset_name == 'mslr':
+            return self._preprocess_mslr(**kwargs)
         elif dataset_name == 'custom':
             # For custom datasets, expect user to provide preprocessed data
             if 'data' not in kwargs:
@@ -74,7 +78,7 @@ class DatasetLoader:
             return self._validate_standardized_format(kwargs['data'])
         else:
             raise ValueError(f"Unknown dataset: {dataset_name}. "
-                           f"Supported: ultrafeedback, judge_bench, maj_eval, custom")
+                           f"Supported: ultrafeedback, judge_bench, maj_eval, story_spark_qa, mslr, custom")
     
     def _select_random_completion(self, completions: List[Dict]) -> Optional[Dict]:
         """
@@ -158,7 +162,7 @@ class DatasetLoader:
                     'dataset': 'ultrafeedback',
                     'target': None,  # Will be filled by persona simulation
                     'target_type': 'persona' if with_personas else None,
-                    'target_score_range': (1.0, 10.0),  # Persona scores are 1-10
+                    'target_score_range': (0.0, 10.0),  # Persona scores are 0-10
                     'original_index': i
                 })
 
@@ -222,6 +226,180 @@ class DatasetLoader:
             "MAJ-Eval loader not yet implemented. "
             "This will be added when starting Track 1.2 experiments."
         )
+
+    def _preprocess_story_spark_qa(
+        self,
+        split: str = "train",
+        n_samples: Optional[int] = None,
+        random_seed: int = 42
+    ) -> pd.DataFrame:
+        """
+        Load StorySparkQA and preprocess to standardized format.
+
+        StorySparkQA is a long-form QA dataset from HuggingFace.
+        This will auto-download from HuggingFace when first called.
+
+        Args:
+            split: Dataset split (default: "train")
+            n_samples: Number of samples (None = all)
+            random_seed: Random seed for sampling
+
+        Returns:
+            DataFrame in standardized format
+
+        Note:
+            Used for Track 1.2 (MAJ-Eval comparison experiments).
+        """
+        logger.info(f"Loading StorySparkQA dataset (split: {split})")
+
+        # Auto-download from HuggingFace
+        try:
+            dataset = load_dataset("NEU-HAI/StorySparkQA", split=split, cache_dir=self.cache_dir)
+            logger.info(f"Loaded {len(dataset)} samples from StorySparkQA")
+        except Exception as e:
+            logger.error(f"Failed to load StorySparkQA: {e}")
+            raise
+
+        # Sample if requested
+        if n_samples is not None and n_samples < len(dataset):
+            logger.info(f"Sampling {n_samples} examples from {len(dataset)} total")
+            dataset = dataset.shuffle(seed=random_seed).select(range(n_samples))
+
+        # Process into standardized format
+        processed_data = []
+        for i, item in enumerate(dataset):
+            try:
+                # Extract question and response
+                # Note: Actual field names may differ - adjust as needed when implementing
+                question = item.get('question', item.get('input', ''))
+                response = item.get('response', item.get('output', ''))
+
+                if not question or not response:
+                    logger.warning(f"Sample {i} missing question or response, skipping")
+                    continue
+
+                # Standardized format
+                processed_data.append({
+                    'question': question,
+                    'response': response,
+                    'dataset': 'story_spark_qa',
+                    'target': None,  # Will be filled by evaluation
+                    'target_type': None,  # To be determined by experiment
+                    'target_score_range': None,  # To be determined by experiment
+                    'original_index': i
+                })
+
+            except Exception as e:
+                logger.warning(f"Error processing sample {i}: {e}")
+                continue
+
+        logger.info(f"Successfully processed {len(processed_data)} samples")
+
+        # Convert to DataFrame
+        df = pd.DataFrame(processed_data)
+        return df
+
+    def _preprocess_mslr(
+        self,
+        data_file: str = "dataset/mslr-annotated/data/data_with_overlap_scores.json",
+        n_samples: Optional[int] = None,
+        random_seed: int = 42
+    ) -> pd.DataFrame:
+        """
+        Load MSLR annotated dataset and preprocess to standardized format.
+
+        MSLR contains medical literature summarization with human facet annotations.
+        The dataset is manually downloaded from allenai/mslr-annotated-dataset.
+
+        Args:
+            data_file: Path to MSLR data file (default: dataset/mslr-annotated/data/)
+            n_samples: Number of samples (None = all)
+            random_seed: Random seed for sampling
+
+        Returns:
+            DataFrame in standardized format
+
+        Note:
+            Used for Track 1.2 (MAJ-Eval comparison experiments).
+            The data is already included in the repository (see dataset/mslr-annotated/VERSION).
+        """
+        import json
+
+        logger.info(f"Loading MSLR dataset from {data_file}")
+
+        # Load JSONL data (JSON Lines format - one JSON object per line)
+        try:
+            data = []
+            with open(data_file, 'r') as f:
+                for line in f:
+                    if line.strip():  # Skip empty lines
+                        data.append(json.loads(line))
+            logger.info(f"Loaded MSLR data with {len(data)} review entries")
+        except Exception as e:
+            logger.error(f"Failed to load MSLR data: {e}")
+            logger.info(f"Make sure the MSLR dataset exists at {data_file}")
+            logger.info("See dataset/mslr-annotated/VERSION for version information")
+            raise
+
+        # Process into standardized format
+        processed_data = []
+        for review_idx, review in enumerate(data):
+            # Each review has multiple predictions (system outputs)
+            review_id = review.get('review_id', f'review_{review_idx}')
+            target = review.get('target', '')
+
+            for pred_idx, prediction in enumerate(review.get('predictions', [])):
+                try:
+                    # Use review background/question as "question"
+                    # The target summary acts as reference
+                    question = f"Review ID: {review_id}"  # Simplified, may want more context
+                    response = prediction.get('prediction', '')
+
+                    # Extract human annotations if available
+                    annotations = prediction.get('annotations', [])
+                    human_score = None
+                    if annotations:
+                        # Average facet scores as target (fluency, population, intervention, outcome)
+                        # This is a simplified approach - may want more sophisticated aggregation
+                        annot = annotations[0]  # Use first annotation
+                        facet_scores = [
+                            annot.get('fluency', 0),
+                            annot.get('population', 0),
+                            annot.get('intervention', 0),
+                            annot.get('outcome', 0)
+                        ]
+                        human_score = sum(facet_scores) / len(facet_scores) if facet_scores else None
+
+                    if not response:
+                        logger.warning(f"Review {review_idx}, prediction {pred_idx} missing response, skipping")
+                        continue
+
+                    # Standardized format
+                    processed_data.append({
+                        'question': question,
+                        'response': response,
+                        'dataset': 'mslr',
+                        'target': human_score,  # Average facet score
+                        'target_type': 'human' if human_score is not None else None,
+                        'target_score_range': (0.0, 2.0),  # MSLR facets are 0-2 scale
+                        'original_index': f"{review_idx}_{pred_idx}",
+                        'review_id': review_id,
+                        'system_id': prediction.get('exp_short', 'unknown')
+                    })
+
+                except Exception as e:
+                    logger.warning(f"Error processing review {review_idx}, prediction {pred_idx}: {e}")
+                    continue
+
+        logger.info(f"Successfully processed {len(processed_data)} prediction samples from MSLR")
+
+        # Sample if requested
+        df = pd.DataFrame(processed_data)
+        if n_samples is not None and n_samples < len(df):
+            logger.info(f"Sampling {n_samples} examples from {len(df)} total")
+            df = df.sample(n=n_samples, random_state=random_seed).reset_index(drop=True)
+
+        return df
 
     def _validate_standardized_format(self, data: pd.DataFrame) -> pd.DataFrame:
         """
@@ -290,7 +468,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Load and process datasets")
-    parser.add_argument('--dataset', choices=['ultrafeedback', 'judge_bench', 'maj_eval'],
+    parser.add_argument('--dataset', choices=['ultrafeedback', 'judge_bench', 'maj_eval', 'story_spark_qa', 'mslr'],
                         default='ultrafeedback',
                         help='Dataset to load')
     parser.add_argument('--n-samples', type=int, default=100,
