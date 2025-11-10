@@ -9,7 +9,7 @@ import logging
 import pickle
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Union
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -153,6 +153,45 @@ class GAMAggregator:
             importance[label] = 1.0 - p_value
 
         return importance
+
+    def save_model(self, path: Union[str, Path]):
+        """Save GAM model to disk using joblib (sklearn-recommended).
+
+        Args:
+            path: Path to save the model
+
+        Note:
+            Uses joblib instead of pickle for better compression and
+            efficiency with numpy arrays (sklearn best practice).
+        """
+        from pathlib import Path as PathType
+        import joblib
+
+        if self.model is None:
+            raise ValueError("Model must be fitted before saving")
+
+        path = PathType(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Save entire GAMAggregator object (includes model + metadata)
+        joblib.dump(self, path, compress=3)
+        logger.info(f"Saved GAM model to {path}")
+
+    @classmethod
+    def load_model(cls, path: Union[str, Path]) -> 'GAMAggregator':
+        """Load GAM model from disk.
+
+        Args:
+            path: Path to load the model from
+
+        Returns:
+            Loaded GAMAggregator instance
+        """
+        import joblib
+
+        gam = joblib.load(path)
+        logger.info(f"Loaded GAM model from {path}")
+        return gam
 
 
 class MLPTrainer:
@@ -304,10 +343,17 @@ class MLPTrainer:
         
         return outputs.cpu().numpy()
     
-    def save_model(self, path: Path):
-        """Save model checkpoint."""
+    def save_model(self, path: Union[str, Path]):
+        """Save model checkpoint.
+
+        Args:
+            path: Path to save the model checkpoint
+        """
         if self.model is None:
             raise ValueError("No model to save")
+
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
 
         torch.save({
             'model_state_dict': self.model.state_dict(),
@@ -316,8 +362,12 @@ class MLPTrainer:
         }, path)
         logger.info(f"Model saved to {path}")
 
-    def load_model(self, path: Path):
-        """Load model checkpoint."""
+    def load_model(self, path: Union[str, Path]):
+        """Load model checkpoint.
+
+        Args:
+            path: Path to load the model from
+        """
         checkpoint = torch.load(path, map_location=self.device)
         # Support both old 'n_judges' key and new 'n_features' key
         n_features = checkpoint.get('n_features', checkpoint.get('n_judges', 10))
