@@ -127,6 +127,9 @@ class ExperimentRunner:
 
         log_experiment_milestone(f"Loaded {len(df)} samples from {self.config.dataset}")
 
+        # Validate config against loaded data
+        self.config.validate_with_data(df)
+
         # Save copy to run directory for traceability
         dataset_path = self.run_dir / "data" / "dataset.pkl"
         df.to_pickle(dataset_path)
@@ -243,28 +246,25 @@ class ExperimentRunner:
         # Extract features (judge scores)
         X = np.array([row['judge_scores'] for _, row in df.iterrows()])
 
-        # Extract targets based on config.target
+        # Extract targets based on config.target (always use target_dimension)
         if self.config.target == 'target_human_aggregated':
-            # Use mean of aggregated human scores across dimensions
+            # Use specific dimension
             y = np.array([
-                np.mean(list(row['target_human_aggregated'].values()))
+                row['target_human_aggregated'].get(self.config.target_dimension, np.nan)
                 if row['target_human_aggregated'] is not None else np.nan
                 for _, row in df.iterrows()
             ])
         elif self.config.target == 'target_human_individual':
-            # Use mean of individual annotator scores (averaged across annotators and dimensions)
-            y = np.array([
-                np.mean([
-                    np.mean(list(annotator.values()))
-                    for annotator in row['target_human_individual']
-                ])
-                if row['target_human_individual'] is not None else np.nan
-                for _, row in df.iterrows()
-            ])
+            # TODO: Fit separate aggregators for each individual annotator
+            raise NotImplementedError(
+                "target_human_individual not yet implemented. "
+                "This should train separate aggregators for each annotator, not average them. "
+                "Use target_human_aggregated for now."
+            )
         elif self.config.target == 'target_synthetic':
-            # Use mean of synthetic persona scores across dimensions
+            # Use specific dimension
             y = np.array([
-                np.mean(list(row['target_synthetic'].values()))
+                row['target_synthetic'].get(self.config.target_dimension, np.nan)
                 if row['target_synthetic'] is not None else np.nan
                 for _, row in df.iterrows()
             ])
@@ -278,7 +278,7 @@ class ExperimentRunner:
 
         log_experiment_milestone(
             f"Training data: {len(X)} samples with {X.shape[1]} judges, "
-            f"target={self.config.target}"
+            f"target={self.config.target}, dimension={self.config.target_dimension}"
         )
 
         # Train/test split
@@ -351,7 +351,7 @@ class ExperimentRunner:
 
         # Save model
         model_path = self.run_dir / "models" / "gam_model.pkl"
-        gam.save(str(model_path))
+        gam.save_model(str(model_path))
 
         return {
             'model': gam,
@@ -372,23 +372,45 @@ class ExperimentRunner:
         log_experiment_milestone("Running baseline models")
 
         evaluator = BaselineEvaluator(
-            judge_names=data['judge_names'],
-            results_dir=str(self.run_dir / "baseline_results")
+            random_seed=self.config.random_seed,
+            test_size=self.config.models.test_size
         )
 
-        # Fit all baselines
-        evaluator.fit(data['X_train'], data['y_train'])
-
-        # Evaluate on test set
+        # Run all baseline methods
         baseline_results = {}
-        for name in evaluator.baselines.keys():
-            predictions = evaluator.predict(name, data['X_test'])
-            metrics = compute_metrics(data['y_test'], predictions)
-            baseline_results[name] = metrics
 
-            log_experiment_milestone(
-                f"Baseline '{name}' - Test R²: {metrics['r2']:.4f}"
-            )
+        # Naive mean (no scaling)
+        result = evaluator.naive_mean_baseline(
+            data['X_train'], data['y_train'],
+            data['X_test'], data['y_test']
+        )
+        baseline_results['naive_mean'] = result['metrics']
+        log_experiment_milestone(f"Baseline 'naive_mean' - Test R²: {result['metrics']['r2']:.4f}")
+
+        # Linear scaling mean (main experiment method)
+        result = evaluator.linear_scaling_mean_baseline(
+            data['X_train'], data['y_train'],
+            data['X_test'], data['y_test']
+        )
+        baseline_results['linear_scaling_mean'] = result['metrics']
+        log_experiment_milestone(f"Baseline 'linear_scaling_mean' - Test R²: {result['metrics']['r2']:.4f}")
+
+        # StandardScaler + LinearRegression mean
+        result = evaluator.standardscaler_lr_mean_baseline(
+            data['X_train'], data['y_train'],
+            data['X_test'], data['y_test']
+        )
+        baseline_results['standardscaler_lr_mean'] = result['metrics']
+        log_experiment_milestone(f"Baseline 'standardscaler_lr_mean' - Test R²: {result['metrics']['r2']:.4f}")
+
+        # Best single judge (naive)
+        result = evaluator.best_single_judge_naive(
+            data['X_train'], data['y_train'],
+            data['X_test'], data['y_test'],
+            judge_names=data['judge_names']
+        )
+        baseline_results['best_single_judge_naive'] = result['metrics']
+        log_experiment_milestone(f"Baseline 'best_single_judge_naive' - Test R²: {result['metrics']['r2']:.4f}")
 
         return baseline_results
 
