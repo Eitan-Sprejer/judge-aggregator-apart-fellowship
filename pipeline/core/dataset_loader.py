@@ -64,6 +64,7 @@ class DatasetLoader:
     def load(
         self,
         dataset_name: str,
+        use_cache: bool = True,
         **kwargs
     ) -> pd.DataFrame:
         """
@@ -79,11 +80,46 @@ class DatasetLoader:
         Args:
             dataset_name: Name of dataset ('ultrafeedback', 'judge_bench_*', 'maj_eval', 'story_spark_qa', 'mslr', 'helpsteer2')
                          Note: JUDGE-BENCH tasks are separate datasets (e.g., 'judge_bench_switchboard')
+            use_cache: If True, load from datasets/processed/ cache if exists (default: True)
             **kwargs: Dataset-specific arguments
 
         Returns:
             DataFrame in standardized format
         """
+        # Check cache first
+        if use_cache:
+            cache_path = self._get_cache_path(dataset_name, **kwargs)
+            if cache_path.exists():
+                logger.info(f"Loading cached dataset from {cache_path}")
+                return pd.read_pickle(cache_path)
+
+        # Load from source
+        df = self._load_from_source(dataset_name, **kwargs)
+
+        # Save to cache
+        cache_path = self._get_cache_path(dataset_name, **kwargs)
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        df.to_pickle(cache_path)
+        logger.info(f"Cached dataset to {cache_path}")
+
+        return df
+
+    def _get_cache_path(self, dataset_name: str, **kwargs) -> Path:
+        """Generate cache path for dataset."""
+        # Determine base name
+        if dataset_name == 'judge_bench':
+            name = kwargs.get('task_name', 'unknown')
+        elif dataset_name == 'mslr':
+            name = 'mslr_annotated'  # Always filtered version
+        else:
+            name = dataset_name
+
+        return Path('datasets/processed') / f'{name}.pkl'
+
+    def _load_from_source(self, dataset_name: str, **kwargs) -> pd.DataFrame:
+        """Load dataset from original source (HuggingFace, files, etc.)."""
+        logger.info(f"Loading {dataset_name} from source...")
+
         if dataset_name == 'ultrafeedback':
             return self._preprocess_ultrafeedback(**kwargs)
         elif dataset_name == 'judge_bench':
