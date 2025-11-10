@@ -11,6 +11,7 @@
 name: persona_synthetic_ultrafeedback
 dataset: ultrafeedback  # Dataset name for loader
 target: target_synthetic  # AUTO-TRIGGERS persona simulation (no synthetic scores in raw data)
+target_dimension: overall  # REQUIRED: UltraFeedback only has ['overall'] dimension
 
 # Dataset-specific parameters
 dataset_kwargs:

@@ -11,6 +11,7 @@
 name: baseline_summeval
 dataset: judge_bench  # Dataset name for loader
 target: target_human_aggregated  # Use human aggregated scores as target
+target_dimension: coherence  # REQUIRED: SummEval dimensions: ['coherence', 'consistency', 'fluency', 'relevance']
 
 # Dataset-specific parameters
 dataset_kwargs:
