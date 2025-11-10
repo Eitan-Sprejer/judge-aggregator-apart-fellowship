@@ -109,6 +109,7 @@ class ExperimentConfig:
         name: Experiment name (for logging/saving)
         dataset: Dataset name ('ultrafeedback', 'judge_bench', 'helpsteer2', etc.)
         target: Target field for training ('target_human_aggregated', 'target_human_individual', 'target_synthetic')
+        target_dimension: REQUIRED dimension name to predict (e.g., 'helpfulness', 'overall')
         dataset_kwargs: Additional arguments for dataset loader
         judges: Judge configuration
         models: Model configuration and hyperparameters
@@ -122,6 +123,7 @@ class ExperimentConfig:
     name: str
     dataset: str  # 'ultrafeedback', 'judge_bench', 'helpsteer2', etc.
     target: str  # 'target_human_aggregated', 'target_human_individual', 'target_synthetic'
+    target_dimension: str  # Specific dimension name (e.g., 'helpfulness', 'overall')
     judges: JudgeConfig
     models: ModelConfig = field(default_factory=ModelConfig)
     dataset_kwargs: Dict[str, Any] = field(default_factory=dict)
@@ -142,6 +144,43 @@ class ExperimentConfig:
             True if target is 'target_synthetic', False otherwise
         """
         return self.target == 'target_synthetic'
+
+    def validate_with_data(self, df) -> None:
+        """Validate configuration against loaded dataset.
+
+        Args:
+            df: Loaded DataFrame with standardized format
+
+        Raises:
+            ValueError: If configuration is invalid for the dataset
+        """
+        import pandas as pd
+
+        # Check dataset has enough samples
+        n_requested = self.dataset_kwargs.get('n_samples')
+        if n_requested and n_requested > len(df):
+            logger.warning(
+                f"Requested {n_requested} samples but dataset only has {len(df)}. "
+                f"Using all {len(df)} samples."
+            )
+
+        # Check target dimension exists in dataset
+        first_row = df.iloc[0]
+        dimensions = first_row.get('dimensions', [])
+
+        if not dimensions:
+            raise ValueError(
+                f"Dataset '{self.dataset}' has no dimensions field. "
+                f"Cannot use target_dimension."
+            )
+
+        if self.target_dimension not in dimensions:
+            raise ValueError(
+                f"target_dimension '{self.target_dimension}' not found in dataset dimensions: {dimensions}. "
+                f"Available dimensions: {', '.join(dimensions)}"
+            )
+
+        logger.info(f"✓ Using target dimension: {self.target_dimension}")
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert config to dictionary."""
@@ -189,6 +228,7 @@ class ExperimentConfig:
             name=config_dict['name'],
             dataset=config_dict['dataset'],
             target=config_dict['target'],
+            target_dimension=config_dict['target_dimension'],
             judges=judges,
             models=models,
             dataset_kwargs=config_dict.get('dataset_kwargs', {}),
@@ -245,6 +285,7 @@ DEFAULT_10_JUDGES = JudgeConfig(
 
 def create_default_config(
     name: str,
+    target_dimension: str,
     dataset: str = 'ultrafeedback',
     target: str = 'target_synthetic',
     n_samples: Optional[int] = None,
@@ -255,6 +296,7 @@ def create_default_config(
 
     Args:
         name: Experiment name
+        target_dimension: REQUIRED dimension name (e.g., 'helpfulness', 'overall')
         dataset: Dataset to use
         target: Target field ('target_human_aggregated', 'target_human_individual', 'target_synthetic')
         n_samples: Number of samples (None = all)
@@ -274,6 +316,7 @@ def create_default_config(
         name=name,
         dataset=dataset,
         target=target,
+        target_dimension=target_dimension,
         judges=judges,
         dataset_kwargs=dataset_kwargs,
         concurrency=concurrency
