@@ -107,18 +107,41 @@ class ExperimentConfig:
 
     Attributes:
         name: Experiment name (for logging/saving)
-        dataset: Dataset name ('ultrafeedback', 'judge_bench', 'maj_eval')
+        dataset: Dataset name ('ultrafeedback', 'judge_bench', 'helpsteer2', etc.)
+        target: Target field for training ('target_human_aggregated', 'target_human_individual', 'target_synthetic')
         dataset_kwargs: Additional arguments for dataset loader
         judges: Judge configuration
         models: Model configuration and hyperparameters
+        concurrency: Max concurrent API calls for judge evaluation and persona simulation
         random_seed: Random seed for reproducibility
+
+    Note:
+        Persona simulation runs automatically when target='target_synthetic' and the dataset
+        has no synthetic annotations yet.
     """
     name: str
-    dataset: str  # 'ultrafeedback', 'judge_bench', 'maj_eval', etc.
+    dataset: str  # 'ultrafeedback', 'judge_bench', 'helpsteer2', etc.
+    target: str  # 'target_human_aggregated', 'target_human_individual', 'target_synthetic'
     judges: JudgeConfig
     models: ModelConfig = field(default_factory=ModelConfig)
     dataset_kwargs: Dict[str, Any] = field(default_factory=dict)
+    concurrency: int = 1  # Conservative default for API rate limiting
     random_seed: int = 42
+
+    def __post_init__(self):
+        """Validate experiment configuration."""
+        valid_targets = ['target_human_aggregated', 'target_human_individual', 'target_synthetic']
+        if self.target not in valid_targets:
+            raise ValueError(f"target must be one of {valid_targets}, got: {self.target}")
+
+    @property
+    def needs_persona_simulation(self) -> bool:
+        """Check if persona simulation should run based on target field.
+
+        Returns:
+            True if target is 'target_synthetic', False otherwise
+        """
+        return self.target == 'target_synthetic'
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert config to dictionary."""
@@ -165,9 +188,11 @@ class ExperimentConfig:
         return cls(
             name=config_dict['name'],
             dataset=config_dict['dataset'],
+            target=config_dict['target'],
             judges=judges,
             models=models,
             dataset_kwargs=config_dict.get('dataset_kwargs', {}),
+            concurrency=config_dict.get('concurrency', 1),
             random_seed=config_dict.get('random_seed', 42)
         )
 
@@ -221,16 +246,20 @@ DEFAULT_10_JUDGES = JudgeConfig(
 def create_default_config(
     name: str,
     dataset: str = 'ultrafeedback',
+    target: str = 'target_synthetic',
     n_samples: Optional[int] = None,
-    judge_config: Optional[JudgeConfig] = None
+    judge_config: Optional[JudgeConfig] = None,
+    concurrency: int = 1
 ) -> ExperimentConfig:
     """Create a default experiment configuration.
 
     Args:
         name: Experiment name
         dataset: Dataset to use
+        target: Target field ('target_human_aggregated', 'target_human_individual', 'target_synthetic')
         n_samples: Number of samples (None = all)
         judge_config: Judge configuration (None = use all 10 judges)
+        concurrency: Max concurrent API calls (default: 1 for rate limiting)
 
     Returns:
         ExperimentConfig with sensible defaults
@@ -244,6 +273,8 @@ def create_default_config(
     return ExperimentConfig(
         name=name,
         dataset=dataset,
+        target=target,
         judges=judges,
-        dataset_kwargs=dataset_kwargs
+        dataset_kwargs=dataset_kwargs,
+        concurrency=concurrency
     )

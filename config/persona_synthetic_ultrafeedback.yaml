@@ -1,0 +1,79 @@
+# Example Experiment Configuration: UltraFeedback with Persona Simulation
+#
+# This configuration demonstrates automatic persona simulation when
+# target='target_synthetic'. The experiment runner will detect that
+# synthetic annotations are needed and automatically run persona simulation.
+#
+# Usage:
+#   python run_experiment.py config/persona_synthetic_ultrafeedback.yaml
+
+# Experiment metadata
+name: persona_synthetic_ultrafeedback
+dataset: ultrafeedback  # Dataset name for loader
+target: target_synthetic  # AUTO-TRIGGERS persona simulation (no synthetic scores in raw data)
+
+# Dataset-specific parameters
+dataset_kwargs:
+  n_samples: 100  # Small sample for testing (64K total available)
+
+# Judge configuration
+judges:
+  # Judge IDs reference judges defined in pipeline/utils/judges.yaml
+  judge_ids:
+    - truthfulness-judge
+    - harmlessness-judge
+    - helpfulness-judge
+    - honesty-judge
+    - explanatory-depth-judge
+    - instruction-following-judge
+    - clarity-judge
+    - conciseness-judge
+    - logical-consistency-judge
+    - creativity-judge
+
+  # Human-readable names for plots and reports
+  judge_names:
+    - Truthfulness
+    - Harmlessness
+    - Helpfulness
+    - Honesty
+    - Explanatory Depth
+    - Instruction Following
+    - Clarity
+    - Conciseness
+    - Logical Consistency
+    - Creativity
+
+  # Score range for judges
+  score_range:
+    - 0.0
+    - 4.0
+
+# Model training configuration
+models:
+  gam:
+    n_splines: 10
+    lam: 0.6
+    max_iter: 100
+
+  mlp:
+    hidden_dim: 64
+    learning_rate: 0.005
+    batch_size: 16
+    n_epochs: 100
+    dropout: 0.0
+    l2_reg: 0.0
+    early_stopping_patience: 15
+    min_delta: 0.0001
+
+  train_gam: true
+  train_mlp: false
+
+  test_size: 0.2
+  val_size: 0.15
+
+# API concurrency settings
+concurrency: 1  # Max concurrent API calls for persona simulation and judge evaluation
+
+# Random seed for reproducibility
+random_seed: 42
