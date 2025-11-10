@@ -3,5 +3,5 @@ _judged_cache/
 
 # Optionally ignore experiment directories if they become too large
 # Uncomment the following lines if experiment results are too large to commit:
-# */
-# !.gitignore
+*/
+!.gitignore
