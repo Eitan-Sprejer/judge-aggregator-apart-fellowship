@@ -23,12 +23,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Default configuration
-DEFAULT_MAX_WORKERS = 10  # Use all judges in parallel for true speedup
+DEFAULT_MAX_WORKERS = 10  # Maximum parallel workers (will use min of this and number of judges)
 DEFAULT_CHECKPOINT_INTERVAL = 100
 DEFAULT_MAX_RETRIES = 5
 DEFAULT_INITIAL_DELAY = 1.0
 
-# Default judge set (all 10 judges for backward compatibility)
+# Default judge set (all judges from JUDGE_RUBRICS for backward compatibility)
 DEFAULT_JUDGE_IDS = list(JUDGE_RUBRICS.keys())
 
 
@@ -44,10 +44,10 @@ class JudgeEvaluator:
         Initialize the evaluator with Martian API client.
 
         Args:
-            judge_ids: List of judge IDs to use (None = use all 10 judges)
+            judge_ids: List of judge IDs to use (None = use all judges from JUDGE_RUBRICS)
             config_path: Optional path to configuration file (kept for compatibility)
         """
-        # Set judge IDs (use all 10 if not specified)
+        # Set judge IDs (use all judges from JUDGE_RUBRICS if not specified)
         self.judge_ids = judge_ids if judge_ids is not None else DEFAULT_JUDGE_IDS
         logger.info(f"Initializing evaluator with {len(self.judge_ids)} judges")
 
@@ -256,8 +256,8 @@ class JudgeEvaluator:
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             def eval_row(args):
                 idx, question, answer = args
-                # Always use full judge parallelization (10 judges), regardless of row concurrency
-                scores = self.evaluate_parallel(question, answer, max_workers=10)
+                # Use full judge parallelization (all configured judges), regardless of row concurrency
+                scores = self.evaluate_parallel(question, answer, max_workers=None)
                 return idx, scores
             
             for idx, scores in executor.map(eval_row, tasks):
