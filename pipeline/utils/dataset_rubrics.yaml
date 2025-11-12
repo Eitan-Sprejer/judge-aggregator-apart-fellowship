@@ -1,0 +1,218 @@
+# Dataset-Specific Human Annotation Rubrics
+#
+# These rubrics mirror the exact instructions given to human annotators for each dataset.
+# The LLM judge receives the same rubric and is expected to return scores in JSON format.
+#
+# Structure for each dataset:
+#   rubric: Multi-line text with full annotation instructions (given to humans)
+#   dimensions: List of evaluation dimensions with their scales
+#   response_format: "json" (forced via OpenAI API response_format parameter)
+#
+# Note: Model and temperature are NOT specified here - they come from experiment config
+
+helpsteer2:
+  rubric: |
+    You are evaluating the quality of an AI assistant's response to a user question.
+    Please rate the response across the following 5 dimensions on a scale from 0 to 4:
+
+    **Dimensions to evaluate:**
+
+    1. **Helpfulness (0-4)**: How well does the response address the user's question or request?
+       - 0: Not helpful at all
+       - 1: Slightly helpful, but misses key points
+       - 2: Somewhat helpful, addresses some aspects
+       - 3: Helpful, addresses most aspects well
+       - 4: Very helpful, thoroughly addresses the question
+
+    2. **Correctness (0-4)**: Is the information provided factually accurate and free of errors?
+       - 0: Contains significant factual errors
+       - 1: Mostly incorrect with some accurate details
+       - 2: Mix of correct and incorrect information
+       - 3: Mostly correct with minor errors
+       - 4: Completely accurate and error-free
+
+    3. **Coherence (0-4)**: Is the response well-structured, logical, and easy to follow?
+       - 0: Incoherent, confusing structure
+       - 1: Poorly structured, hard to follow
+       - 2: Somewhat coherent with organizational issues
+       - 3: Well-structured and mostly clear
+       - 4: Excellently organized, very clear flow
+
+    4. **Complexity (0-4)**: Does the response appropriately match the complexity of the question?
+       - 0: Oversimplified or overly complex
+       - 1: Somewhat inappropriate complexity level
+       - 2: Acceptable complexity, some mismatches
+       - 3: Good complexity match
+       - 4: Perfect complexity level for the question
+
+    5. **Verbosity (0-4)**: Is the response appropriately detailed without being too brief or too lengthy?
+       - 0: Far too brief or far too verbose
+       - 1: Too brief or too verbose
+       - 2: Acceptable length with some issues
+       - 3: Good length, mostly appropriate
+       - 4: Perfect level of detail
+
+    **Instructions:**
+    - Read the question and response carefully
+    - Consider each dimension independently
+    - For each dimension, provide a brief explanation (1-2 sentences) and then a score (0-4)
+    - Return in JSON format: {"helpfulness": {"explanation": "...", "score": X}, "correctness": {"explanation": "...", "score": X}, "coherence": {"explanation": "...", "score": X}, "complexity": {"explanation": "...", "score": X}, "verbosity": {"explanation": "...", "score": X}}
+
+  dimensions:
+    - name: "helpfulness"
+      scale: [0, 4]
+      description: "How well the response addresses the user's question"
+    - name: "correctness"
+      scale: [0, 4]
+      description: "Factual accuracy of the information provided"
+    - name: "coherence"
+      scale: [0, 4]
+      description: "Logical structure and clarity of the response"
+    - name: "complexity"
+      scale: [0, 4]
+      description: "Appropriateness of complexity level"
+    - name: "verbosity"
+      scale: [0, 4]
+      description: "Appropriateness of response length and detail"
+
+  response_format: "json"
+
+summeval:
+  rubric: |
+    You are evaluating the quality of a text summary. Please rate the summary across 4 dimensions:
+
+    **Dimensions to evaluate:**
+
+    1. **Coherence (1-5)**: How well-structured and organized is the summary?
+       - 1: Completely incoherent
+       - 2: Mostly incoherent with some structure
+       - 3: Somewhat coherent
+       - 4: Coherent with minor issues
+       - 5: Perfectly coherent
+
+    2. **Consistency (1-5)**: Is the summary factually consistent with the source document?
+       - 1: Highly inconsistent, major contradictions
+       - 2: Mostly inconsistent
+       - 3: Somewhat consistent
+       - 4: Mostly consistent with minor issues
+       - 5: Completely consistent
+
+    3. **Fluency (1-5)**: Is the summary well-written and grammatically correct?
+       - 1: Very poor fluency, many errors
+       - 2: Poor fluency
+       - 3: Acceptable fluency
+       - 4: Good fluency with minor errors
+       - 5: Excellent fluency
+
+    4. **Relevance (1-5)**: Does the summary capture the most important information?
+       - 1: Not relevant at all
+       - 2: Mostly irrelevant
+       - 3: Somewhat relevant
+       - 4: Mostly relevant
+       - 5: Highly relevant
+
+    **Instructions:**
+    - Read both the source document and the summary
+    - For each dimension, provide a brief explanation (1-2 sentences) and then a score (1-5)
+    - Return in JSON format: {"coherence": {"explanation": "...", "score": X}, "consistency": {"explanation": "...", "score": X}, "fluency": {"explanation": "...", "score": X}, "relevance": {"explanation": "...", "score": X}}
+
+  dimensions:
+    - name: "coherence"
+      scale: [1, 5]
+      description: "Structure and organization quality"
+    - name: "consistency"
+      scale: [1, 5]
+      description: "Factual consistency with source"
+    - name: "fluency"
+      scale: [1, 5]
+      description: "Writing quality and grammar"
+    - name: "relevance"
+      scale: [1, 5]
+      description: "Importance of captured information"
+
+  response_format: "json"
+
+ultrafeedback:
+  rubric: |
+    You are evaluating the overall quality of an AI assistant's response.
+    Rate the response on a scale from 1 to 5 based on overall quality.
+
+    **Overall Quality (1-5):**
+    - 1: Very poor response, unhelpful and problematic
+    - 2: Poor response with significant issues
+    - 3: Acceptable response, meets basic requirements
+    - 4: Good response, helpful and well-constructed
+    - 5: Excellent response, exceptionally helpful and high-quality
+
+    **Consider these aspects in your overall rating:**
+    - Helpfulness and relevance
+    - Accuracy of information
+    - Clarity and coherence
+    - Appropriate level of detail
+    - Overall usefulness to the user
+
+    **Instructions:**
+    - Read the question and response carefully
+    - Provide a brief explanation (1-2 sentences) and then assign an overall quality score from 1-5
+    - Return in JSON format: {"overall": {"explanation": "...", "score": X}}
+
+  dimensions:
+    - name: "overall"
+      scale: [1, 5]
+      description: "Overall quality of the response"
+
+  response_format: "json"
+
+# Additional datasets - Add rubrics as needed
+
+newsroom:
+  # TODO: Add newsroom rubric (4 dimensions: Informativeness, Relevance, Fluency, Coherence)
+  rubric: |
+    # Placeholder - add actual human annotation instructions
+  dimensions:
+    - name: "Informativeness"
+      scale: [1, 5]
+    - name: "Relevance"
+      scale: [1, 5]
+    - name: "Fluency"
+      scale: [1, 5]
+    - name: "Coherence"
+      scale: [1, 5]
+  response_format: "json"
+
+recipe:
+  # TODO: Add recipe rubric (6 dimensions)
+  rubric: |
+    # Placeholder - add actual human annotation instructions
+  dimensions:
+    - name: "grammar"
+      scale: [1, 5]
+    - name: "fluency"
+      scale: [1, 5]
+    - name: "verbosity"
+      scale: [1, 5]
+    - name: "structure"
+      scale: [1, 5]
+    - name: "success"
+      scale: [1, 5]
+    - name: "overall"
+      scale: [1, 5]
+  response_format: "json"
+
+wmt_en_de:
+  # TODO: Add WMT English-German translation quality rubric
+  rubric: |
+    # Placeholder - add actual human annotation instructions
+  dimensions:
+    - name: "quality"
+      scale: [1, 5]
+  response_format: "json"
+
+wmt_zh_en:
+  # TODO: Add WMT Chinese-English translation quality rubric
+  rubric: |
+    # Placeholder - add actual human annotation instructions
+  dimensions:
+    - name: "quality"
+      scale: [1, 5]
+  response_format: "json"
