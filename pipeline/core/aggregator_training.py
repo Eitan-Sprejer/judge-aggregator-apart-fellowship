@@ -381,19 +381,49 @@ class MLPTrainer:
 
 def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
     """
-    Compute evaluation metrics.
-    
+    Compute comprehensive evaluation metrics including regression and correlation metrics.
+
     Args:
         y_true: Ground truth values
         y_pred: Predicted values
-        
+
     Returns:
-        Dictionary of metrics
+        Dictionary of metrics with keys:
+            - mse: Mean Squared Error
+            - mae: Mean Absolute Error
+            - r2: R-squared score
+            - spearman_rho: Spearman's rank correlation coefficient
+            - kendall_tau: Kendall's tau correlation coefficient
+            - pearson_r: Pearson's correlation coefficient
     """
+    # Basic regression metrics
+    mse = mean_squared_error(y_true, y_pred)
+    mae = mean_absolute_error(y_true, y_pred)
+    r2 = r2_score(y_true, y_pred)
+
+    # Correlation metrics
+    try:
+        spearman_result = stats.spearmanr(y_true, y_pred)
+        spearman_rho = float(spearman_result.correlation)
+
+        kendall_result = stats.kendalltau(y_true, y_pred)
+        kendall_tau = float(kendall_result.correlation)
+
+        pearson_result = stats.pearsonr(y_true, y_pred)
+        pearson_r = float(pearson_result[0])
+    except (ValueError, RuntimeError) as e:
+        logging.warning(f"Error computing correlation metrics: {e}")
+        spearman_rho = float('nan')
+        kendall_tau = float('nan')
+        pearson_r = float('nan')
+
     return {
-        'mse': mean_squared_error(y_true, y_pred),
-        'mae': mean_absolute_error(y_true, y_pred),
-        'r2': r2_score(y_true, y_pred)
+        'mse': float(mse),
+        'mae': float(mae),
+        'r2': float(r2),
+        'spearman_rho': spearman_rho,
+        'kendall_tau': kendall_tau,
+        'pearson_r': pearson_r
     }
 
 
