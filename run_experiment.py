@@ -38,7 +38,6 @@ from pipeline.core.dataset_loader import DatasetLoader
 from pipeline.core.persona_simulation import PersonaSimulator
 from pipeline.core.judge_evaluation import JudgeEvaluator
 from pipeline.core.aggregator_training import GAMAggregator, compute_metrics
-from pipeline.core.baseline_models import BaselineEvaluator
 from utils.logging_setup import (
     setup_universal_logging, log_experiment_start,
     log_experiment_milestone, log_experiment_complete
@@ -239,7 +238,7 @@ class ExperimentRunner:
             df: DataFrame with judge scores and target annotations
 
         Returns:
-            Dictionary with train/val/test splits
+            Dictionary with train/val/test splits and test_indices in full df
         """
         log_experiment_milestone("Preparing training data")
 
@@ -248,21 +247,18 @@ class ExperimentRunner:
 
         # Extract targets based on config.target (always use target_dimension)
         if self.config.target == 'target_human_aggregated':
-            # Use specific dimension
             y = np.array([
                 row['target_human_aggregated'].get(self.config.target_dimension, np.nan)
                 if row['target_human_aggregated'] is not None else np.nan
                 for _, row in df.iterrows()
             ])
         elif self.config.target == 'target_human_individual':
-            # TODO: Fit separate aggregators for each individual annotator
             raise NotImplementedError(
                 "target_human_individual not yet implemented. "
                 "This should train separate aggregators for each annotator, not average them. "
                 "Use target_human_aggregated for now."
             )
         elif self.config.target == 'target_synthetic':
-            # Use specific dimension
             y = np.array([
                 row['target_synthetic'].get(self.config.target_dimension, np.nan)
                 if row['target_synthetic'] is not None else np.nan
@@ -273,6 +269,7 @@ class ExperimentRunner:
 
         # Filter out NaN targets
         valid_mask = ~np.isnan(y)
+        valid_indices = np.where(valid_mask)[0]
         X = X[valid_mask]
         y = y[valid_mask]
 
@@ -282,11 +279,15 @@ class ExperimentRunner:
         )
 
         # Train/test split
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y,
+        indices = np.arange(len(X))
+        indices_train, indices_test, X_train, X_test, y_train, y_test = train_test_split(
+            indices, X, y,
             test_size=self.config.models.test_size,
             random_state=self.config.random_seed
         )
+
+        # Map back to original df indices
+        test_indices_in_full = valid_indices[indices_test]
 
         # Train/val split
         X_train, X_val, y_train, y_val = train_test_split(
@@ -302,7 +303,8 @@ class ExperimentRunner:
             'y_val': y_val,
             'X_test': X_test,
             'y_test': y_test,
-            'judge_names': self.config.judges.judge_names
+            'judge_names': self.config.judges.judge_names,
+            'test_indices_in_full': test_indices_in_full
         }
 
     def train_gam(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -360,59 +362,150 @@ class ExperimentRunner:
             'test_metrics': test_metrics
         }
 
-    def run_baselines(self, data: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
-        """Run baseline models for comparison.
+    def run_baselines(self, data: Dict[str, Any],
+                      human_rubric_predictions: Optional[np.ndarray] = None) -> Dict[str, Dict[str, float]]:
+        """Run baseline: single LLM judge with exact human annotation rubric.
 
         Args:
-            data: Training data dictionary
-
-        Returns:
-            Dictionary mapping baseline name to metrics
+            data: Training data dictionary with test set
+            human_rubric_predictions: Predictions from human-rubric judge on test set
         """
         log_experiment_milestone("Running baseline models")
 
-        evaluator = BaselineEvaluator(
-            random_seed=self.config.random_seed,
-            test_size=self.config.models.test_size
-        )
-
-        # Run all baseline methods
         baseline_results = {}
 
-        # Naive mean (no scaling)
-        result = evaluator.naive_mean_baseline(
-            data['X_train'], data['y_train'],
-            data['X_test'], data['y_test']
-        )
-        baseline_results['naive_mean'] = result['metrics']
-        log_experiment_milestone(f"Baseline 'naive_mean' - Test R²: {result['metrics']['r2']:.4f}")
+        if human_rubric_predictions is not None:
+            y_test = data['y_test']
 
-        # Linear scaling mean (main experiment method)
-        result = evaluator.linear_scaling_mean_baseline(
-            data['X_train'], data['y_train'],
-            data['X_test'], data['y_test']
-        )
-        baseline_results['linear_scaling_mean'] = result['metrics']
-        log_experiment_milestone(f"Baseline 'linear_scaling_mean' - Test R²: {result['metrics']['r2']:.4f}")
+            if len(human_rubric_predictions) != len(y_test):
+                log_experiment_milestone(
+                    f"Warning: Human-rubric predictions length mismatch ({len(human_rubric_predictions)} vs {len(y_test)}), skipping baseline"
+                )
+            else:
+                metrics = compute_metrics(y_test, human_rubric_predictions)
+                baseline_results['human_rubric_judge'] = metrics
 
-        # StandardScaler + LinearRegression mean
-        result = evaluator.standardscaler_lr_mean_baseline(
-            data['X_train'], data['y_train'],
-            data['X_test'], data['y_test']
-        )
-        baseline_results['standardscaler_lr_mean'] = result['metrics']
-        log_experiment_milestone(f"Baseline 'standardscaler_lr_mean' - Test R²: {result['metrics']['r2']:.4f}")
-
-        # Best single judge (naive)
-        result = evaluator.best_single_judge_naive(
-            data['X_train'], data['y_train'],
-            data['X_test'], data['y_test'],
-            judge_names=data['judge_names']
-        )
-        baseline_results['best_single_judge_naive'] = result['metrics']
-        log_experiment_milestone(f"Baseline 'best_single_judge_naive' - Test R²: {result['metrics']['r2']:.4f}")
+                log_experiment_milestone(
+                    f"Baseline 'human_rubric_judge' - R²: {metrics['r2']:.4f}, "
+                    f"Spearman ρ: {metrics['spearman_rho']:.4f}, Kendall τ: {metrics['kendall_tau']:.4f}"
+                )
+        else:
+            log_experiment_milestone("No human-rubric predictions available, skipping baseline")
 
         return baseline_results
+
+    def run_human_rubric_evaluation(self, df: pd.DataFrame, test_indices: np.ndarray) -> Optional[np.ndarray]:
+        """Evaluate test set using human annotation rubric via MartianClient.
+
+        Args:
+            df: Full dataset
+            test_indices: Indices of test samples
+
+        Returns:
+            Predictions for test samples only
+        """
+        import hashlib
+        import yaml
+        from pathlib import Path
+        from pipeline.utils.martian_client import MartianClient
+
+        log_experiment_milestone("Running human-rubric evaluation on test set")
+
+        # Get test subset
+        df_test = df.iloc[test_indices].reset_index(drop=True)
+
+        # Cache key: dataset + dimension + test size + seed (for reproducibility)
+        cache_key_str = f"{self.config.dataset}_{self.config.target_dimension}_{len(df_test)}_{self.config.random_seed}"
+        cache_key = hashlib.md5(cache_key_str.encode()).hexdigest()
+        cache_dir = Path("results") / "_baseline_cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        cache_path = cache_dir / f"human_rubric_{cache_key}.pkl"
+        if cache_path.exists():
+            try:
+                with open(cache_path, 'rb') as f:
+                    cached_predictions = pickle.load(f)
+                if len(cached_predictions) == len(df_test):
+                    log_experiment_milestone(f"Loaded human-rubric scores from cache: {cache_path}")
+                    return cached_predictions
+            except Exception as e:
+                log_experiment_milestone(f"Cache load failed: {e}, regenerating...")
+        rubric_path = Path(__file__).parent / "pipeline" / "utils" / "dataset_rubrics.yaml"
+        if not rubric_path.exists():
+            log_experiment_milestone(f"Rubric file not found: {rubric_path}, skipping human-rubric baseline")
+            return None
+
+        with open(rubric_path) as f:
+            rubrics = yaml.safe_load(f)
+
+        if self.config.dataset not in rubrics:
+            log_experiment_milestone(
+                f"Dataset '{self.config.dataset}' not in rubrics, skipping human-rubric baseline"
+            )
+            return None
+
+        rubric_config = rubrics[self.config.dataset]
+        rubric_text = rubric_config['rubric']
+        dimensions = [d['name'] for d in rubric_config['dimensions']]
+
+        # Validate target dimension
+        if self.config.target_dimension not in dimensions:
+            log_experiment_milestone(
+                f"Target dimension '{self.config.target_dimension}' not in rubric dimensions {dimensions}"
+            )
+            return None
+
+        # Initialize Martian client
+        try:
+            client = MartianClient()
+        except Exception as e:
+            log_experiment_milestone(f"Failed to initialize MartianClient: {e}")
+            return None
+
+        # Prepare batch evaluations for test set only
+        question_col = 'question' if 'question' in df_test.columns else 'instruction'
+        response_col = 'response' if 'response' in df_test.columns else 'answer'
+
+        evaluations = [
+            {
+                'rubric': rubric_text,
+                'question': row[question_col],
+                'answer': row[response_col]
+            }
+            for _, row in df_test.iterrows()
+        ]
+
+        # Batch evaluate with multi-dimensional format
+        log_experiment_milestone(f"Batch evaluating {len(evaluations)} test samples with human rubric...")
+        results = client.evaluate_batch(
+            evaluations,
+            model=None,
+            max_workers=self.config.concurrency,
+            multi_dimensional=True
+        )
+
+        # Extract target dimension scores
+        # Results format: {"dimension": {"score": X, "explanation": "..."}, ...}
+        predictions = []
+        for idx, result in enumerate(results):
+            try:
+                dim_result = result.get(self.config.target_dimension, {})
+                score = dim_result.get('score', float('nan'))
+                predictions.append(float(score))
+            except Exception as e:
+                log_experiment_milestone(f"Error parsing sample {idx}: {e}")
+                predictions.append(float('nan'))
+
+        predictions = np.array(predictions)
+
+        # Cache results
+        with open(cache_path, 'wb') as f:
+            pickle.dump(predictions, f)
+
+        log_experiment_milestone(
+            f"Human-rubric evaluation complete. Cached to: {cache_path}"
+        )
+
+        return predictions
 
     def save_results(
         self,
@@ -463,14 +556,17 @@ class ExperimentRunner:
             # 3. Get judge scores (with caching)
             df = self.get_judged_data(df)
 
-            # 4. Prepare training data
+            # 4. Prepare training data (includes test_indices_in_full)
             data = self.prepare_training_data(df)
 
             # 5. Train GAM
             gam_results = self.train_gam(data)
 
-            # 6. Run baselines
-            baseline_results = self.run_baselines(data)
+            # 6. Run human-rubric evaluation on test set and baselines
+            human_rubric_predictions = self.run_human_rubric_evaluation(
+                df, data['test_indices_in_full']
+            )
+            baseline_results = self.run_baselines(data, human_rubric_predictions)
 
             # 7. Save results
             self.save_results(gam_results, baseline_results)
