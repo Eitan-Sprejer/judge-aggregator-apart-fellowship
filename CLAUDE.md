@@ -118,7 +118,7 @@ judge-aggregator/
 │   └── training_config.json
 ├── utils/                           # Logging utilities
 │   └── logging_setup.py
-├── run_full_experiment.py           # Main CLI: Full experiment pipeline (workshop)
+├── run_experiment.py                # Main CLI: Config-driven experiment pipeline
 ├── analyze_existing_experiment.py   # Main CLI: Post-hoc GAM analysis
 └── gam_stability_analysis.py        # Main CLI: Feature stability analysis
 ```
@@ -137,16 +137,16 @@ pip install -r requirements.txt
 cp .env.example .env  # Add your API keys (OpenAI, etc.)
 ```
 
-### Workshop Experiments (Legacy)
+### Running Experiments
 ```bash
-# Run workshop pipeline (UltraFeedback synthetic personas)
-python run_full_experiment.py --data-source ultrafeedback --data-size 2000
+# Run experiment from config file
+python run_experiment.py config/test_helpsteer2_50.yaml
 
 # Add GAM analysis to existing results
-python analyze_existing_experiment.py --experiment-dir results/full_experiments/main_experiment_results
+python analyze_existing_experiment.py --experiment-dir results/test-helpsteer2-50_20241110_201155
 
 # Stability analysis
-python gam_stability_analysis.py --experiment-dir results/full_experiments/main_experiment_results --n-runs 20
+python gam_stability_analysis.py --experiment-dir results/test-helpsteer2-50_20241110_201155 --n-runs 20
 ```
 
 ### Fellowship Experiments (Current)
@@ -166,7 +166,7 @@ python run_experiment.py
 
 ### Main Scripts (User-facing CLI)
 
-- **`run_full_experiment.py`**: Main experiment pipeline - loads UltraFeedback, simulates personas, gets judge scores, trains models
+- **`run_experiment.py`**: Config-driven experiment pipeline - loads dataset, gets judge scores, trains models, runs baselines
 - **`analyze_existing_experiment.py`**: Adds GAM hyperparameter tuning and baseline comparisons to existing results (non-destructive)
 - **`gam_stability_analysis.py`**: Analyzes stability of GAM feature importance across model variants
 
@@ -211,6 +211,50 @@ python run_experiment.py
 - Better performance on complex interactions
 - Less interpretable than GAM
 - Hyperparameter tuning supported
+
+## Evaluation Metrics
+
+All models and baselines are evaluated using 6 comprehensive metrics:
+
+### Regression Metrics
+- **MSE** (Mean Squared Error): Average squared difference between predictions and ground truth
+- **MAE** (Mean Absolute Error): Average absolute difference
+- **R²** (R-squared): Proportion of variance explained (0-1, higher is better)
+
+### Correlation Metrics
+- **Spearman's ρ** (rho): Rank correlation coefficient (measures monotonic relationships)
+- **Kendall's τ** (tau): Rank correlation with better properties for small samples
+- **Pearson's r**: Linear correlation coefficient
+
+These metrics provide complementary views of model performance: regression metrics measure numerical accuracy, while correlation metrics assess ranking quality (important for preference learning).
+
+## Baseline Methods
+
+The framework includes multiple baseline methods for comparison:
+
+### Non-Learned Baselines
+1. **Naive Mean**: Simple average of all judge scores (no scaling)
+2. **Linear Scaling Mean**: Judge scores scaled to target range, then averaged (main comparison)
+3. **StandardScaler + LR Mean**: StandardScaler normalization + LinearRegression, then averaged
+4. **Best Single Judge (Naive)**: Best-performing individual judge (no scaling)
+
+### Human-Rubric Baseline (NEW)
+**Purpose**: Tests whether a single LLM judge with the exact human annotation rubric can match the learned aggregator.
+
+**How it works**:
+- Uses the same rubric that human annotators received for each dataset
+- Evaluates all dimensions simultaneously (multi-dimensional JSON response)
+- Model and temperature configured per experiment (default: GPT-4, temp=0.0)
+- Results are cached in `results/_baseline_cache/` for reuse
+
+**Configuration** (in experiment YAML):
+```yaml
+baseline_judge_model: "gpt-4"  # Optional, defaults to gpt-4
+baseline_judge_temperature: 0.0  # Optional, defaults to 0.0
+run_human_rubric_baseline: true  # Optional, defaults to true
+```
+
+**Rubrics** are stored in `pipeline/utils/dataset_rubrics.yaml` and match the exact instructions given to human annotators.
 
 ## Experiments
 
