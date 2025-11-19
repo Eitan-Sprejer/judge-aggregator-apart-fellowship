@@ -9,7 +9,7 @@ import logging
 import pickle
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Union
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -153,6 +153,45 @@ class GAMAggregator:
             importance[label] = 1.0 - p_value
 
         return importance
+
+    def save_model(self, path: Union[str, Path]):
+        """Save GAM model to disk using joblib (sklearn-recommended).
+
+        Args:
+            path: Path to save the model
+
+        Note:
+            Uses joblib instead of pickle for better compression and
+            efficiency with numpy arrays (sklearn best practice).
+        """
+        from pathlib import Path as PathType
+        import joblib
+
+        if self.model is None:
+            raise ValueError("Model must be fitted before saving")
+
+        path = PathType(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Save entire GAMAggregator object (includes model + metadata)
+        joblib.dump(self, path, compress=3)
+        logger.info(f"Saved GAM model to {path}")
+
+    @classmethod
+    def load_model(cls, path: Union[str, Path]) -> 'GAMAggregator':
+        """Load GAM model from disk.
+
+        Args:
+            path: Path to load the model from
+
+        Returns:
+            Loaded GAMAggregator instance
+        """
+        import joblib
+
+        gam = joblib.load(path)
+        logger.info(f"Loaded GAM model from {path}")
+        return gam
 
 
 class MLPTrainer:
@@ -304,10 +343,17 @@ class MLPTrainer:
         
         return outputs.cpu().numpy()
     
-    def save_model(self, path: Path):
-        """Save model checkpoint."""
+    def save_model(self, path: Union[str, Path]):
+        """Save model checkpoint.
+
+        Args:
+            path: Path to save the model checkpoint
+        """
         if self.model is None:
             raise ValueError("No model to save")
+
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
 
         torch.save({
             'model_state_dict': self.model.state_dict(),
@@ -316,8 +362,12 @@ class MLPTrainer:
         }, path)
         logger.info(f"Model saved to {path}")
 
-    def load_model(self, path: Path):
-        """Load model checkpoint."""
+    def load_model(self, path: Union[str, Path]):
+        """Load model checkpoint.
+
+        Args:
+            path: Path to load the model from
+        """
         checkpoint = torch.load(path, map_location=self.device)
         # Support both old 'n_judges' key and new 'n_features' key
         n_features = checkpoint.get('n_features', checkpoint.get('n_judges', 10))
@@ -331,19 +381,49 @@ class MLPTrainer:
 
 def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
     """
-    Compute evaluation metrics.
-    
+    Compute comprehensive evaluation metrics including regression and correlation metrics.
+
     Args:
         y_true: Ground truth values
         y_pred: Predicted values
-        
+
     Returns:
-        Dictionary of metrics
+        Dictionary of metrics with keys:
+            - mse: Mean Squared Error
+            - mae: Mean Absolute Error
+            - r2: R-squared score
+            - spearman_rho: Spearman's rank correlation coefficient
+            - kendall_tau: Kendall's tau correlation coefficient
+            - pearson_r: Pearson's correlation coefficient
     """
+    # Basic regression metrics
+    mse = mean_squared_error(y_true, y_pred)
+    mae = mean_absolute_error(y_true, y_pred)
+    r2 = r2_score(y_true, y_pred)
+
+    # Correlation metrics
+    try:
+        spearman_result = stats.spearmanr(y_true, y_pred)
+        spearman_rho = float(spearman_result.correlation)
+
+        kendall_result = stats.kendalltau(y_true, y_pred)
+        kendall_tau = float(kendall_result.correlation)
+
+        pearson_result = stats.pearsonr(y_true, y_pred)
+        pearson_r = float(pearson_result[0])
+    except (ValueError, RuntimeError) as e:
+        logging.warning(f"Error computing correlation metrics: {e}")
+        spearman_rho = float('nan')
+        kendall_tau = float('nan')
+        pearson_r = float('nan')
+
     return {
-        'mse': mean_squared_error(y_true, y_pred),
-        'mae': mean_absolute_error(y_true, y_pred),
-        'r2': r2_score(y_true, y_pred)
+        'mse': float(mse),
+        'mae': float(mae),
+        'r2': float(r2),
+        'spearman_rho': spearman_rho,
+        'kendall_tau': kendall_tau,
+        'pearson_r': pearson_r
     }
 
 

@@ -1,0 +1,85 @@
+# Example Experiment Configuration: SummEval Baseline
+#
+# This configuration runs a baseline experiment on the SummEval dataset
+# from JUDGE-BENCH, training a GAM aggregator to predict human aggregated
+# scores from 10 judge dimensions.
+#
+# Usage:
+#   python run_experiment.py config/baseline_summeval.yaml
+
+# Experiment metadata
+name: baseline_summeval
+dataset: judge_bench  # Dataset name for loader
+target: target_human_aggregated  # Use human aggregated scores as target
+target_dimension: coherence  # REQUIRED: SummEval dimensions: ['coherence', 'consistency', 'fluency', 'relevance']
+
+# Dataset-specific parameters
+dataset_kwargs:
+  task_name: summeval  # JUDGE-BENCH task
+  n_samples: null  # null = use all samples (1,600 for SummEval)
+
+# Judge configuration
+judges:
+  # Judge IDs reference judges defined in pipeline/utils/judges.yaml
+  judge_ids:
+    - truthfulness-judge
+    - harmlessness-judge
+    - helpfulness-judge
+    - honesty-judge
+    - explanatory-depth-judge
+    - instruction-following-judge
+    - clarity-judge
+    - conciseness-judge
+    - logical-consistency-judge
+    - creativity-judge
+
+  # Human-readable names for plots and reports
+  judge_names:
+    - Truthfulness
+    - Harmlessness
+    - Helpfulness
+    - Honesty
+    - Explanatory Depth
+    - Instruction Following
+    - Clarity
+    - Conciseness
+    - Logical Consistency
+    - Creativity
+
+  # Score range for judges (Martian judges use 0.0-4.0)
+  score_range:
+    - 0.0
+    - 4.0
+
+# Model training configuration
+models:
+  # GAM (Generalized Additive Model) configuration
+  gam:
+    n_splines: 10  # Number of splines for each feature
+    lam: 0.6  # Lambda regularization parameter
+    max_iter: 100  # Maximum iterations for fitting
+
+  # MLP configuration (not used currently)
+  mlp:
+    hidden_dim: 64
+    learning_rate: 0.005
+    batch_size: 16
+    n_epochs: 100
+    dropout: 0.0
+    l2_reg: 0.0
+    early_stopping_patience: 15
+    min_delta: 0.0001
+
+  # Training flags
+  train_gam: true  # Train GAM model
+  train_mlp: false  # Skip MLP for now
+
+  # Data splits
+  test_size: 0.2  # 20% of data for test set
+  val_size: 0.15  # 15% of remaining training data for validation
+
+# API concurrency settings
+concurrency: 1  # Max concurrent API calls for judge evaluation (1 = conservative for rate limiting)
+
+# Random seed for reproducibility
+random_seed: 42

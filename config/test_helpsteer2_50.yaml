@@ -1,5 +1,5 @@
-# Example Experiment Configuration
-# This shows the full structure of an experiment config
+# Test Experiment Configuration - HelpSteer2 (n=50)
+# Quick test with real human annotations, no persona simulation
 #
 # Available Datasets and Dimensions:
 #   - ultrafeedback: ['overall'] (synthetic only, no human annotations)
@@ -9,15 +9,15 @@
 #   - recipe: ['grammar', 'fluency', 'verbosity', 'structure', 'success', 'overall']
 #   - wmt_en_de, wmt_zh_en: ['quality']
 
-name: "example-experiment"
-dataset: "ultrafeedback"
-target: "target_synthetic"  # 'target_human_aggregated', 'target_human_individual', or 'target_synthetic'
-target_dimension: "overall"  # REQUIRED: Specific dimension name (e.g., 'helpfulness', 'overall')
+name: "test-helpsteer2-50"
+dataset: "helpsteer2"
+target: "target_human_aggregated"  # Use real human annotations (no persona simulation)
+target_dimension: "helpfulness"  # REQUIRED: Specific dimension to predict
 
 dataset_kwargs:
-  n_samples: 2000
+  n_samples: 50
   random_seed: 42
-  with_personas: true
+  split: "train"  # or "validation"
 
 judges:
   judge_ids:
@@ -49,24 +49,24 @@ judges:
 models:
   train_gam: true
   train_mlp: true
-  test_size: 0.2
-  val_size: 0.15
+  test_size: 0.2    # 10 samples for test
+  val_size: 0.15    # ~6 samples for validation
 
   gam:
-    n_splines: 10
+    n_splines: 5    # Reduced for small dataset
     lam: 0.6
-    max_iter: 100
+    max_iter: 50    # Faster for testing
 
   mlp:
-    hidden_dim: 64
+    hidden_dim: 32  # Smaller for small dataset
     learning_rate: 0.005
-    batch_size: 16
-    n_epochs: 100
+    batch_size: 8   # Smaller batches
+    n_epochs: 50    # Fewer epochs
     dropout: 0.0
     l2_reg: 0.0
-    early_stopping_patience: 15
+    early_stopping_patience: 10
     min_delta: 0.0001
 
-concurrency: 1  # Max concurrent API calls
+concurrency: 3  # Moderate parallelism for judge API calls
 
 random_seed: 42

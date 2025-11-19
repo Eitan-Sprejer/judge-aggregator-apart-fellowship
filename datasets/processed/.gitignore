@@ -1,0 +1,5 @@
+# Ignore all cached preprocessed datasets (large binary files)
+*.pkl
+
+# Keep this README
+!README.md
