@@ -38,6 +38,8 @@ from pipeline.core.dataset_loader import DatasetLoader
 from pipeline.core.persona_simulation import PersonaSimulator
 from pipeline.core.judge_evaluation import JudgeEvaluator
 from pipeline.core.aggregator_training import GAMAggregator, compute_metrics
+from pipeline.core.judge_creation_orchestrator import JudgeCreationOrchestrator
+from pipeline.utils import judge_rubrics
 from utils.logging_setup import (
     setup_universal_logging, log_experiment_start,
     log_experiment_milestone, log_experiment_complete
@@ -89,7 +91,7 @@ class ExperimentRunner:
             'name': config.name,
             'dataset': config.dataset,
             'target': config.target,
-            'judges': config.judges.judge_ids,
+            'judge_files': config.judges.file_paths if config.judges.has_files else [],
             'run_dir': str(self.run_dir)
         })
 
@@ -99,12 +101,20 @@ class ExperimentRunner:
     def _compute_judge_cache_key(self) -> str:
         """Compute MD5 hash of judge configuration for cache key.
 
+        Cache key must include actual judge IDs to invalidate cache when judges change.
+
         Returns:
             MD5 hash string
         """
-        # Sort judge IDs for consistent hashing
-        sorted_ids = sorted(self.config.judges.judge_ids)
-        cache_str = "_".join(sorted_ids)
+        # Use judge IDs if available (after evaluation), otherwise use file paths
+        if hasattr(self, 'judge_ids') and self.judge_ids:
+            # Cache key based on actual judge IDs (most accurate)
+            cache_str = "_".join(sorted(self.judge_ids))
+        else:
+            # Fallback: use judge file paths (before evaluation)
+            file_paths = sorted(self.config.judges.file_paths)
+            cache_str = "_".join(file_paths)
+
         return hashlib.md5(cache_str.encode()).hexdigest()
 
     def load_dataset(self) -> pd.DataFrame:
@@ -177,6 +187,132 @@ class ExperimentRunner:
 
         return df_with_personas
 
+    def create_judges_if_needed(self, df: pd.DataFrame):
+        """Create dataset-specific judges if target_dimensions is specified in config.
+
+        Args:
+            df: Dataset DataFrame (may be used for sample Q&A pairs in judge creation)
+        """
+        # Check if judge creation is needed
+        if not hasattr(self.config, 'target_dimensions') or not self.config.target_dimensions:
+            log_experiment_milestone("No target_dimensions specified, skipping judge creation")
+            return
+
+        target_dimensions = self.config.target_dimensions
+        log_experiment_milestone(
+            f"Judge creation requested for {len(target_dimensions)} dimensions: {target_dimensions}"
+        )
+
+        # Get cache strategy (default: 'auto')
+        cache_strategy = getattr(self.config, 'judge_cache_strategy', 'auto')
+        decomposition_depth = getattr(self.config, 'judge_decomposition_depth', 1)
+
+        # Get judge creation config (optional)
+        judge_creation_config = getattr(self.config, 'judge_creation_config', None) or {}
+        model = judge_creation_config.get('model', 'openai/gpt-5.1')
+        temperature = judge_creation_config.get('temperature', 0.4)
+        max_tokens = judge_creation_config.get('max_tokens', 2048)
+
+        log_experiment_milestone(
+            f"Judge cache strategy: {cache_strategy}, decomposition depth: {decomposition_depth}"
+        )
+
+        # Initialize orchestrator
+        orchestrator = JudgeCreationOrchestrator(
+            dataset_name=self.config.dataset,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens
+        )
+
+        # Load dimension descriptions from dataset_rubrics.yaml
+        import yaml
+        rubrics_path = Path(__file__).parent / "pipeline" / "utils" / "dataset_rubrics.yaml"
+
+        if not rubrics_path.exists():
+            raise FileNotFoundError(
+                f"dataset_rubrics.yaml not found at {rubrics_path}. "
+                f"Cannot create judges without dimension descriptions."
+            )
+
+        with open(rubrics_path) as f:
+            rubrics = yaml.safe_load(f)
+
+        if self.config.dataset not in rubrics:
+            raise ValueError(
+                f"Dataset '{self.config.dataset}' not found in dataset_rubrics.yaml. "
+                f"Available datasets: {list(rubrics.keys())}"
+            )
+
+        rubric_config = rubrics[self.config.dataset]
+        rubric_dimensions = {
+            d['name']: d['description']
+            for d in rubric_config.get('dimensions', [])
+        }
+
+        # Validate target dimensions
+        for dim in target_dimensions:
+            if dim not in rubric_dimensions:
+                raise ValueError(
+                    f"Target dimension '{dim}' not found in dataset rubrics. "
+                    f"Available dimensions: {list(rubric_dimensions.keys())}"
+                )
+
+        # Prepare dimension list for orchestrator
+        dimensions = [
+            {'name': dim, 'description': rubric_dimensions[dim]}
+            for dim in target_dimensions
+        ]
+
+        # Optional: Extract sample Q&A pairs for context (first 3 samples)
+        sample_qa_pairs = None
+        if len(df) > 0:
+            question_col = 'question' if 'question' in df.columns else 'instruction'
+            response_col = 'response' if 'response' in df.columns else 'answer'
+
+            sample_qa_pairs = [
+                {'question': row[question_col], 'response': row[response_col]}
+                for _, row in df.head(3).iterrows()
+            ]
+
+        # Create judges
+        try:
+            judges = orchestrator.create_judges_for_dataset(
+                dimensions=dimensions,
+                cache_strategy=cache_strategy,
+                decomposition_depth=decomposition_depth,
+                sample_qa_pairs=sample_qa_pairs
+            )
+
+            log_experiment_milestone(
+                f"Judge creation complete: {len(judges)} judges available for {self.config.dataset}"
+            )
+
+            # Update config with judge file paths if not manually specified
+            if not self.config.judges.has_files:
+                # Auto-set judge files to all depth files created
+                dataset_judges_dir = Path(__file__).parent / "judges" / self.config.dataset
+                depth_files = sorted(dataset_judges_dir.glob("depth_*.yaml"))
+
+                if depth_files:
+                    # Convert to relative paths from repo root
+                    relative_paths = [
+                        f"judges/{self.config.dataset}/{f.name}"
+                        for f in depth_files
+                    ]
+                    log_experiment_milestone(
+                        f"Auto-detected {len(relative_paths)} judge files: {[f.name for f in depth_files]}"
+                    )
+                    self.config.judges.judge_files = relative_paths
+                else:
+                    raise RuntimeError(
+                        f"Judge creation succeeded but no depth files found in {dataset_judges_dir}"
+                    )
+
+        except Exception as e:
+            log_experiment_milestone(f"Judge creation failed: {e}")
+            raise
+
     def get_judged_data(self, df: pd.DataFrame) -> pd.DataFrame:
         """Get judge scores for dataset, using shared cache if available.
 
@@ -186,7 +322,25 @@ class ExperimentRunner:
         Returns:
             DataFrame with judge scores
         """
-        # Compute cache key
+        # Validate that judge files are specified
+        if not self.config.judges.has_files:
+            raise ValueError(
+                "No judge files specified in config. Either:\n"
+                "1. Specify 'judge_file' or 'judge_files' in config, OR\n"
+                "2. Specify 'target_dimensions' to trigger automatic judge creation"
+            )
+
+        # Initialize judge evaluator to get judge IDs (doesn't run evaluation yet)
+        evaluator = JudgeEvaluator(
+            judge_file_paths=self.config.judges.file_paths,
+            model=self.config.judge_model
+        )
+
+        # Store judge IDs and names for later use
+        self.judge_ids = evaluator.judge_ids
+        self.judge_names = [jid.replace('-', ' ').title() for jid in evaluator.judge_ids]
+
+        # Compute cache key based on actual judge IDs
         cache_key = self._compute_judge_cache_key()
         cache_path = self.judged_cache_dir / f"{self.config.dataset}_{cache_key}.pkl"
 
@@ -195,7 +349,7 @@ class ExperimentRunner:
             log_experiment_milestone(f"Loading judged data from shared cache: {cache_path}")
             df_with_judges = pd.read_pickle(cache_path)
 
-            # Verify cache matches current dataset size
+            # Verify cache matches current dataset size and judge set
             if len(df_with_judges) >= len(df):
                 # Use subset if cached data is larger
                 df_judged = df_with_judges.iloc[:len(df)].copy()
@@ -209,9 +363,6 @@ class ExperimentRunner:
                 return df_judged
 
         log_experiment_milestone("Running judge evaluation (no cache found)")
-
-        # Initialize judge evaluator
-        evaluator = JudgeEvaluator(judge_ids=self.config.judges.judge_ids)
 
         # Run evaluation
         df_with_judges = evaluator.evaluate_dataset(
@@ -230,6 +381,25 @@ class ExperimentRunner:
         df_with_judges.to_pickle(judge_path)
 
         return df_with_judges
+
+    def _store_judge_info_from_cache(self, df: pd.DataFrame):
+        """Extract judge IDs from cached data and store for later use.
+
+        Args:
+            df: DataFrame with judge_scores column
+        """
+        # Get judge IDs from first row's judge_scores keys
+        if len(df) > 0 and 'judge_scores' in df.columns:
+            first_scores = df.iloc[0]['judge_scores']
+            if isinstance(first_scores, dict):
+                self.judge_ids = list(first_scores.keys())
+                self.judge_names = [jid.replace('-', ' ').title() for jid in self.judge_ids]
+            else:
+                self.judge_ids = []
+                self.judge_names = []
+        else:
+            self.judge_ids = []
+            self.judge_names = []
 
     def prepare_training_data(self, df: pd.DataFrame) -> Dict[str, Any]:
         """Prepare features and targets for training.
@@ -303,7 +473,7 @@ class ExperimentRunner:
             'y_val': y_val,
             'X_test': X_test,
             'y_test': y_test,
-            'judge_names': self.config.judges.judge_names,
+            'judge_names': self.judge_names,
             'test_indices_in_full': test_indices_in_full
         }
 
@@ -324,6 +494,7 @@ class ExperimentRunner:
 
         # Initialize GAM
         gam = GAMAggregator(
+            feature_names=self.judge_names,
             n_splines=self.config.models.gam.n_splines,
             lam=self.config.models.gam.lam,
             max_iter=self.config.models.gam.max_iter
@@ -454,9 +625,9 @@ class ExperimentRunner:
             )
             return None
 
-        # Initialize Martian client
+        # Initialize Martian client (uses same model as judge evaluation)
         try:
-            client = MartianClient()
+            client = MartianClient(default_model=self.config.judge_model)
         except Exception as e:
             log_experiment_milestone(f"Failed to initialize MartianClient: {e}")
             return None
@@ -474,23 +645,27 @@ class ExperimentRunner:
             for _, row in df_test.iterrows()
         ]
 
-        # Batch evaluate with multi-dimensional format
         log_experiment_milestone(f"Batch evaluating {len(evaluations)} test samples with human rubric...")
         results = client.evaluate_batch(
             evaluations,
-            model=None,
-            max_workers=self.config.concurrency,
-            multi_dimensional=True
+            dataset=self.config.dataset,
+            model=self.config.judge_model,
+            max_workers=self.config.concurrency
         )
 
-        # Extract target dimension scores
-        # Results format: {"dimension": {"score": X, "explanation": "..."}, ...}
         predictions = []
         for idx, result in enumerate(results):
             try:
-                dim_result = result.get(self.config.target_dimension, {})
-                score = dim_result.get('score', float('nan'))
-                predictions.append(float(score))
+                if "error" in result:
+                    log_experiment_milestone(f"Sample {idx} evaluation failed: {result['error']}")
+                    predictions.append(float('nan'))
+                else:
+                    dim_data = result.get(self.config.target_dimension)
+                    if dim_data and isinstance(dim_data, dict):
+                        score = dim_data.get('score', float('nan'))
+                    else:
+                        score = float('nan')
+                    predictions.append(float(score))
             except Exception as e:
                 log_experiment_milestone(f"Error parsing sample {idx}: {e}")
                 predictions.append(float('nan'))
@@ -524,8 +699,9 @@ class ExperimentRunner:
             'experiment_name': self.config.name,
             'dataset': self.config.dataset,
             'target': self.config.target,
-            'judges': self.config.judges.judge_ids,
-            'n_judges': len(self.config.judges.judge_ids),
+            'judge_files': self.config.judges.file_paths,
+            'judges': self.judge_ids,
+            'n_judges': len(self.judge_ids),
             'random_seed': self.config.random_seed,
             'gam_results': {
                 'train': gam_results.get('train_metrics', {}),
@@ -552,6 +728,9 @@ class ExperimentRunner:
 
             # 2. Run persona simulation if needed
             df = await self.run_persona_simulation_if_needed(df)
+
+            # 2.5. Create dataset-specific judges if needed (NEW)
+            self.create_judges_if_needed(df)
 
             # 3. Get judge scores (with caching)
             df = self.get_judged_data(df)
