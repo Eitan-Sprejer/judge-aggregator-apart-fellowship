@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
 import pandas as pd
 
+from pipeline.utils import judge_rubrics
 from pipeline.utils.judge_rubrics import JUDGE_RUBRICS
 from pipeline.utils.martian_client import MartianClient
 
@@ -33,46 +34,46 @@ DEFAULT_JUDGE_IDS = list(JUDGE_RUBRICS.keys())
 
 
 class JudgeEvaluator:
-    """Handles evaluation of Q&A pairs using configurable sets of judges."""
+    """Handles evaluation of Q&A pairs using judges loaded from YAML files."""
 
     def __init__(
         self,
-        judge_ids: Optional[List[str]] = None,
-        config_path: Optional[str] = None
+        judge_file_paths: List[str],
+        config_path: Optional[str] = None,
+        model: Optional[str] = None
     ):
         """
         Initialize the evaluator with Martian API client.
 
         Args:
-            judge_ids: List of judge IDs to use (None = use all judges from JUDGE_RUBRICS)
+            judge_file_paths: List of paths to YAML files with judge definitions
+                             Can be relative to repo root or absolute
             config_path: Optional path to configuration file (kept for compatibility)
+            model: Model to use for judge evaluation (defaults to gpt-5-mini)
         """
-        # Set judge IDs (use all judges from JUDGE_RUBRICS if not specified)
-        self.judge_ids = judge_ids if judge_ids is not None else DEFAULT_JUDGE_IDS
-        logger.info(f"Initializing evaluator with {len(self.judge_ids)} judges")
+        self.judge_file_paths = judge_file_paths
+        logger.info(f"Initializing evaluator with judges from {len(judge_file_paths)} file(s)")
 
-        # Initialize Martian client
-        self.client = MartianClient()
+        # Initialize Martian client with specified model
+        self.client = MartianClient(default_model=model) if model else MartianClient()
 
-        # Load judge rubrics
+        # Load judge rubrics from files
         self.judges = self._load_judges()
-        
-    def _load_judges(self) -> Dict[str, str]:
-        """Load judge rubrics from local definitions."""
-        judges = {}
-        for judge_id in self.judge_ids:
-            if judge_id not in JUDGE_RUBRICS:
-                logger.error(f"❌ Judge {judge_id} not found in JUDGE_RUBRICS")
-                continue
+        self.judge_ids = list(self.judges.keys())
 
-            # Get rubric function and call it to get rubric text
-            rubric_func = JUDGE_RUBRICS[judge_id]
+        logger.info(f"✅ Loaded {len(self.judge_ids)} judges total")
+
+    def _load_judges(self) -> Dict[str, str]:
+        """Load judge rubrics from YAML files."""
+        # Load rubric functions from files
+        judge_rubric_functions = judge_rubrics.load_judges_from_files(self.judge_file_paths)
+
+        # Convert rubric functions to rubric text
+        judges = {}
+        for judge_id, rubric_func in judge_rubric_functions.items():
             rubric = rubric_func()
             judges[judge_id] = rubric
-            logger.info(f"✅ Loaded judge {judge_id}")
-
-        if len(judges) != len(self.judge_ids):
-            logger.warning(f"Only loaded {len(judges)}/{len(self.judge_ids)} judges")
+            logger.info(f"  ✅ Loaded judge {judge_id}")
 
         return judges
     

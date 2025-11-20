@@ -1,0 +1,321 @@
+judges:
+- id: helpsteer2-helpfulness-judge-directness-and-relevance
+  name: Directness and Relevance
+  version: '1.0'
+  description: "Measures how immediately and tightly the response addresses the user\u2019\
+    s stated question and intent. Emphasizes presenting the core answer in the opening\
+    \ and maintaining focus without digressions, filler, or restating the prompt without\
+    \ added value."
+  scoring_description: Score how well the response demonstrates directness and relevance
+  definition: "Measures how immediately and tightly the response addresses the user\u2019\
+    s stated question and intent. Emphasizes presenting the core answer in the opening\
+    \ and maintaining focus without digressions, filler, or restating the prompt without\
+    \ added value."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - No identifiable attempt to answer the question; content is irrelevant, evasive,
+      or off-topic.
+    - "Opens and continues without addressing the user\u2019s intent or constraints\
+      \ (e.g., only meta talk, disclaimers, or unrelated content)."
+    - Changes subject or introduces information with no clear tie to the request.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Primarily restates the prompt or gives generic filler; the core answer is unclear
+      or only briefly mentioned.
+    - "Includes clear digressions or unrelated details that do not advance the user\u2019\
+      s goal."
+    - Relevant content is outweighed by off-topic or misaligned material.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Partially addresses the request; the answer is buried (appears mid-response)
+      after setup or restatement.
+    - Includes noticeable generic background or side points; some content is loosely
+      related or redundant.
+    - Focus drifts in places, making the core answer harder to identify.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - "Core answer appears early (within the first 2\u20133 sentences) and remains\
+      \ the main thread."
+    - Minor tangents or brief context are present but do not impede the main answer.
+    - "Mostly aligned with the user\u2019s stated intent/constraints, with minimal\
+      \ extraneous material."
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "Leads with the core answer or action in the first sentence and directly aligns\
+      \ with the user\u2019s intent/constraints."
+    - Maintains strict focus throughout; no digressions, filler, or prompt restatements
+      without added value.
+    - "All content directly supports the user\u2019s goal; no off-topic details or\
+      \ meta commentary."
+  guidelines:
+  - Leads with a clear, explicit answer to the main question.
+  - Stays on-topic and avoids extraneous or meta content.
+  - Focuses on the user's intent rather than generic filler.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+- id: helpsteer2-helpfulness-judge-adherence-to-instructions-and-context
+  name: Adherence to Instructions and Context
+  version: '1.0'
+  description: Measures how faithfully the response follows explicit instructions,
+    format requirements, and tool usage, and how correctly it integrates any provided
+    context or materials. High scores require precise mechanical compliance, accurate
+    use of supplied resources, and clear respect for constraints; lower scores reflect
+    omissions, misuse, or unacknowledged deviations.
+  scoring_description: Score how well the response demonstrates adherence to instructions
+    and context
+  definition: Measures how faithfully the response follows explicit instructions,
+    format requirements, and tool usage, and how correctly it integrates any provided
+    context or materials. High scores require precise mechanical compliance, accurate
+    use of supplied resources, and clear respect for constraints; lower scores reflect
+    omissions, misuse, or unacknowledged deviations.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Ignores explicit instructions/constraints and required formats or tools entirely.
+    - Does not use or contradicts provided context/materials without acknowledgment.
+    - Includes fabricated or incompatible content presented as if it came from the
+      required sources/tools.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Follows only a small portion of instructions; key requirements (format, tool
+      use, citations) are missing or incorrect.
+    - Uses provided context incorrectly (misquotes, misattributes) or in a way that
+      conflicts with constraints.
+    - Deviations from instructions are not acknowledged or justified.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - 'Partial compliance: some required formats/tools used but with notable errors
+      or omissions.'
+    - Integrates context superficially or inconsistently; minor contradictions or
+      unsupported inferences.
+    - Constraints are only partly observed and deviations (if any) are vaguely noted
+      without fixes.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Mostly follows instructions and format with only minor lapses (small citation/format
+      errors or a missed detail).
+    - Accurately uses provided context/tools with minimal, noncritical issues.
+    - Respects stated constraints and briefly acknowledges any necessary, limited
+      deviation.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Strict, complete compliance with all instructions, required formats, and tool
+      usage.
+    - Accurate, faithful integration of provided context/materials with no distortions
+      or omissions.
+    - Explicitly honors all constraints; any unavoidable deviation is clearly stated,
+      justified, and minimized.
+  guidelines:
+  - Uses required formats, citations, or tools exactly as specified.
+  - Incorporates supplied sources, data, or constraints (e.g., dates, scope) as directed.
+  - Acknowledges limitations and offers compliant alternatives if strict adherence
+    is impossible.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+- id: helpsteer2-helpfulness-judge-factual-accuracy-and-reliability
+  name: Factual Accuracy and Reliability
+  version: '1.0'
+  description: Assesses whether the response is factually correct, internally consistent,
+    and free of fabricated or unsupported claims. Emphasizes verifiability through
+    evidence, alignment with provided context, and appropriate signaling of uncertainty.
+    Rewards precise, checkable statements and penalizes inaccuracies, contradictions,
+    and overconfident assertions without support.
+  scoring_description: Score how well the response demonstrates factual accuracy and
+    reliability
+  definition: Assesses whether the response is factually correct, internally consistent,
+    and free of fabricated or unsupported claims. Emphasizes verifiability through
+    evidence, alignment with provided context, and appropriate signaling of uncertainty.
+    Rewards precise, checkable statements and penalizes inaccuracies, contradictions,
+    and overconfident assertions without support.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Multiple major factual errors or contradictions; key claims conflict with provided
+      context or established facts.
+    - Fabricated or unverifiable details presented as facts (e.g., invented statistics,
+      quotes, sources).
+    - Overconfident tone despite inaccuracies; no caveats or recognition of uncertainty.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - At least one major factual error affecting the core answer, or several minor
+      errors.
+    - Claims lack support or are not verifiable where evidence is expected (no basis,
+      references, or checkable reasoning).
+    - Internal inconsistencies or misuse/misinterpretation of provided data/tools.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Mostly correct but includes a minor factual error, ambiguous claim, or omission
+      that reduces reliability.
+    - 'Limited verifiability: some non-obvious statements lack evidence or clear basis;
+      uncertainty signaling is weak.'
+    - Generally aligns with context but may overlook a relevant constraint leading
+      to potential inaccuracy.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Factually correct on all key points; only minor imprecision that does not alter
+      meaning or outcomes.
+    - Internally consistent and aligned with provided context, data, and instructions.
+    - Non-obvious claims are supported by credible evidence or transparent reasoning,
+      with appropriate qualification of uncertainty.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Fully accurate with precise, specific statements; no factual errors or contradictions.
+    - All substantive claims are verifiable via credible sources, data, or explicit,
+      checkable reasoning; no fabricated details.
+    - Explicitly states assumptions and uncertainty where evidence is limited; cross-checks
+      numbers/dates/definitions for consistency.
+  guidelines:
+  - Contains no clear factual errors, contradictions, or fabrications.
+  - Distinguishes verified facts from uncertainty and flags limits when needed.
+  - Uses terminology and data correctly and aligns with any provided context.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+- id: helpsteer2-helpfulness-judge-actionable-completeness
+  name: Actionable Completeness
+  version: '1.0'
+  description: This rubric assesses how completely and practically a response addresses
+    the user's task. It emphasizes coverage of all required components and inclusion
+    of specific, immediately usable steps, details, and decision points aligned to
+    stated constraints. Favor concise, focused completeness over verbosity; penalize
+    missing essentials and vague generalities.
+  scoring_description: Score how well the response demonstrates actionable completeness
+  definition: This rubric assesses how completely and practically a response addresses
+    the user's task. It emphasizes coverage of all required components and inclusion
+    of specific, immediately usable steps, details, and decision points aligned to
+    stated constraints. Favor concise, focused completeness over verbosity; penalize
+    missing essentials and vague generalities.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Non-Actionable
+    indicators:
+    - Does not cover required components of the task.
+    - Provides no usable steps, details, or next actions.
+    - Content is generic, off-topic, or contradictions prevent execution.
+  - range: [1.0, 1.9]
+    label: Minimal
+    indicators:
+    - Touches the topic but misses most key requirements or constraints.
+    - Offers only vague suggestions with no concrete specifics (who/what/how/when).
+    - Cannot be executed without substantial additional information from the user.
+  - range: [2.0, 2.9]
+    label: Partial
+    indicators:
+    - Covers some key components but omits several essential steps or details.
+    - Presents steps or advice with limited specificity (missing parameters, tools,
+      examples, or sequencing).
+    - Leaves notable ambiguities or dependencies unaddressed.
+  - range: [3.0, 3.9]
+    label: Substantial
+    indicators:
+    - Addresses most required components with clear, ordered steps that are largely
+      executable.
+    - Includes important specifics (inputs, tools, parameters, or examples) aligned
+      to stated constraints.
+    - Minor omissions or edge cases remain but do not block execution.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Fully covers all key requirements with concise, end-to-end, prioritized steps
+      and decision points tailored to the context.
+    - Supplies concrete specifics needed to act (values, commands, links, templates,
+      or success criteria) while adhering to stated constraints.
+    - Anticipates ambiguities or variants with brief assumptions, options, or follow-ups
+      without unnecessary filler.
+  guidelines:
+  - Addresses all major sub-questions or requirements in the prompt.
+  - Provides concrete steps, examples, parameters, or recommendations the user can
+    act on.
+  - Offers a concise summary plus necessary detail without major omissions.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+- id: helpsteer2-helpfulness-judge-structure-and-ambiguity-management
+  name: Structure and Ambiguity Management
+  version: '1.0'
+  description: Evaluates how clearly and logically the response is organized for easy
+    use and how effectively it handles ambiguity. Rewards concise structure (e.g.,
+    overview first, then ordered bullets/steps) and proactive clarification (explicit
+    assumptions or focused questions) while still delivering immediate, actionable
+    value.
+  scoring_description: Score how well the response demonstrates structure and ambiguity
+    management
+  definition: Evaluates how clearly and logically the response is organized for easy
+    use and how effectively it handles ambiguity. Rewards concise structure (e.g.,
+    overview first, then ordered bullets/steps) and proactive clarification (explicit
+    assumptions or focused questions) while still delivering immediate, actionable
+    value.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Disorganized or incoherent presentation (e.g., unrelated fragments or a rambling
+      paragraph) that hinders extraction of the answer.
+    - Fails to recognize ambiguity or introduces conflicting, unstated assumptions
+      or irrelevant questions.
+    - Deflects without offering any actionable guidance or next steps.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Minimal or unclear structure (wall of text or unordered points) with weak logical
+      flow.
+    - "Ignores ambiguity or asks a generic \u201Cplease clarify\u201D without specifying\
+      \ what is unclear."
+    - Provides little to no actionable help pending clarification.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Some structure present (bullets or sections) but mixed with dense or scattered
+      content that reduces usability.
+    - Acknowledges ambiguity vaguely or late; questions are broad/unspecific or assumptions
+      are implicit.
+    - Offers partial or generic guidance with limited immediate usefulness while awaiting
+      clarification.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Clear, mostly well-organized layout (brief overview plus bullets/steps) with
+      logical sequencing.
+    - Identifies key ambiguity and either states a primary assumption or asks 1 focused,
+      relevant question.
+    - Provides actionable guidance based on the stated assumption and notes how the
+      answer may change once clarified.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Highly navigable structure (concise summary first, labeled sections or numbered
+      steps) that enables quick extraction of key points.
+    - "Proactively manages ambiguity with explicit assumptions and/or 1\u20133 targeted\
+      \ clarifying questions tied to decision points."
+    - Delivers immediate, tailored guidance for likely paths or assumptions and explains
+      exactly how to adapt after clarification.
+  guidelines:
+  - Presents a clear structure (brief overview first, then organized details).
+  - States necessary assumptions or asks targeted clarifying questions.
+  - Provides immediate partial guidance despite ambiguity.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true

@@ -1,5 +1,5 @@
-# Example Experiment Configuration
-# This shows the full structure of an experiment config
+# Example Configuration for Multi-Judge Interpretability Framework
+# This is a template showing all available options with sensible defaults
 #
 # Available Datasets and Dimensions:
 #   - ultrafeedback: ['overall'] (synthetic only, no human annotations)
@@ -8,65 +8,67 @@
 #   - newsroom: ['Informativeness', 'Relevance', 'Fluency', 'Coherence']
 #   - recipe: ['grammar', 'fluency', 'verbosity', 'structure', 'success', 'overall']
 #   - wmt_en_de, wmt_zh_en: ['quality']
+#
+# Usage:
+#   python run_experiment.py config/example_config.yaml
 
-name: "example-experiment"
-dataset: "ultrafeedback"
-target: "target_synthetic"  # 'target_human_aggregated', 'target_human_individual', or 'target_synthetic'
-target_dimension: "overall"  # REQUIRED: Specific dimension name (e.g., 'helpfulness', 'overall')
+name: "my-experiment"
+dataset: "helpsteer2"                    # Dataset to use
+target: "target_human_aggregated"         # Options: target_human_aggregated, target_human_individual, target_synthetic
+target_dimension: "helpfulness"           # Specific dimension to train aggregator for
 
+# Dataset parameters
 dataset_kwargs:
-  n_samples: 2000
+  n_samples: 100                          # Number of samples (null = use all available)
   random_seed: 42
-  with_personas: true
+  split: "train"                          # For datasets with splits
 
+# Judge configuration (2 modes: create or use_files)
 judges:
-  judge_ids:
-    - "truthfulness-judge"
-    - "harmlessness-judge"
-    - "helpfulness-judge"
-    - "honesty-judge"
-    - "explanatory-depth-judge"
-    - "instruction-following-judge"
-    - "clarity-judge"
-    - "conciseness-judge"
-    - "logical-consistency-judge"
-    - "creativity-judge"
+  # MODE 1: Auto-create judges for target_dimension
+  create:
+    depth: 1                              # 0=parents only, 1=add children, 2=add grandchildren
+    cache: "auto"                         # auto | force_create | load_only
+    model: "openai/gpt-5"                 # Model for judge creation
+    temperature: 0.4
 
-  judge_names:
-    - "Truthfulness"
-    - "Harmlessness"
-    - "Helpfulness"
-    - "Honesty"
-    - "Explanatory Depth"
-    - "Instruction Following"
-    - "Clarity"
-    - "Conciseness"
-    - "Logical Consistency"
-    - "Creativity"
+  # MODE 2: Use existing judge files (uncomment to override auto-creation)
+  # use_files:
+  #   - "judges/helpsteer2/depth_0_parents.yaml"
+  #   - "judges/helpsteer2/depth_1_children.yaml"
+  # Or use baseline judges:
+  # use_files: ["judges/ultrafeedback/depth_0_parents.yaml"]
 
+  # Judge evaluation model (used for scoring responses AND baselines)
+  judge_model: "openai/gpt-5-mini"
+
+  # Score range
   score_range: [0.0, 4.0]
 
+# Model training configuration
 models:
-  train_gam: true
-  train_mlp: true
-  test_size: 0.2
-  val_size: 0.15
+  train_gam: true                         # Train interpretable GAM model
+  train_mlp: true                         # Train MLP neural network
+  test_size: 0.2                          # 20% of data for test set
+  val_size: 0.15                          # 15% of training data for validation
 
   gam:
     n_splines: 10
     lam: 0.6
-    max_iter: 100
+    max_iter: 200
 
   mlp:
     hidden_dim: 64
-    learning_rate: 0.005
-    batch_size: 16
+    learning_rate: 0.001
+    batch_size: 32
     n_epochs: 100
-    dropout: 0.0
-    l2_reg: 0.0
+    dropout: 0.1
+    l2_reg: 0.001
     early_stopping_patience: 15
     min_delta: 0.0001
 
-concurrency: 1  # Max concurrent API calls
+# Concurrency for API calls
+concurrency: 5                            # Max parallel judge evaluations
 
+# Random seed for reproducibility
 random_seed: 42
