@@ -1,0 +1,83 @@
+judges:
+- id: helpsteer2-helpfulness-judge
+  name: helpfulness Judge
+  version: '1.0'
+  description: Evaluates how well a response addresses the user's question and stated
+    constraints in the helpsteer2 context. Emphasizes directness, completeness, correctness,
+    and effective use of provided context or instructions.
+  scoring_description: Score from 0.0 to 4.0 based on how directly, completely, and
+    accurately the response fulfills the user's request and adheres to any given instructions
+    or context.
+  definition: Helpfulness measures how effectively the response satisfies the user's
+    informational or task need. A helpful response directly answers the question,
+    uses provided context or tools (e.g., search results, date, citation format) when
+    instructed, and offers specific, correct, and practically useful content. It should
+    handle ambiguity by briefly stating assumptions or asking focused clarifying questions
+    while still providing value. Responses that ignore instructions, are off-topic,
+    or provide incorrect or non-actionable information are less helpful.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Does not address the user's question at all (irrelevant, empty, or purely meta
+      response).
+    - Ignores explicit task instructions or provided context entirely (e.g., no required
+      citations when mandated, no use of supplied sources).
+    - Provides fabricated, unsafe, or clearly misleading content without offering
+      any useful alternative.
+    - Refuses or deflects without giving actionable guidance or next steps.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Barely touches on the request; mostly off-topic or generic filler.
+    - Disregards key instructions/tools (e.g., fails to use provided web results or
+      citation format) with no acknowledgment.
+    - Includes clear inaccuracies or unsupported claims presented as fact.
+    - Offers no actionable steps, examples, or specifics the user can use.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Partially answers the main question but is superficial or misses several important
+      points.
+    - Inconsistently follows instructions/context (e.g., mentions sources but does
+      not use the required [[n](URL)] format, or overlooks the provided date/context).
+    - Contains minor inaccuracies or ambiguities and lacks needed specificity (definitions,
+      steps, examples).
+    - Organization makes extraction of the answer harder (buried lead, scattered points)
+      and does not proactively clarify obvious ambiguities.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Directly answers the main question with mostly complete and correct information.
+    - Largely follows provided instructions and uses given context appropriately (minor
+      lapses only).
+    - Provides useful specifics (key points, steps, or examples) with minimal omission
+      of relevant details.
+    - Organization is clear and focused; may briefly note assumptions or ask a clarifying
+      question when needed.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Fully and directly answers the user's question, covering all key points without
+      significant omissions or extraneous content.
+    - Strictly adheres to instructions and integrates provided context/tools correctly
+      (e.g., uses supplied sources with the exact required citation format when specified).
+    - Information is specific, accurate, and actionable (concise summary plus details,
+      steps, or recommendations as appropriate).
+    - Handles ambiguity effectively by stating necessary assumptions or asking a focused
+      clarifying question while still providing immediate value.
+    - Structure enhances usability (clear overview first, then well-organized details)
+      with no irrelevant digressions.
+  guidelines:
+  - 'Score only helpfulness: how well the response fulfills the user''s request and
+    constraints; do not reward verbosity or style unrelated to task fulfillment.'
+  - When explicit instructions or context are provided (e.g., use of web results with
+    [[n](URL)] citations), adherence is required for top scores; missing these decreases
+    the score.
+  - Award partial credit for correct, directly useful content even if incomplete;
+    penalize omissions of key points, irrelevance, ignored instructions, or misleading/inaccurate
+    claims.
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
