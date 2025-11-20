@@ -10,7 +10,7 @@ import logging
 import time
 from pathlib import Path
 from typing import Optional, Dict, Any, List
-from pydantic import BaseModel, Field, RootModel
+from pydantic import BaseModel, Field, ConfigDict
 from openai import OpenAI, APIError, RateLimitError, APITimeoutError, APIConnectionError
 from dotenv import load_dotenv
 
@@ -21,21 +21,40 @@ load_dotenv(env_path)
 logger = logging.getLogger(__name__)
 
 
-class SingleDimensionScore(BaseModel):
-    """Single dimension evaluation with score and explanation."""
-    score: float = Field(description="Numerical score")
-    explanation: str = Field(description="Brief explanation (2-3 sentences)")
-
-
 class DimensionScore(BaseModel):
-    """Score and explanation for one dimension in multi-dimensional evaluation."""
     score: float = Field(description="Numerical score")
     explanation: str = Field(description="Brief explanation (1-2 sentences)")
 
 
-class MultiDimensionEvaluation(RootModel[Dict[str, DimensionScore]]):
-    """Multi-dimensional evaluation with dynamic dimension names."""
-    root: Dict[str, DimensionScore]
+class SingleDimensionScore(BaseModel):
+    score: float = Field(description="Numerical score")
+    explanation: str = Field(description="Brief explanation (2-3 sentences)")
+
+
+class HelpSteer2Evaluation(BaseModel):
+    helpfulness: DimensionScore
+    correctness: DimensionScore
+    coherence: DimensionScore
+    complexity: DimensionScore
+    verbosity: DimensionScore
+
+
+class SummEvalEvaluation(BaseModel):
+    coherence: DimensionScore
+    consistency: DimensionScore
+    fluency: DimensionScore
+    relevance: DimensionScore
+
+
+class UltraFeedbackEvaluation(BaseModel):
+    overall: DimensionScore
+
+
+DATASET_SCHEMAS = {
+    "helpsteer2": HelpSteer2Evaluation,
+    "summeval": SummEvalEvaluation,
+    "ultrafeedback": UltraFeedbackEvaluation,
+}
 
 
 class MartianClient:
@@ -45,7 +64,7 @@ class MartianClient:
         self,
         api_key: Optional[str] = None,
         base_url: str = "https://api.withmartian.com/v1",
-        default_model: str = "openai/gpt-4o-mini",
+        default_model: str = "openai/gpt-5-mini",
         temperature: float = 0.0,
         max_retries: int = 5,
         initial_retry_delay: float = 1.0,
@@ -112,23 +131,17 @@ class MartianClient:
         rubric: str,
         question: str,
         answer: str,
-        model: Optional[str] = None,
-        multi_dimensional: bool = False
+        dataset: Optional[str] = None,
+        model: Optional[str] = None
     ) -> Dict[str, Any]:
-        """
-        Evaluate a Q&A pair using a judge rubric with retry logic.
-
-        Args:
-            rubric: Judge rubric prompt (system message)
-            question: The question/instruction to evaluate
-            answer: The response to evaluate
-            model: Model to use (defaults to default_model)
-            multi_dimensional: If True, use MultiDimensionEvaluation format
-
-        Returns:
-            Parsed evaluation dict
-        """
         model = model or self.default_model
+
+        if dataset is not None:
+            if dataset not in DATASET_SCHEMAS:
+                raise ValueError(f"Unknown dataset '{dataset}'. Available: {list(DATASET_SCHEMAS.keys())}")
+            schema = DATASET_SCHEMAS[dataset]
+        else:
+            schema = SingleDimensionScore
 
         user_message = f"""Evaluate the following response:
 
@@ -140,32 +153,29 @@ Response to Evaluate:
 
 Provide your evaluation following the rubric criteria."""
 
-        text_format = MultiDimensionEvaluation if multi_dimensional else SingleDimensionScore
         last_exception = None
+        is_gpt5 = "gpt-5" in model.lower()
 
         for attempt in range(self.max_retries):
             try:
-                response = self.client.responses.parse(
-                    model=model,
-                    input=[
+                request_params = {
+                    "model": model,
+                    "input": [
                         {"role": "system", "content": rubric},
                         {"role": "user", "content": user_message}
                     ],
-                    text_format=text_format,
-                    temperature=self.temperature
-                )
+                    "text_format": schema
+                }
 
-                evaluation = response.output_parsed
+                if not is_gpt5:
+                    request_params["temperature"] = self.temperature
 
-                if multi_dimensional:
-                    return evaluation.root
-                else:
-                    return {"score": evaluation.score, "explanation": evaluation.explanation}
+                response = self.client.responses.parse(**request_params)
+                return response.output_parsed.model_dump()
 
             except RateLimitError as e:
                 last_exception = e
                 if attempt < self.max_retries - 1:
-                    # Extract retry-after header if available
                     retry_after = getattr(e, 'retry_after', None)
                     if retry_after:
                         delay = float(retry_after)
@@ -212,22 +222,10 @@ Provide your evaluation following the rubric criteria."""
     def evaluate_batch(
         self,
         evaluations: List[Dict[str, str]],
+        dataset: Optional[str] = None,
         model: Optional[str] = None,
-        max_workers: int = 5,
-        multi_dimensional: bool = False
+        max_workers: int = 5
     ) -> List[Dict[str, Any]]:
-        """
-        Evaluate multiple Q&A pairs in parallel using ThreadPoolExecutor.
-
-        Args:
-            evaluations: List of dicts with 'rubric', 'question', 'answer'
-            model: Model to use
-            max_workers: Number of parallel workers (reasonable: 5-20)
-            multi_dimensional: If True, expect multi-dimensional scores
-
-        Returns:
-            List of evaluation results (same order as input)
-        """
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
         results = [None] * len(evaluations)
@@ -239,8 +237,8 @@ Provide your evaluation following the rubric criteria."""
                     eval_dict["rubric"],
                     eval_dict["question"],
                     eval_dict["answer"],
-                    model,
-                    multi_dimensional
+                    dataset,
+                    model
                 ): idx
                 for idx, eval_dict in enumerate(evaluations)
             }
@@ -251,16 +249,11 @@ Provide your evaluation following the rubric criteria."""
                     results[idx] = future.result()
                 except Exception as e:
                     logger.error(f"Batch evaluation {idx} failed after retries: {e}")
-                    results[idx] = {"score": 2.0, "explanation": f"Error: {e}"}
+                    results[idx] = {"error": str(e)}
 
         return results
 
 
 def load_client() -> MartianClient:
-    """
-    Load Martian client from environment configuration.
-
-    Returns:
-        Initialized MartianClient
-    """
+    """Load Martian client from environment configuration."""
     return MartianClient()
