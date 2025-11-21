@@ -33,6 +33,12 @@ models:
   test_size: 0.2
   val_size: 0.15
 
+  # Enable tuning for testing
+  tuning:
+    enabled: true
+    method: "exhaustive"
+    n_trials: 10
+
   gam:
     n_splines: 5
     lam: 0.6

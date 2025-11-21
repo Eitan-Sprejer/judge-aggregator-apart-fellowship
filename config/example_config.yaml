@@ -52,6 +52,15 @@ models:
   test_size: 0.2                          # 20% of data for test set
   val_size: 0.15                          # 15% of training data for validation
 
+  # Hyperparameter tuning (optional)
+  # If enabled, finds optimal hyperparameters before training
+  # Results always saved to run_dir/tuning_analysis/
+  tuning:
+    enabled: false                        # Set to true to enable tuning
+    method: "random"                      # "random" or "exhaustive" (both use exhaustive for GAM)
+    n_trials: 30                          # Ignored for GAM (3 configs tested)
+
+  # Default hyperparameters (used if tuning disabled)
   gam:
     n_splines: 10
     lam: 0.6

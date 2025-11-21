@@ -95,6 +95,23 @@ class MLPConfig:
 
 
 @dataclass
+class HyperparameterTuningConfig:
+    """Hyperparameter tuning configuration.
+
+    If enabled, runs optimization before training and always uses optimized params.
+    Results are always saved to run_dir/tuning_analysis/.
+
+    Attributes:
+        enabled: Whether to run hyperparameter tuning
+        method: Search method ('random' or 'exhaustive')
+        n_trials: Number of random search trials (ignored for exhaustive)
+    """
+    enabled: bool = False
+    method: str = "random"
+    n_trials: int = 30
+
+
+@dataclass
 class ModelConfig:
     """Configuration for aggregation models.
 
@@ -105,13 +122,15 @@ class ModelConfig:
         train_mlp: Whether to train MLP model
         test_size: Fraction of data for test set
         val_size: Fraction of training data for validation set
+        tuning: Hyperparameter tuning configuration
     """
     gam: GAMConfig = field(default_factory=GAMConfig)
     mlp: MLPConfig = field(default_factory=MLPConfig)
     train_gam: bool = True
     train_mlp: bool = True
     test_size: float = 0.2
-    val_size: float = 0.15  # Of remaining training data
+    val_size: float = 0.15
+    tuning: HyperparameterTuningConfig = field(default_factory=HyperparameterTuningConfig)
 
 
 @dataclass
@@ -303,6 +322,7 @@ class ExperimentConfig:
         models_dict = config_dict.get('models', {})
         gam_dict = models_dict.get('gam', {})
         mlp_dict = models_dict.get('mlp', {})
+        tuning_dict = models_dict.get('tuning', {})
 
         models = ModelConfig(
             gam=GAMConfig(**gam_dict),
@@ -310,7 +330,8 @@ class ExperimentConfig:
             train_gam=models_dict.get('train_gam', True),
             train_mlp=models_dict.get('train_mlp', True),
             test_size=models_dict.get('test_size', 0.2),
-            val_size=models_dict.get('val_size', 0.15)
+            val_size=models_dict.get('val_size', 0.15),
+            tuning=HyperparameterTuningConfig(**tuning_dict)
         )
 
         return cls(
