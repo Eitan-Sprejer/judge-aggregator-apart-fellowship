@@ -477,11 +477,62 @@ class ExperimentRunner:
             'test_indices_in_full': test_indices_in_full
         }
 
-    def train_gam(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Train GAM aggregator.
+    def tune_hyperparameters(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Run hyperparameter tuning if enabled.
 
         Args:
             data: Training data dictionary
+
+        Returns:
+            Dict with 'gam' key containing optimal params (empty if disabled)
+        """
+        if not self.config.models.tuning.enabled:
+            log_experiment_milestone("Hyperparameter tuning disabled")
+            return {}
+
+        log_experiment_milestone(
+            f"Running hyperparameter tuning (method={self.config.models.tuning.method}, "
+            f"n_trials={self.config.models.tuning.n_trials})"
+        )
+
+        optimal_params = {}
+
+        if self.config.models.train_gam:
+            from analysis.gam_hyperparameter_tuning import GAMHyperparameterTuner
+
+            tuner = GAMHyperparameterTuner(
+                output_dir=str(self.run_dir / "tuning_analysis" / "gam"),
+                feature_names=self.judge_names,
+                random_seed=self.config.random_seed
+            )
+
+            results = tuner.run_search(
+                X_train=data['X_train'],
+                y_train=data['y_train'],
+                X_val=data['X_val'],
+                y_val=data['y_val'],
+                method=self.config.models.tuning.method,
+                n_trials=self.config.models.tuning.n_trials
+            )
+
+            if results:
+                optimal_params['gam'] = results[0]['config']
+                log_experiment_milestone(
+                    f"✓ Optimal GAM: n_splines={optimal_params['gam']['n_splines']}, "
+                    f"lam={optimal_params['gam']['lam']:.2f}, "
+                    f"val_R²={results[0]['val_metrics']['r2']:.4f}"
+                )
+            else:
+                log_experiment_milestone("⚠ GAM tuning produced no results, using config defaults")
+
+        return optimal_params
+
+    def train_gam(self, data: Dict[str, Any], optimal_params: Optional[Dict] = None) -> Dict[str, Any]:
+        """Train GAM aggregator with optional optimized hyperparameters.
+
+        Args:
+            data: Training data dictionary
+            optimal_params: Optional dict with tuned hyperparameters
 
         Returns:
             Dictionary with model and metrics
@@ -490,14 +541,22 @@ class ExperimentRunner:
             log_experiment_milestone("GAM training disabled in config")
             return {}
 
-        log_experiment_milestone("Training GAM aggregator")
+        if optimal_params:
+            n_splines = optimal_params['n_splines']
+            lam = optimal_params['lam']
+            max_iter = optimal_params.get('max_iter', self.config.models.gam.max_iter)
+            log_experiment_milestone("Training GAM with tuned hyperparameters")
+        else:
+            n_splines = self.config.models.gam.n_splines
+            lam = self.config.models.gam.lam
+            max_iter = self.config.models.gam.max_iter
+            log_experiment_milestone("Training GAM with config defaults")
 
-        # Initialize GAM
         gam = GAMAggregator(
             feature_names=self.judge_names,
-            n_splines=self.config.models.gam.n_splines,
-            lam=self.config.models.gam.lam,
-            max_iter=self.config.models.gam.max_iter
+            n_splines=n_splines,
+            lam=lam,
+            max_iter=max_iter
         )
 
         # Train
@@ -738,16 +797,19 @@ class ExperimentRunner:
             # 4. Prepare training data (includes test_indices_in_full)
             data = self.prepare_training_data(df)
 
-            # 5. Train GAM
-            gam_results = self.train_gam(data)
+            # 5. OPTIONAL: Tune hyperparameters
+            optimal_params = self.tune_hyperparameters(data)
 
-            # 6. Run human-rubric evaluation on test set and baselines
+            # 6. Train GAM with optimal or default params
+            gam_results = self.train_gam(data, optimal_params.get('gam'))
+
+            # 7. Run human-rubric evaluation on test set and baselines
             human_rubric_predictions = self.run_human_rubric_evaluation(
                 df, data['test_indices_in_full']
             )
             baseline_results = self.run_baselines(data, human_rubric_predictions)
 
-            # 7. Save results
+            # 8. Save results
             self.save_results(gam_results, baseline_results)
 
             log_experiment_complete({
