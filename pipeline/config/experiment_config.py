@@ -160,7 +160,7 @@ class ExperimentConfig:
     name: str
     dataset: str  # 'ultrafeedback', 'judge_bench', 'helpsteer2', etc.
     target: str  # 'target_human_aggregated', 'target_human_individual', 'target_synthetic'
-    target_dimension: str  # Specific dimension name (e.g., 'helpfulness', 'overall')
+    target_dimensions: List[str]  # List of dimensions to train on (e.g., ['helpfulness', 'overall'])
     judges: JudgeConfig
     models: ModelConfig = field(default_factory=ModelConfig)
     dataset_kwargs: Dict[str, Any] = field(default_factory=dict)
@@ -168,7 +168,6 @@ class ExperimentConfig:
     random_seed: int = 42
 
     # Judge creation fields
-    target_dimensions: Optional[List[str]] = None
     judge_cache_strategy: str = 'auto'  # 'auto' | 'force_create' | 'load_only'
     judge_decomposition_depth: int = 1  # 0 = no decomposition (parent only), 1 = one level of children, etc.
     judge_creation_config: Optional[Dict[str, Any]] = None
@@ -224,23 +223,24 @@ class ExperimentConfig:
                 f"Using all {len(df)} samples."
             )
 
-        # Check target dimension exists in dataset
+        # Check target dimensions exist in dataset
         first_row = df.iloc[0]
         dimensions = first_row.get('dimensions', [])
 
         if not dimensions:
             raise ValueError(
                 f"Dataset '{self.dataset}' has no dimensions field. "
-                f"Cannot use target_dimension."
+                f"Cannot use target_dimensions."
             )
 
-        if self.target_dimension not in dimensions:
-            raise ValueError(
-                f"target_dimension '{self.target_dimension}' not found in dataset dimensions: {dimensions}. "
-                f"Available dimensions: {', '.join(dimensions)}"
-            )
+        for dim in self.target_dimensions:
+            if dim not in dimensions:
+                raise ValueError(
+                    f"target_dimension '{dim}' not found in dataset dimensions: {dimensions}. "
+                    f"Available dimensions: {', '.join(dimensions)}"
+                )
 
-        logger.info(f"✓ Using target dimension: {self.target_dimension}")
+        logger.info(f"✓ Using target dimensions: {self.target_dimensions}")
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert config to dictionary."""
@@ -273,13 +273,17 @@ class ExperimentConfig:
         """
         judges_dict = config_dict['judges']
 
+        # Get target_dimensions (required)
+        target_dimensions = config_dict.get('target_dimensions')
+        if not target_dimensions:
+            raise ValueError("target_dimensions is required in config")
+        if isinstance(target_dimensions, str):
+            target_dimensions = [target_dimensions]  # Convert single string to list
+
         # Check if new simplified structure is used
         if 'create' in judges_dict:
             # New structure: judges.create.{cache, depth, model, temperature}
-            # Uses target_dimension to determine what judges to create
             create_config = judges_dict['create']
-            # Use target_dimension from top level (single dimension per experiment)
-            target_dimensions = [config_dict['target_dimension']]
             judge_cache_strategy = create_config.get('cache', 'auto')
             judge_decomposition_depth = create_config.get('depth', 1)
             judge_creation_config = {
@@ -288,8 +292,7 @@ class ExperimentConfig:
                 'max_tokens': create_config.get('max_tokens', 10000)
             }
         else:
-            # Old structure: top-level target_dimensions, judge_cache_strategy, etc.
-            target_dimensions = config_dict.get('target_dimensions')
+            # Old structure: top-level judge_cache_strategy, etc.
             judge_cache_strategy = config_dict.get('judge_cache_strategy', 'auto')
             judge_decomposition_depth = config_dict.get('judge_decomposition_depth', 1)
             judge_creation_config = config_dict.get('judge_creation_config')
@@ -338,14 +341,13 @@ class ExperimentConfig:
             name=config_dict['name'],
             dataset=config_dict['dataset'],
             target=config_dict['target'],
-            target_dimension=config_dict['target_dimension'],
+            target_dimensions=target_dimensions,
             judges=judges,
             models=models,
             dataset_kwargs=config_dict.get('dataset_kwargs', {}),
             concurrency=config_dict.get('concurrency', 1),
             random_seed=config_dict.get('random_seed', 42),
             # Judge creation fields (resolved from new or old structure)
-            target_dimensions=target_dimensions,
             judge_cache_strategy=judge_cache_strategy,
             judge_decomposition_depth=judge_decomposition_depth,
             judge_creation_config=judge_creation_config,
