@@ -133,15 +133,38 @@ class JudgeCreationOrchestrator:
                 )
             return self._load_from_cache()
 
-        if cache_strategy == "auto" and cache_exists:
-            print(f"Loading judges from cache: {self.dataset_judges_dir}")
+        # For "auto" strategy, check which dimensions are cached
+        requested_dimensions = {dim["name"] for dim in dimensions}
+        cached_dimensions = self._get_cached_dimensions() if cache_exists else set()
+        missing_dimensions = requested_dimensions - cached_dimensions
+
+        if cache_strategy == "auto" and not missing_dimensions:
+            # All requested dimensions are cached
+            print(f"All {len(requested_dimensions)} dimensions found in cache: {self.dataset_judges_dir}")
             return self._load_from_cache()
 
-        # Need to create judges
-        print(f"Creating judges for {self.dataset_name} with {len(dimensions)} dimensions...")
-        all_judges = []
+        # Need to create some or all judges
+        if missing_dimensions:
+            print(f"Creating judges for {len(missing_dimensions)} missing dimensions: {missing_dimensions}")
+            if cached_dimensions:
+                print(f"  (Will preserve {len(cached_dimensions)} cached dimensions: {cached_dimensions})")
+        else:
+            print(f"Creating judges for {self.dataset_name} with {len(dimensions)} dimensions...")
 
-        for dimension in dimensions:
+        # Load existing judges if any
+        all_judges = []
+        if cache_exists and cached_dimensions:
+            try:
+                all_judges = self._load_from_cache()
+                print(f"  Loaded {len(all_judges)} existing judges from cache")
+            except Exception as e:
+                print(f"Warning: Failed to load existing cache, will recreate all: {e}")
+                all_judges = []
+
+        # Create judges for missing dimensions only
+        dimensions_to_create = [d for d in dimensions if d["name"] in missing_dimensions]
+
+        for dimension in dimensions_to_create:
             dim_name = dimension["name"]
             dim_description = dimension["description"]
             print(f"  Creating parent judge for '{dim_name}'...")
@@ -152,6 +175,8 @@ class JudgeCreationOrchestrator:
                 dimension_description=dim_description,
                 sample_qa_pairs=sample_qa_pairs,
             )
+            # Add explicit dimension field
+            parent_judge['dimension'] = dim_name
             all_judges.append(parent_judge)
 
             # Step 2: Decompose parent if requested
@@ -160,10 +185,13 @@ class JudgeCreationOrchestrator:
                 child_judges = self._decompose_parent(
                     parent_judge=parent_judge, max_depth=decomposition_depth
                 )
+                # Add explicit dimension field to all children
+                for child in child_judges:
+                    child['dimension'] = dim_name
                 all_judges.extend(child_judges)
                 print(f"    Generated {len(child_judges)} child judges for '{dim_name}'")
 
-        # Step 3: Save to YAML
+        # Step 3: Save to YAML (overwrites with complete set)
         print(f"Saving {len(all_judges)} judges to {self.dataset_judges_dir}")
         self._save_to_yaml(all_judges)
 
@@ -327,6 +355,53 @@ class JudgeCreationOrchestrator:
             saved_files.append(filepath)
 
         print(f"\n✅ Saved {len(judges)} total judges across {len(saved_files)} files in {self.dataset_judges_dir}")
+
+    def _get_cached_dimensions(self) -> set[str]:
+        """Get set of dimensions that have cached judges.
+
+        Returns:
+            Set of dimension names found in cached judges
+
+        Raises:
+            RuntimeError: If cache files don't exist or are invalid
+        """
+        # Check if cache exists (look for depth_0_parents.yaml as indicator)
+        depth_0_file = self.dataset_judges_dir / "depth_0_parents.yaml"
+
+        if not depth_0_file.exists():
+            return set()
+
+        # Load all depth files to extract dimensions
+        cached_dimensions = set()
+        depth_files = sorted(self.dataset_judges_dir.glob("depth_*.yaml"))
+
+        for depth_file in depth_files:
+            try:
+                with depth_file.open("r", encoding="utf-8") as f:
+                    data = yaml.safe_load(f)
+
+                if not isinstance(data, dict) or "judges" not in data:
+                    continue
+
+                judges = data["judges"]
+                if not isinstance(judges, list):
+                    continue
+
+                # Extract dimensions from judge IDs
+                # Format: {dataset}-{dimension}-judge[-subdimension]
+                for judge in judges:
+                    judge_id = judge.get("id", "")
+                    parts = judge_id.split("-")
+                    if len(parts) >= 3:
+                        # Extract dimension (second part)
+                        dimension = parts[1]
+                        cached_dimensions.add(dimension)
+
+            except Exception as e:
+                print(f"Warning: Failed to parse dimensions from {depth_file}: {e}")
+                continue
+
+        return cached_dimensions
 
     def _load_from_cache(self) -> List[Dict[str, Any]]:
         """Load judges from cached depth-specific YAML files.

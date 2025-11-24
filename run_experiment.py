@@ -66,11 +66,9 @@ class ExperimentRunner:
         self.run_name = f"{config.name}_{timestamp}"
         self.run_dir = Path("results") / self.run_name
 
-        # Create subdirectories
+        # Create subdirectories (models and plots are created per-dimension)
         self.run_dir.mkdir(parents=True, exist_ok=True)
         (self.run_dir / "data").mkdir(exist_ok=True)
-        (self.run_dir / "models").mkdir(exist_ok=True)
-        (self.run_dir / "plots").mkdir(exist_ok=True)
         (self.run_dir / "logs").mkdir(exist_ok=True)
 
         # Shared cache for judged data
@@ -98,10 +96,17 @@ class ExperimentRunner:
         print(f"🚀 Starting experiment: {self.run_name}")
         print(f"📁 Run directory: {self.run_dir}")
 
-    def _compute_judge_cache_key(self) -> str:
-        """Compute MD5 hash of judge configuration for cache key.
+    def _compute_judge_cache_key(self, df_size: int) -> str:
+        """Compute MD5 hash of judge configuration + dataset parameters for cache key.
 
-        Cache key must include actual judge IDs to invalidate cache when judges change.
+        Cache key must include:
+        - Judge IDs (to invalidate when judges change)
+        - Dataset size (to invalidate when n_samples changes)
+        - Random seed (to invalidate when seed changes)
+        - Split name (to invalidate when split changes)
+
+        Args:
+            df_size: Number of samples in dataset
 
         Returns:
             MD5 hash string
@@ -109,13 +114,95 @@ class ExperimentRunner:
         # Use judge IDs if available (after evaluation), otherwise use file paths
         if hasattr(self, 'judge_ids') and self.judge_ids:
             # Cache key based on actual judge IDs (most accurate)
-            cache_str = "_".join(sorted(self.judge_ids))
+            judges_str = "_".join(sorted(self.judge_ids))
         else:
             # Fallback: use judge file paths (before evaluation)
             file_paths = sorted(self.config.judges.file_paths)
-            cache_str = "_".join(file_paths)
+            judges_str = "_".join(file_paths)
+
+        # Include dataset parameters to invalidate cache when they change
+        cache_str = (
+            f"{judges_str}_"
+            f"n{df_size}_"  # Number of samples
+            f"seed{self.config.random_seed}_"  # Random seed
+            f"split{self.config.dataset_kwargs.get('split', 'train')}"  # Dataset split
+        )
 
         return hashlib.md5(cache_str.encode()).hexdigest()
+
+    def _get_judge_dimension(self, judge_def: Dict[str, Any]) -> Optional[str]:
+        """Extract dimension from judge definition.
+
+        Args:
+            judge_def: Judge definition dictionary with 'dimension' field
+
+        Returns:
+            Dimension name
+        """
+        return judge_def.get('dimension')
+
+    def _compute_judge_depth(self, judge_def: Dict[str, Any]) -> int:
+        """Compute depth of a judge in the hierarchy.
+
+        Args:
+            judge_def: Judge definition dictionary
+
+        Returns:
+            Depth (0 = parent, 1 = child, 2 = grandchild, etc.)
+        """
+        if judge_def.get('parent_id') is None:
+            return 0
+
+        # Find parent and recurse
+        parent_id = judge_def['parent_id']
+        parent = next((j for j in self.judges if j['id'] == parent_id), None)
+
+        if parent is None:
+            # Parent not found - treat as depth 0
+            return 0
+
+        return 1 + self._compute_judge_depth(parent)
+
+    def _filter_judges_by_dimension(self, dimension: str) -> tuple[list[str], list[int]]:
+        """Get judge IDs and indices for a specific dimension and depth.
+
+        Filters by both dimension and the configured depth level.
+        For example, if depth=1 is configured, only depth 1 judges (children)
+        will be included, excluding depth 0 judges (parents).
+
+        Args:
+            dimension: Dimension name (e.g., "helpfulness")
+
+        Returns:
+            Tuple of (judge_ids, judge_indices) for the dimension and depth
+        """
+        if not hasattr(self, 'judges') or not self.judges:
+            return [], []
+
+        # Get configured depth from top-level judge_decomposition_depth field
+        target_depth = self.config.judge_decomposition_depth if hasattr(self.config, 'judge_decomposition_depth') else None
+
+        dimension_judge_ids = []
+        dimension_indices = []
+
+        for idx, judge_def in enumerate(self.judges):
+            judge_dim = self._get_judge_dimension(judge_def)
+
+            # Check dimension match
+            if judge_dim != dimension:
+                continue
+
+            # Check depth match if depth filtering is enabled
+            if target_depth is not None:
+                judge_depth = self._compute_judge_depth(judge_def)
+                if judge_depth != target_depth:
+                    continue
+
+            judge_id = judge_def.get('id', '')
+            dimension_judge_ids.append(judge_id)
+            dimension_indices.append(idx)
+
+        return dimension_judge_ids, dimension_indices
 
     def load_dataset(self) -> pd.DataFrame:
         """Load dataset with caching.
@@ -340,8 +427,24 @@ class ExperimentRunner:
         self.judge_ids = evaluator.judge_ids
         self.judge_names = [jid.replace('-', ' ').title() for jid in evaluator.judge_ids]
 
-        # Compute cache key based on actual judge IDs
-        cache_key = self._compute_judge_cache_key()
+        # Load full judge definitions (including dimension field) from YAML files
+        self.judges = []
+        for judge_path in self.config.judges.file_paths:
+            import yaml
+            file_path = Path(judge_path)
+            if not file_path.is_absolute():
+                file_path = Path.cwd() / file_path
+
+            if file_path.exists():
+                with open(file_path, 'r') as f:
+                    data = yaml.safe_load(f)
+                    if 'judges' in data:
+                        self.judges.extend(data['judges'])
+
+        log_experiment_milestone(f"  Loaded {len(self.judges)} judge definitions")
+
+        # Compute cache key based on judge IDs + dataset parameters
+        cache_key = self._compute_judge_cache_key(df_size=len(df))
         cache_path = self.judged_cache_dir / f"{self.config.dataset}_{cache_key}.pkl"
 
         # Check cache
@@ -349,18 +452,21 @@ class ExperimentRunner:
             log_experiment_milestone(f"Loading judged data from shared cache: {cache_path}")
             df_with_judges = pd.read_pickle(cache_path)
 
-            # Verify cache matches current dataset size and judge set
-            if len(df_with_judges) >= len(df):
-                # Use subset if cached data is larger
-                df_judged = df_with_judges.iloc[:len(df)].copy()
-                log_experiment_milestone(f"Using cached judge scores for {len(df_judged)} samples")
+            # Verify cache exactly matches current dataset
+            if len(df_with_judges) == len(df):
+                log_experiment_milestone(f"Using cached judge scores for {len(df_with_judges)} samples")
 
                 # Save to run directory
                 (self.run_dir / "data" / "data_with_judge_scores.pkl").write_bytes(
                     cache_path.read_bytes()
                 )
 
-                return df_judged
+                return df_with_judges
+            else:
+                log_experiment_milestone(
+                    f"Cache size mismatch: cached={len(df_with_judges)}, "
+                    f"requested={len(df)}. Re-evaluating."
+                )
 
         log_experiment_milestone("Running judge evaluation (no cache found)")
 
@@ -401,24 +507,44 @@ class ExperimentRunner:
             self.judge_ids = []
             self.judge_names = []
 
-    def prepare_training_data(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """Prepare features and targets for training.
+    def prepare_training_data(self, df: pd.DataFrame, dimension: str) -> Dict[str, Any]:
+        """Prepare features and targets for training on a specific dimension.
 
         Args:
             df: DataFrame with judge scores and target annotations
+            dimension: Dimension to train on (e.g., "helpfulness")
 
         Returns:
-            Dictionary with train/val/test splits and test_indices in full df
+            Dictionary with train/val/test splits and dimension-specific judges
         """
-        log_experiment_milestone("Preparing training data")
+        log_experiment_milestone(f"Preparing training data for dimension: {dimension}")
 
-        # Extract features (judge scores)
-        X = np.array([row['judge_scores'] for _, row in df.iterrows()])
+        # Filter judges by dimension
+        dimension_judge_ids, dimension_indices = self._filter_judges_by_dimension(dimension)
 
-        # Extract targets based on config.target (always use target_dimension)
+        if not dimension_indices:
+            raise ValueError(
+                f"No judges found for dimension '{dimension}'. "
+                f"Available judge IDs: {self.judge_ids}"
+            )
+
+        log_experiment_milestone(
+            f"  Found {len(dimension_indices)} judges for {dimension}: {dimension_judge_ids}"
+        )
+
+        # Extract features (judge scores) - ALL judges first
+        X_all = np.array([row['judge_scores'] for _, row in df.iterrows()])
+
+        # Filter to dimension-specific judges
+        X = X_all[:, dimension_indices]
+
+        # Get dimension-specific judge names
+        dimension_judge_names = [self.judge_names[i] for i in dimension_indices]
+
+        # Extract targets based on config.target
         if self.config.target == 'target_human_aggregated':
             y = np.array([
-                row['target_human_aggregated'].get(self.config.target_dimension, np.nan)
+                row['target_human_aggregated'].get(dimension, np.nan)
                 if row['target_human_aggregated'] is not None else np.nan
                 for _, row in df.iterrows()
             ])
@@ -430,7 +556,7 @@ class ExperimentRunner:
             )
         elif self.config.target == 'target_synthetic':
             y = np.array([
-                row['target_synthetic'].get(self.config.target_dimension, np.nan)
+                row['target_synthetic'].get(dimension, np.nan)
                 if row['target_synthetic'] is not None else np.nan
                 for _, row in df.iterrows()
             ])
@@ -444,8 +570,7 @@ class ExperimentRunner:
         y = y[valid_mask]
 
         log_experiment_milestone(
-            f"Training data: {len(X)} samples with {X.shape[1]} judges, "
-            f"target={self.config.target}, dimension={self.config.target_dimension}"
+            f"  Training data: {len(X)} samples with {X.shape[1]} judges for {dimension}"
         )
 
         # Train/test split
@@ -473,15 +598,17 @@ class ExperimentRunner:
             'y_val': y_val,
             'X_test': X_test,
             'y_test': y_test,
-            'judge_names': self.judge_names,
+            'judge_names': dimension_judge_names,  # Dimension-specific judges
+            'judge_ids': dimension_judge_ids,       # For caching/traceability
             'test_indices_in_full': test_indices_in_full
         }
 
-    def tune_hyperparameters(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def tune_hyperparameters(self, data: Dict[str, Any], output_dir: Optional[Path] = None) -> Dict[str, Any]:
         """Run hyperparameter tuning if enabled.
 
         Args:
-            data: Training data dictionary
+            data: Training data dictionary (includes dimension-specific judge_names)
+            output_dir: Optional directory for tuning results (defaults to run_dir/tuning_analysis)
 
         Returns:
             Dict with 'gam' key containing optimal params (empty if disabled)
@@ -500,9 +627,15 @@ class ExperimentRunner:
         if self.config.models.train_gam:
             from analysis.gam_hyperparameter_tuning import GAMHyperparameterTuner
 
+            # Use provided output_dir or default to run_dir
+            if output_dir is None:
+                tuning_dir = self.run_dir / "tuning_analysis" / "gam"
+            else:
+                tuning_dir = output_dir / "tuning_analysis" / "gam"
+
             tuner = GAMHyperparameterTuner(
-                output_dir=str(self.run_dir / "tuning_analysis" / "gam"),
-                feature_names=self.judge_names,
+                output_dir=str(tuning_dir),
+                feature_names=data['judge_names'],  # Use dimension-specific judges
                 random_seed=self.config.random_seed
             )
 
@@ -553,7 +686,7 @@ class ExperimentRunner:
             log_experiment_milestone("Training GAM with config defaults")
 
         gam = GAMAggregator(
-            feature_names=self.judge_names,
+            feature_names=data['judge_names'],  # Use dimension-specific judges
             n_splines=n_splines,
             lam=lam,
             max_iter=max_iter
@@ -581,9 +714,7 @@ class ExperimentRunner:
             f"Val R²: {val_metrics['r2']:.4f}, Test R²: {test_metrics['r2']:.4f}"
         )
 
-        # Save model
-        model_path = self.run_dir / "models" / "gam_model.pkl"
-        gam.save_model(str(model_path))
+        # Model will be saved in save_results_for_dimension() to dimension-specific directory
 
         return {
             'model': gam,
@@ -624,12 +755,13 @@ class ExperimentRunner:
 
         return baseline_results
 
-    def run_human_rubric_evaluation(self, df: pd.DataFrame, test_indices: np.ndarray) -> Optional[np.ndarray]:
+    def run_human_rubric_evaluation(self, df: pd.DataFrame, test_indices: np.ndarray, dimension: str) -> Optional[np.ndarray]:
         """Evaluate test set using human annotation rubric via MartianClient.
 
         Args:
             df: Full dataset
             test_indices: Indices of test samples
+            dimension: Dimension to evaluate (e.g., "helpfulness")
 
         Returns:
             Predictions for test samples only
@@ -639,13 +771,13 @@ class ExperimentRunner:
         from pathlib import Path
         from pipeline.utils.martian_client import MartianClient
 
-        log_experiment_milestone("Running human-rubric evaluation on test set")
+        log_experiment_milestone(f"Running human-rubric evaluation for {dimension} on test set")
 
         # Get test subset
         df_test = df.iloc[test_indices].reset_index(drop=True)
 
         # Cache key: dataset + dimension + test size + seed (for reproducibility)
-        cache_key_str = f"{self.config.dataset}_{self.config.target_dimension}_{len(df_test)}_{self.config.random_seed}"
+        cache_key_str = f"{self.config.dataset}_{dimension}_{len(df_test)}_{self.config.random_seed}"
         cache_key = hashlib.md5(cache_key_str.encode()).hexdigest()
         cache_dir = Path("results") / "_baseline_cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
@@ -678,9 +810,9 @@ class ExperimentRunner:
         dimensions = [d['name'] for d in rubric_config['dimensions']]
 
         # Validate target dimension
-        if self.config.target_dimension not in dimensions:
+        if dimension not in dimensions:
             log_experiment_milestone(
-                f"Target dimension '{self.config.target_dimension}' not in rubric dimensions {dimensions}"
+                f"Target dimension '{dimension}' not in rubric dimensions {dimensions}"
             )
             return None
 
@@ -719,7 +851,7 @@ class ExperimentRunner:
                     log_experiment_milestone(f"Sample {idx} evaluation failed: {result['error']}")
                     predictions.append(float('nan'))
                 else:
-                    dim_data = result.get(self.config.target_dimension)
+                    dim_data = result.get(dimension)
                     if dim_data and isinstance(dim_data, dict):
                         score = dim_data.get('score', float('nan'))
                     else:
@@ -779,45 +911,134 @@ class ExperimentRunner:
 
         log_experiment_milestone(f"Results saved to {summary_path}")
 
+    def save_results_for_dimension(
+        self,
+        dimension: str,
+        dim_dir: Path,
+        gam_results: Dict[str, Any],
+        baseline_results: Dict[str, Dict[str, float]],
+        data: Dict[str, Any]
+    ):
+        """Save dimension-specific experiment results to JSON.
+
+        Args:
+            dimension: Dimension name (e.g., "helpfulness")
+            dim_dir: Dimension-specific results directory
+            gam_results: GAM model results
+            baseline_results: Baseline model results
+            data: Training data dict (includes judge_names, judge_ids)
+        """
+        log_experiment_milestone(f"Saving results for {dimension}")
+
+        summary = {
+            'experiment_name': self.config.name,
+            'dimension': dimension,
+            'dataset': self.config.dataset,
+            'target': self.config.target,
+            'judge_files': self.config.judges.file_paths,
+            'judges': data.get('judge_ids', []),  # Dimension-specific judges
+            'n_judges': len(data.get('judge_ids', [])),
+            'random_seed': self.config.random_seed,
+            'gam_results': {
+                'train': gam_results.get('train_metrics', {}),
+                'val': gam_results.get('val_metrics', {}),
+                'test': gam_results.get('test_metrics', {})
+            },
+            'baseline_results': baseline_results,
+            'run_dir': str(self.run_dir),
+            'dimension_dir': str(dim_dir),
+            'timestamp': datetime.now().isoformat()
+        }
+
+        # Save dimension-specific summary
+        summary_path = dim_dir / "experiment_summary.json"
+        with open(summary_path, 'w') as f:
+            json.dump(summary, f, indent=2)
+
+        # Also save GAM model to dimension directory
+        if gam_results and 'model' in gam_results:
+            import joblib
+            model_path = dim_dir / "models" / "gam_model.pkl"
+            joblib.dump(gam_results['model'], model_path)
+            log_experiment_milestone(f"  Saved GAM model to {model_path}")
+
+        log_experiment_milestone(f"Results for {dimension} saved to {summary_path}")
+
     async def run(self):
-        """Run complete experiment pipeline."""
+        """Run complete experiment pipeline with multi-dimension support."""
         try:
+            # ========== SHARED STEPS (1-3): Run once for ALL dimensions ==========
+            print(f"🚀 Starting experiment with {len(self.config.target_dimensions)} dimensions: {self.config.target_dimensions}\n")
+
             # 1. Load dataset
             df = self.load_dataset()
 
             # 2. Run persona simulation if needed
             df = await self.run_persona_simulation_if_needed(df)
 
-            # 2.5. Create dataset-specific judges if needed (NEW)
+            # 3. Create dataset-specific judges if needed + evaluate
             self.create_judges_if_needed(df)
-
-            # 3. Get judge scores (with caching)
             df = self.get_judged_data(df)
 
-            # 4. Prepare training data (includes test_indices_in_full)
-            data = self.prepare_training_data(df)
+            # ========== PER-DIMENSION STEPS (4-9): Loop over dimensions ==========
+            for dimension in self.config.target_dimensions:
+                print(f"\n{'='*80}")
+                print(f"📊 Training models for dimension: {dimension}")
+                print(f"{'='*80}\n")
 
-            # 5. OPTIONAL: Tune hyperparameters
-            optimal_params = self.tune_hyperparameters(data)
+                # Create dimension subdirectory inside dimensions/ folder
+                dim_dir = self.run_dir / "dimensions" / dimension
+                dim_dir.mkdir(parents=True, exist_ok=True)
+                (dim_dir / "models").mkdir(exist_ok=True)
+                (dim_dir / "plots").mkdir(exist_ok=True)
 
-            # 6. Train GAM with optimal or default params
-            gam_results = self.train_gam(data, optimal_params.get('gam'))
+                # 4. Prepare training data for this dimension
+                data = self.prepare_training_data(df, dimension)
 
-            # 7. Run human-rubric evaluation on test set and baselines
-            human_rubric_predictions = self.run_human_rubric_evaluation(
-                df, data['test_indices_in_full']
-            )
-            baseline_results = self.run_baselines(data, human_rubric_predictions)
+                # 5. OPTIONAL: Tune hyperparameters (saves to dimension directory)
+                optimal_params = self.tune_hyperparameters(data, output_dir=dim_dir)
 
-            # 8. Save results
-            self.save_results(gam_results, baseline_results)
+                # 6. Train GAM with optimal or default params
+                gam_results = self.train_gam(data, optimal_params.get('gam'))
+
+                # 7. Run human-rubric evaluation on test set and baselines
+                human_rubric_predictions = self.run_human_rubric_evaluation(
+                    df, data['test_indices_in_full'], dimension
+                )
+                baseline_results = self.run_baselines(data, human_rubric_predictions)
+
+                # 8. Save results (dimension-specific)
+                self.save_results_for_dimension(dimension, dim_dir, gam_results, baseline_results, data)
+
+                # 9. Generate visualizations (dimension-specific)
+                if self.config.models.train_gam and gam_results:
+                    from pipeline.core.visualization import ExperimentVisualizer
+
+                    log_experiment_milestone(f"Generating visualizations for {dimension}")
+
+                    visualizer = ExperimentVisualizer(
+                        run_dir=dim_dir,  # Dimension-specific directory
+                        config=self.config,
+                        gam_model=gam_results.get('model'),
+                        gam_results=gam_results,
+                        baseline_results=baseline_results,
+                        judge_names=data['judge_names'],  # Dimension-specific judges
+                        dimension_name=dimension,  # Pass dimension name for plot filenames
+                        data=data
+                    )
+
+                    plot_paths = visualizer.generate_all_plots()
+                    log_experiment_milestone(f"Generated {len(plot_paths)} visualizations for {dimension}")
+
+                print(f"\n✅ Completed dimension: {dimension}")
 
             log_experiment_complete({
                 'status': 'SUCCESS',
-                'run_dir': str(self.run_dir)
+                'run_dir': str(self.run_dir),
+                'dimensions': self.config.target_dimensions
             })
 
-            print(f"✅ Experiment complete! Results in {self.run_dir}")
+            print(f"\n🎉 All dimensions complete! Results in {self.run_dir}")
 
         except Exception as e:
             log_experiment_complete({
@@ -847,7 +1068,7 @@ def main():
 
     config = ExperimentConfig.from_yaml(config_path)
 
-    # Run experiment
+    # Run experiment (handles multiple dimensions internally)
     runner = ExperimentRunner(config)
     asyncio.run(runner.run())
 

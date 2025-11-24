@@ -2,82 +2,439 @@ judges:
 - id: helpsteer2-helpfulness-judge
   name: helpfulness Judge
   version: '1.0'
-  description: Evaluates how well a response addresses the user's question and stated
-    constraints in the helpsteer2 context. Emphasizes directness, completeness, correctness,
-    and effective use of provided context or instructions.
-  scoring_description: Score from 0.0 to 4.0 based on how directly, completely, and
-    accurately the response fulfills the user's request and adheres to any given instructions
-    or context.
-  definition: Helpfulness measures how effectively the response satisfies the user's
-    informational or task need. A helpful response directly answers the question,
-    uses provided context or tools (e.g., search results, date, citation format) when
-    instructed, and offers specific, correct, and practically useful content. It should
-    handle ambiguity by briefly stating assumptions or asking focused clarifying questions
-    while still providing value. Responses that ignore instructions, are off-topic,
-    or provide incorrect or non-actionable information are less helpful.
+  description: "Evaluates how well an AI response addresses the user\u2019s question\
+    \ in the helpsteer2 dataset. Emphasizes directness, correctness, completeness,\
+    \ and actionability of guidance (e.g., steps, code, commands). Considers use of\
+    \ accurate tools/APIs and how uncertainty or missing context is handled."
+  scoring_description: "Score from 0.0 to 4.0 based on the level whose indicators\
+    \ best match the response. Decimals within a level\u2019s range are allowed to\
+    \ reflect nuance."
+  definition: "Helpfulness measures whether the response directly and effectively\
+    \ solves the user\u2019s stated need. A helpful answer is relevant, accurate,\
+    \ and sufficiently detailed to be actionable, including concrete steps, examples,\
+    \ or code as appropriate. It should reflect the user\u2019s context, avoid hallucinated\
+    \ tools or capabilities, and note prerequisites and constraints. When the request\
+    \ involves uncertainty (e.g., predictions) or missing details, a helpful response\
+    \ states limits, offers best-effort guidance, and may ask focused clarifying questions\
+    \ without derailing. Brevity is valued only if completeness and correctness are\
+    \ maintained."
   criteria:
   - range: [0.0, 0.9]
     label: Very Poor
     indicators:
-    - Does not address the user's question at all (irrelevant, empty, or purely meta
-      response).
-    - Ignores explicit task instructions or provided context entirely (e.g., no required
-      citations when mandated, no use of supplied sources).
-    - Provides fabricated, unsafe, or clearly misleading content without offering
-      any useful alternative.
-    - Refuses or deflects without giving actionable guidance or next steps.
+    - Does not address the question or is largely off-topic/refuses without meaningful
+      reason.
+    - Contains major factual errors or fabricated tools/APIs/commands inappropriate
+      to the task.
+    - Offers non-actionable content (e.g., platitudes) with no usable steps, examples,
+      or guidance.
+    - Ignores essential context or constraints from the prompt/history.
   - range: [1.0, 1.9]
     label: Poor
     indicators:
-    - Barely touches on the request; mostly off-topic or generic filler.
-    - Disregards key instructions/tools (e.g., fails to use provided web results or
-      citation format) with no acknowledgment.
-    - Includes clear inaccuracies or unsupported claims presented as fact.
-    - Offers no actionable steps, examples, or specifics the user can use.
+    - Partially relevant but misses the core task or most requirements.
+    - Advice is vague or high-level with significant inaccuracies or omissions that
+      block execution.
+    - Uses incorrect or mismatched technologies (e.g., wrong platform/hypervisor/API)
+      for the described scenario.
+    - Includes filler or repeats the question without providing a workable solution.
   - range: [2.0, 2.9]
     label: Fair
     indicators:
-    - Partially answers the main question but is superficial or misses several important
-      points.
-    - Inconsistently follows instructions/context (e.g., mentions sources but does
-      not use the required [[n](URL)] format, or overlooks the provided date/context).
-    - Contains minor inaccuracies or ambiguities and lacks needed specificity (definitions,
-      steps, examples).
-    - Organization makes extraction of the answer harder (buried lead, scattered points)
-      and does not proactively clarify obvious ambiguities.
+    - Addresses the main intent with some correct information but lacks important
+      details or coverage.
+    - Provides partially actionable guidance (some steps/code) yet omits key parameters,
+      prerequisites, or edge cases.
+    - May contain minor inaccuracies or unverified assumptions that require user correction.
+    - "Limited adaptation to the user\u2019s context; multi-part requests are only\
+      \ partly handled."
   - range: [3.0, 3.9]
     label: Good
     indicators:
-    - Directly answers the main question with mostly complete and correct information.
-    - Largely follows provided instructions and uses given context appropriately (minor
-      lapses only).
-    - Provides useful specifics (key points, steps, or examples) with minimal omission
-      of relevant details.
-    - Organization is clear and focused; may briefly note assumptions or ask a clarifying
-      question when needed.
+    - Directly answers the question and covers most requirements accurately and relevantly.
+    - Includes clear steps, working code/config examples, or commands with appropriate
+      placeholders and brief explanations.
+    - References necessary prerequisites, options, and constraints; flags uncertainties
+      or missing info appropriately.
+    - Uses correct domain terminology and real tools/APIs for the task; minimal extraneous
+      content and well-structured delivery.
   - range: [4.0, 4.0]
     label: Excellent
     indicators:
-    - Fully and directly answers the user's question, covering all key points without
-      significant omissions or extraneous content.
-    - Strictly adheres to instructions and integrates provided context/tools correctly
-      (e.g., uses supplied sources with the exact required citation format when specified).
-    - Information is specific, accurate, and actionable (concise summary plus details,
-      steps, or recommendations as appropriate).
-    - Handles ambiguity effectively by stating necessary assumptions or asking a focused
-      clarifying question while still providing immediate value.
-    - Structure enhances usability (clear overview first, then well-organized details)
-      with no irrelevant digressions.
+    - Fully satisfies the request, including all parts and context, with precise and
+      correct details.
+    - Supplies executable steps/code tailored to the scenario, plus validation or
+      test steps to confirm success.
+    - Anticipates pitfalls and edge cases; offers sensible alternatives or next steps
+      when applicable.
+    - Handles limitations (e.g., predictions, missing data) by stating constraints
+      and, if needed, asking one or two focused clarifying questions without derailing
+      the solution.
   guidelines:
-  - 'Score only helpfulness: how well the response fulfills the user''s request and
-    constraints; do not reward verbosity or style unrelated to task fulfillment.'
-  - When explicit instructions or context are provided (e.g., use of web results with
-    [[n](URL)] citations), adherence is required for top scores; missing these decreases
-    the score.
-  - Award partial credit for correct, directly useful content even if incomplete;
-    penalize omissions of key points, irrelevance, ignored instructions, or misleading/inaccurate
-    claims.
+  - "Score primarily on relevance, correctness, completeness, and actionability relative\
+    \ to the user\u2019s request; do not reward verbosity for its own sake."
+  - Penalize hallucinated or incorrect tools/APIs/commands and confident misinformation;
+    reward concise, directly applicable guidance with necessary prerequisites.
+  - In multi-turn contexts, judge against the latest user query using prior context;
+    when uncertainty exists, credit clear limits, best-effort guidance, and focused
+    clarifying questions.
   score_range: [0.0, 4.0]
   dataset: helpsteer2
   parent_id: null
   auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-correctness-judge
+  name: Correctness Judge
+  version: '1.0'
+  description: "Evaluates the factual and technical accuracy of an assistant\u2019\
+    s response in the helpsteer2 setting, which commonly includes how-to guidance,\
+    \ code, and tool/API usage. The judge checks whether claims, steps, and code align\
+    \ with real-world behavior, documented features, and platform constraints."
+  scoring_description: Assign a score from 0 to 4 based on the severity and centrality
+    of inaccuracies. Use decimals within the specified band to fine-tune when a response
+    sits between descriptors.
+  definition: Correctness measures whether the information provided is factually true,
+    technically valid, and feasible as stated. In helpsteer2, this includes accurate
+    use of platform-specific terms, valid APIs/cmdlets/parameters, executable code
+    or clearly marked pseudocode, and steps that would work under reasonable assumptions.
+    Responses should avoid hallucinated tools or capabilities, clearly qualify uncertainty
+    or time-sensitive facts, and refrain from unwarranted predictions. Minor imprecision
+    is acceptable at higher scores if it does not change outcomes or feasibility.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Includes fabricated or impossible features/APIs/cmdlets (e.g., non-existent
+      PowerCLI/PowerShell commands) or conflates unrelated platforms (e.g., Hyper-V
+      vs vSphere) in a way that breaks feasibility.
+    - Core claims are demonstrably false or contradict well-established facts, leading
+      to failure if followed.
+    - Code is non-executable due to non-existent functions/parameters or targets the
+      wrong ecosystem entirely.
+    - Makes definitive claims about unknowable or future outcomes without caveats,
+      or states outcomes that are known to be false.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Multiple major inaccuracies or omissions that undermine the primary task (e.g.,
+      missing required prerequisites or misusing key concepts like NSX-T roles).
+    - Code contains major logical/semantic errors (wrong cmdlet for the platform,
+      incompatible parameters), unlikely to run successfully.
+    - Mislabels or conflates important technologies or resources in ways that materially
+      affect correctness.
+    - Some correct fragments exist, but they are outweighed by incorrect guidance
+      or infeasible steps.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Core idea is plausible, but includes notable inaccuracies, outdated details,
+      or unverified assumptions that could cause partial failure.
+    - Code is mostly syntactically reasonable but uses incorrect flags/resource names,
+      or is incomplete for the stated scenario.
+    - Important constraints/edge cases are omitted (e.g., cross-vCenter requirements),
+      affecting correctness for common setups.
+    - Speculative statements are presented without sufficient qualification, though
+      not blatantly false.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Main claims are accurate with only minor imprecision that does not alter feasibility
+      or outcomes.
+    - Code/commands align with the correct platform and are largely runnable; may
+      require small tweaks (naming, minor options).
+    - Uses correct terminology and distinguishes known facts from assumptions or uncertainties.
+    - Includes key prerequisites/constraints; minor omissions or edge cases are not
+      critical to success.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All claims are factually correct and consistent with authoritative documentation
+      and real-world behavior.
+    - Code/commands are valid, executable as given under stated assumptions, and use
+      correct APIs/cmdlets/parameters for the platform.
+    - No conflation of technologies; precise distinctions and constraints are correctly
+      stated (including cross-environment requirements).
+    - Time-sensitive or uncertain information is properly qualified; the response
+      avoids unwarranted assumptions or hallucinations.
+    - Steps are complete and feasible end-to-end for the described scenario.
+  guidelines:
+  - Judge only factual and technical accuracy relevant to the question; do not consider
+    style, tone, or completeness beyond what affects correctness.
+  - For code/tooling, verify existence and validity of APIs/cmdlets/parameters, platform
+    compatibility, and whether the procedure is feasible or runnable as presented
+    (or clearly marked as illustrative).
+  - 'Weigh severity and centrality: a single critical falsehood that breaks the solution
+    caps the score; minor nits permit higher scores. Credit appropriate uncertainty
+    disclaimers over invented facts.'
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-coherence-judge
+  name: coherence Judge
+  version: '1.0'
+  description: "Evaluates how logically structured, internally consistent, and easy\
+    \ to follow an assistant\u2019s response is. Focuses on whether the answer maintains\
+    \ a clear flow, stays on topic, and connects code, steps, and explanations coherently."
+  scoring_description: "Assign a score from 0 to 4 based on the response\u2019s logical\
+    \ flow, internal consistency, and clarity of organization. Ignore factual correctness\
+    \ except where it causes internal contradictions or incoherent flow."
+  definition: "Coherence measures the logical structure and clarity of a response:\
+    \ how well ideas progress, how consistently terms and entities are used, and whether\
+    \ code, steps, and explanations align. In the helpsteer2 context, coherent answers\
+    \ stay focused on the user\u2019s request, use clear sequencing for procedures,\
+    \ and avoid contradictory or disjointed statements. Smooth transitions and consistent\
+    \ references to tools, APIs, and variables signal coherence. Multi-turn coherence\
+    \ includes correctly addressing the latest user prompt while maintaining consistent\
+    \ context. Minor stylistic issues are tolerated if the overall flow remains clear\
+    \ and connected."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Sentences or sections are disjointed; ideas do not connect or form a logical
+      sequence.
+    - Large portions are off-topic or answer a different question entirely.
+    - Direct contradictions within the response (e.g., proposes one approach then
+      refutes it without explanation).
+    - Broken or fragmentary structure (e.g., incomplete steps, unfinished thoughts)
+      that prevents understanding.
+    - Misreferences entities/pronouns (e.g., switches tools/terms without explanation)
+      creating confusion.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Some relevant content, but the flow is confusing with frequent non sequiturs
+      or abrupt topic shifts.
+    - Inconsistent terminology or variable/tool names across text and code, causing
+      interpretive difficulty.
+    - Steps or sections are out of order or missing transitions, obscuring the intended
+      process.
+    - Internal mismatches between prose and code/config (e.g., describes one cmdlet
+      while showing a different one).
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Main idea is understandable, but organization is uneven (mixed granularity or
+      partially jumbled steps).
+    - Minor contradictions or ambiguous references that require reader inference to
+      resolve.
+    - Some redundant or slightly off-topic content that distracts from the main flow.
+    - Partial alignment between explanations and code/commands; reader can reconcile
+      with modest effort.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - "Clear overall structure with mostly logical progression (e.g., overview \u2192\
+      \ prerequisites \u2192 steps \u2192 notes)."
+    - Consistent use of terms, entities, and variables; pronoun references are resolvable.
+    - All parts remain on topic with minimal redundancy or digression.
+    - Code, steps, and explanations align and reinforce each other, with only minor
+      lapses or omissions.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Tight, natural flow with smooth transitions; each section builds logically on
+      the previous.
+    - Fully consistent terminology and entity references across prose, code, and examples.
+    - No internal contradictions; sequencing of steps mirrors a sensible task workflow.
+    - Perfect alignment between narrative and artifacts (code/commands/config), including
+      parameters and names.
+    - Precisely addresses the latest prompt/context in multi-turn settings without
+      drift or repetition.
+  guidelines:
+  - Evaluate coherence independently of factual accuracy; penalize factual errors
+    only when they introduce internal contradictions or disrupt logical flow.
+  - 'Consider alignment between prose and artifacts (code, commands, examples) as
+    part of coherence: they should not contradict and should follow the same sequence.'
+  - Favor responses that stay tightly focused on the user request and maintain consistent
+    terminology and context across the entire answer, especially in multi-turn interactions.
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-complexity-judge
+  name: complexity Judge
+  version: '1.0'
+  description: "Evaluates how well the assistant calibrates the depth, detail, and\
+    \ technical sophistication of its response to the user\u2019s request. Scores\
+    \ reflect whether the response is too shallow, overly complex, or appropriately\
+    \ matched to the task and user cues."
+  scoring_description: "Score based on how well the response\u2019s complexity matches\
+    \ the request\u2019s needs and implied user expertise. Favor balanced, task-appropriate\
+    \ depth over verbosity or oversimplification."
+  definition: "Complexity measures the appropriateness of the response\u2019s depth,\
+    \ granularity, and technical sophistication for the user\u2019s query and implied\
+    \ expertise. A good response matches the user\u2019s signals (e.g., asking for\
+    \ code, high-level overview, or step-by-step guidance), uses necessary jargon\
+    \ with minimal overhead, and avoids irrelevant detail. It should scale complexity\
+    \ with the task: concise for simple queries and structured, thorough for multi-step\
+    \ or advanced tasks. Where uncertainty exists, it should scope assumptions or\
+    \ ask targeted clarifying questions rather than over- or under-shooting detail."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Severe mismatch in depth (e.g., trivial one-liners for complex tasks or long,
+      dense dumps for simple requests).
+    - "Heavy or irrelevant jargon/technologies introduced without context, unrelated\
+      \ to the user\u2019s ask."
+    - "No actionable structure: lacks steps, mapping, or scaffold for the task\u2019\
+      s complexity."
+    - Provides code or advanced constructs when the user asked for a simple explanation
+      (or vice versa) with no justification.
+    - Ignores obvious prerequisites or environment constraints that drive complexity
+      level.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - 'Noticeable over- or under-detail: generic advice for a specialized task or
+      deep dive for a basic query.'
+    - 'Limited structure: steps or code exist but at the wrong granularity to be useful
+      for the stated goal.'
+    - Unnecessary tangents or added components that inflate complexity without advancing
+      the task.
+    - Uses jargon without brief definitions when novice cues are present, or avoids
+      needed technical terms when expert cues are present.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - 'Partially appropriate depth: some sections are well-calibrated while others
+      are too brief or too detailed.'
+    - Covers core flow but omits task-specific complexity (e.g., multi-resource mapping,
+      environment assumptions) or adds minor irrelevant detail.
+    - Provides examples or code stubs that help but are not fully aligned to the requested
+      scope or context.
+    - Uses some jargon with limited explanation or over-explains obvious concepts
+      for the likely audience.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Depth and granularity largely match the request and implied expertise, with
+      clear, task-appropriate steps.
+    - Includes code/config or concrete procedures when asked, with brief cues or comments
+      to aid application.
+    - Employs necessary jargon sparingly and clarifies specialized terms once when
+      helpful.
+    - Avoids irrelevant complexity; asks one or two targeted clarifying questions
+      only if essential to determine depth.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - 'Precisely calibrated complexity: concise for simple asks, and comprehensive
+      yet focused for advanced, multi-step tasks.'
+    - 'Uses progressive disclosure: clearly separates core essentials from optional
+      advanced details or edge cases.'
+    - Tailors artifacts to task complexity (e.g., parameterized, modular code for
+      complex tasks; succinct checklists for simple tasks).
+    - Surfaces key prerequisites and assumptions that control complexity (APIs, permissions,
+      environment) without scope creep.
+    - Structure enhances manageability (logical sections, mappings, decision points)
+      while avoiding unnecessary depth.
+  guidelines:
+  - "Judge complexity alignment, not factual correctness: evaluate whether the depth\
+    \ and sophistication suit the user\u2019s ask and implied expertise."
+  - Use cues from the prompt (e.g., request for code vs. overview, domain specificity,
+    novice vs. expert language) to infer the expected level of detail.
+  - Reward progressive disclosure, concise core guidance, and targeted clarifications;
+    penalize irrelevant deep dives or oversimplified responses to complex tasks.
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-verbosity-judge
+  name: verbosity Judge
+  version: '1.0'
+  description: "Evaluates whether an AI response is the right length and level of\
+    \ detail for the user\u2019s request. Focuses on concision, completeness, and\
+    \ staying on-topic, especially in technical help contexts typical of helpsteer2."
+  scoring_description: Score based on how well the response balances brevity and completeness
+    for the specific query. Higher scores are concise yet sufficient; lower scores
+    are overly long, fluffy, or too terse to be useful.
+  definition: "Verbosity measures the appropriateness of response length and detail\
+    \ relative to the user\u2019s intent, complexity of the task, and specificity\
+    \ of the prompt. An ideal response provides exactly the needed steps, code, or\
+    \ explanation without digressions, repetition, or boilerplate. In helpsteer2,\
+    \ this often means compact code snippets or step lists for technical tasks, and\
+    \ brief, focused explanations for conceptual or speculative questions. The response\
+    \ should scale in length with task complexity and avoid irrelevant context (e.g.,\
+    \ product overviews when the user asked for a script). Minimal necessary qualifiers\
+    \ or caveats are acceptable if they directly support the task."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - 'Gross mismatch of length: multiple paragraphs for a simple ask (e.g., ''Explain
+      NSX-T'' becomes a long tutorial) or a one-liner for a complex multi-step/code
+      request.'
+    - Large amounts of filler or boilerplate (e.g., generic network/DNS disclaimers)
+      unrelated to the requested output; more than half of content is off-topic or
+      repetitive.
+    - Repeats the same points or instructions in different wording without adding
+      value.
+    - Provides broad definitions or product comparisons when the user asked specifically
+      for code or concrete steps.
+    - Buried actionable content (e.g., code) within long narrative, making extraction
+      difficult.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - 'Noticeable mismatch of detail: includes sizeable irrelevant context (roughly
+      a quarter or more) or is too short to execute the task without guessing.'
+    - Overuse of disclaimers, caveats, or environment notes that do not directly enable
+      the requested outcome.
+    - Actionable elements (steps/code) are present but padded with unnecessary exposition
+      or repeated reminders.
+    - Gives high-level outlines where concreteness is expected (e.g., no code for
+      a 'give me a script' request), or over-explains obvious basics for experts.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Generally on the right track but includes some fluff or tangents; could be reduced
+      without losing meaning.
+    - Provides most necessary steps/details but omits minor specifics or includes
+      minor repetition.
+    - 'Length is somewhat longer/shorter than ideal: either brief but requiring small
+      follow-up questions, or slightly verbose but still usable.'
+    - Formatting partially aids brevity (bullets/code), though commentary could be
+      tightened.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - 'Mostly concise and complete: covers the task with minimal extra text and no
+      significant omissions.'
+    - "Keeps focus on the user\u2019s ask (e.g., provides a code snippet plus a few\
+      \ targeted notes rather than broad overviews)."
+    - Uses compact structure (bullets, ordered steps, or code) to maximize signal-to-noise.
+    - Includes only necessary qualifiers (e.g., required permissions, key parameters)
+      and avoids redundant phrasing.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - 'Optimally brief while fully enabling the user to act: precise steps or code
+      with just-in-time context.'
+    - "Length proportionate to complexity: simple asks get 1\u20133 focused sentences;\
+      \ complex tasks get succinct lists or a tight code block with minimal annotations."
+    - No fluff, tangents, or repetition; every sentence contributes to solving the
+      request.
+    - "Tailors depth to intent and domain (e.g., concrete PowerCLI script for 'move\
+      \ VMs', tight 2\u20134 sentence explanation for 'Explain NSX-T', brief uncertainty\
+      \ note for speculative questions)."
+    - Actionable content is immediately accessible and not buried (e.g., code first,
+      short notes after).
+  guidelines:
+  - 'Calibrate expected length by task complexity and prompt specificity: code/step
+    requests need compact actionable content; conceptual or speculative questions
+    need brief, focused explanations.'
+  - Penalize filler, generic boilerplate, and repetition; reward structure that improves
+    density (bullets, concise code) without unnecessary narration.
+  - "Do not judge factual correctness here; assess only whether the amount of text/detail\
+    \ is sufficient and no more than necessary to accomplish the user\u2019s goal."
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: verbosity
