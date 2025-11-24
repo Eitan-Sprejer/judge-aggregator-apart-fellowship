@@ -91,21 +91,51 @@ class DatasetLoader:
             cache_path = self._get_cache_path(dataset_name, **kwargs)
             if cache_path.exists():
                 logger.info(f"Loading cached dataset from {cache_path}")
-                return pd.read_pickle(cache_path)
+                df_full = pd.read_pickle(cache_path)
 
-        # Load from source
-        df = self._load_from_source(dataset_name, **kwargs)
+                # Apply sampling if n_samples specified
+                n_samples = kwargs.get('n_samples')
+                if n_samples is not None and n_samples < len(df_full):
+                    random_seed = kwargs.get('random_seed', 42)
+                    df = df_full.sample(n=n_samples, random_state=random_seed).reset_index(drop=True)
+                    logger.info(f"Sampled {n_samples} from {len(df_full)} cached samples (seed={random_seed})")
+                else:
+                    df = df_full
 
-        # Save to cache
+                return df
+
+        # Load from source (always loads FULL dataset)
+        # Remove n_samples from kwargs so preprocessing methods load full data
+        source_kwargs = {k: v for k, v in kwargs.items() if k != 'n_samples'}
+        df_full = self._load_from_source(dataset_name, **source_kwargs)
+
+        # Save FULL dataset to cache
         cache_path = self._get_cache_path(dataset_name, **kwargs)
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        df.to_pickle(cache_path)
-        logger.info(f"Cached dataset to {cache_path}")
+        df_full.to_pickle(cache_path)
+        logger.info(f"Cached full dataset ({len(df_full)} samples) to {cache_path}")
+
+        # Apply sampling if n_samples specified
+        n_samples = kwargs.get('n_samples')
+        if n_samples is not None and n_samples < len(df_full):
+            random_seed = kwargs.get('random_seed', 42)
+            df = df_full.sample(n=n_samples, random_state=random_seed).reset_index(drop=True)
+            logger.info(f"Sampled {n_samples} from {len(df_full)} samples (seed={random_seed})")
+        else:
+            df = df_full
 
         return df
 
     def _get_cache_path(self, dataset_name: str, **kwargs) -> Path:
-        """Generate cache path for dataset."""
+        """Generate cache path for FULL dataset only.
+
+        We cache only the full preprocessed dataset, never subsamples.
+        Sampling happens at load time (cheap and deterministic with seed).
+
+        Cache includes:
+        - Dataset name
+        - Split name (train/val/test have different data)
+        """
         # Determine base name
         if dataset_name == 'judge_bench':
             name = kwargs.get('task_name', 'unknown')
@@ -114,7 +144,13 @@ class DatasetLoader:
         else:
             name = dataset_name
 
-        return Path('datasets/processed') / f'{name}.pkl'
+        # Include split if specified (different splits = different data)
+        if 'split' in kwargs:
+            cache_name = f"{name}_{kwargs['split']}_full.pkl"
+        else:
+            cache_name = f"{name}_full.pkl"
+
+        return Path('datasets/processed') / cache_name
 
     def _load_from_source(self, dataset_name: str, **kwargs) -> pd.DataFrame:
         """Load dataset from original source (HuggingFace, files, etc.)."""
