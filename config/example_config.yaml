@@ -15,7 +15,7 @@
 name: "my-experiment"
 dataset: "helpsteer2"                    # Dataset to use
 target: "target_human_aggregated"         # Options: target_human_aggregated, target_human_individual, target_synthetic
-target_dimension: "helpfulness"           # Specific dimension to train aggregator for
+target_dimensions: ["helpfulness"]           # Specific dimension to train aggregator for
 
 # Dataset parameters
 dataset_kwargs:

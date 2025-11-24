@@ -1,67 +1,61 @@
-# HelpSteer2 Baseline Experiment Configuration
-# Full baseline with automatic judge creation and dataset-specific judges
+# HelpSteer2 Baseline - All 5 Dimensions (100 samples)
+# Single config for all dimensions
 #
-# This configuration demonstrates the judge creation and selection pipeline.
-# It will:
-# 1. Auto-create parent judges for each HelpSteer2 dimension
-# 2. Decompose parent judges into specialized children
-# 3. Train 5 separate aggregators (one per dimension)
-# 4. Compare against baseline methods
-#
-# Usage:
-#   python run_experiment.py config/helpsteer2_baseline.yaml
+# Total expected cost: ~$0.95 (5 dimensions × ~$0.19 each)
+# Each dimension creates its own 6 judges (1 parent + 5 children)
 
 name: "helpsteer2-baseline"
 dataset: "helpsteer2"
 target: "target_human_aggregated"
-target_dimension: "helpfulness"           # Train on helpfulness dimension
+
+# List of dimensions to train on (will create separate models for each)
+target_dimensions: ["helpfulness", "correctness", "coherence", "complexity", "verbosity"]
 
 # Dataset configuration
 dataset_kwargs:
-  n_samples: 500                          # Use 500 samples for baseline
+  n_samples: 100                    # 100 samples for testing
   random_seed: 42
   split: "train"
 
 # Judge configuration
 judges:
-  # Auto-create judges for target_dimension (helpfulness)
   create:
-    depth: 1                              # 1 level of decomposition (parent → ~4-5 children)
-    cache: "auto"                         # Load from cache if exists, create if missing
-    model: "openai/gpt-5"                 # Model for judge creation
+    depth: 1                        # Creates ~6 judges per dimension
+    cache: "auto"                   # Reuse judge definitions, but scores will be fresh
+    model: "openai/gpt-5"
     temperature: 0.4
     max_tokens: 10000
 
-  # Judge evaluation model (used for scoring responses AND baselines)
-  judge_model: "openai/gpt-5-mini"
-
-  # Score range
+  judge_model: "openai/gpt-5-mini"  # Model for scoring ($0.250/1M input, $2.000/1M output)
   score_range: [0.0, 4.0]
 
-# Model training configuration
+# Model training
 models:
   train_gam: true
-  train_mlp: true
-  test_size: 0.2                          # 100 samples for test (20%)
-  val_size: 0.15                          # 75 samples for validation (15%)
+  train_mlp: false                  # Disable MLP for faster testing
+  test_size: 0.2                    # 20 samples for test
+  val_size: 0.15                    # 15 samples for validation
 
+  # Hyperparameter tuning
+  tuning:
+    enabled: true                   # Find optimal GAM params
+    method: "exhaustive"
+    n_trials: 10
+
+  # Default GAM hyperparameters
   gam:
     n_splines: 10
     lam: 0.6
     max_iter: 200
 
-  mlp:
-    hidden_dim: 64
-    learning_rate: 0.001
-    batch_size: 32
-    n_epochs: 100
-    dropout: 0.1
-    l2_reg: 0.001
-    early_stopping_patience: 15
-    min_delta: 0.0001
-
-# Concurrency
-concurrency: 5                            # Parallel judge API calls
-
-# Random seed
+concurrency: 10                     # Parallel judge API calls
 random_seed: 42
+
+# This will:
+# 1. Create judges for all 5 dimensions (30 judges total, cached after first creation)
+# 2. Evaluate 100 samples with all judges (~3000 API calls total, but only ~600 per dimension due to caching)
+# 3. Train 5 separate GAM models (one per dimension)
+# 4. Generate visualizations for each dimension
+# 5. Save results in separate directories per dimension
+#
+# Total cost: ~$0.19 × 5 = ~$0.95

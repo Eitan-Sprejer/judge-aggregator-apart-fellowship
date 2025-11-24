@@ -9,7 +9,7 @@
 name: "persona-synthetic-ultrafeedback"
 dataset: "ultrafeedback"                  # Dataset name for loader
 target: "target_synthetic"                # AUTO-TRIGGERS persona simulation
-target_dimension: "overall"               # UltraFeedback only has ['overall'] dimension
+target_dimensions: ["overall"]               # UltraFeedback only has ['overall'] dimension
 
 # Dataset parameters
 dataset_kwargs:
