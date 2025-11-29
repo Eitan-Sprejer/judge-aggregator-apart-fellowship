@@ -101,6 +101,7 @@ class JudgeCreationOrchestrator:
         cache_strategy: str = "auto",
         decomposition_depth: int = 1,
         sample_qa_pairs: Optional[List[Dict[str, str]]] = None,
+        full_rubric: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Create judges for dataset dimensions with caching support.
 
@@ -109,6 +110,9 @@ class JudgeCreationOrchestrator:
             cache_strategy: Cache behavior - 'auto', 'force_create', or 'load_only'
             decomposition_depth: Depth of recursive decomposition (0 = no decomposition)
             sample_qa_pairs: Optional sample Q&A pairs to inform judge creation
+            full_rubric: Optional full annotation rubric text from human guidelines.
+                        If provided, this gives judges the complete context of what
+                        human annotators were asked to evaluate.
 
         Returns:
             List of judge definitions (parents + children if decomposed)
@@ -174,6 +178,7 @@ class JudgeCreationOrchestrator:
                 dimension_name=dim_name,
                 dimension_description=dim_description,
                 sample_qa_pairs=sample_qa_pairs,
+                full_rubric=full_rubric,
             )
             # Add explicit dimension field
             parent_judge['dimension'] = dim_name
@@ -202,6 +207,7 @@ class JudgeCreationOrchestrator:
         dimension_name: str,
         dimension_description: str,
         sample_qa_pairs: Optional[List[Dict[str, str]]] = None,
+        full_rubric: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a parent judge for a dimension using ParentJudgeCreatorAgent.
 
@@ -209,6 +215,7 @@ class JudgeCreationOrchestrator:
             dimension_name: Name of the dimension
             dimension_description: Description of what the dimension measures
             sample_qa_pairs: Optional sample Q&A pairs
+            full_rubric: Optional full annotation rubric from human guidelines
 
         Returns:
             Parent judge definition
@@ -219,6 +226,7 @@ class JudgeCreationOrchestrator:
                 dimension_description=dimension_description,
                 dataset_name=self.dataset_name,
                 sample_qa_pairs=sample_qa_pairs,
+                full_rubric=full_rubric,
             )
             return parent_judge
         except Exception as e:

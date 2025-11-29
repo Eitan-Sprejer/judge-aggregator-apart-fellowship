@@ -376,6 +376,7 @@ class ParentJudgeCreatorAgent:
         dimension_description: str,
         dataset_name: str,
         sample_qa_pairs: Optional[List[Dict[str, str]]] = None,
+        full_rubric: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a parent judge definition from a dimension description.
 
@@ -384,6 +385,9 @@ class ParentJudgeCreatorAgent:
             dimension_description: Description of what this dimension measures
             dataset_name: Name of the dataset this judge is for (e.g., 'helpsteer2')
             sample_qa_pairs: Optional sample Q&A pairs to inform rubric creation
+            full_rubric: Optional full annotation rubric text from human guidelines.
+                        This provides the complete context of what human annotators
+                        were asked to evaluate, ensuring semantic alignment.
 
         Returns:
             Complete judge definition in judges.yaml format
@@ -397,11 +401,31 @@ class ParentJudgeCreatorAgent:
                 samples_context += f"Q: {pair.get('question', 'N/A')}\n"
                 samples_context += f"A: {pair.get('response', 'N/A')[:200]}...\n"
 
+        # Build full rubric context if provided
+        rubric_context = ""
+        if full_rubric:
+            rubric_context = f"""
+
+## IMPORTANT: Human Annotation Guidelines
+
+The following is the EXACT rubric that human annotators used when labeling this dataset.
+Your judge MUST align with these guidelines to ensure the judge measures the same thing humans measured.
+
+<human_annotation_rubric>
+{full_rubric}
+</human_annotation_rubric>
+
+CRITICAL: Pay careful attention to how each dimension is defined in the human rubric above.
+Some dimensions (like complexity and verbosity) may be DESCRIPTIVE scales (measuring what level
+something IS) rather than QUALITY judgments (measuring how appropriate something is).
+Your judge must match the human annotators' interpretation exactly.
+"""
+
         user_prompt = f"""
 Dataset: {dataset_name}
 Dimension: {dimension_name}
 Description: {dimension_description}
-{samples_context}
+{rubric_context}{samples_context}
 
 Task: Create a comprehensive parent judge rubric for evaluating "{dimension_name}" in the context of {dataset_name}.
 

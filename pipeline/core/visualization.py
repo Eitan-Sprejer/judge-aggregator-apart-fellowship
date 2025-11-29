@@ -469,6 +469,113 @@ class ExperimentVisualizer:
         logger.info(f"✓ Residual distribution plot saved to {output_path}")
         return output_path
 
+    def plot_spearman_ranking_comparison(self, dimension: str) -> Path:
+        """
+        Create Spearman ranking comparison visualization.
+
+        Shows how well the model preserves ranking order compared to ground truth:
+        - Scatter plot of predicted rank vs actual rank
+        - Perfect Spearman ρ=1.0 would show diagonal line
+        - Rank difference histogram showing distribution of ranking errors
+
+        This is particularly useful for preference learning tasks where relative
+        ordering matters more than absolute values.
+
+        Args:
+            dimension: Target dimension name
+
+        Returns:
+            Path to saved plot
+        """
+        if self.gam_model is None or self.data is None:
+            logger.warning("No GAM model or data available, skipping ranking comparison plot")
+            return None
+
+        X_test = self.data.get('X_test')
+        y_test = self.data.get('y_test')
+
+        if X_test is None or y_test is None:
+            logger.warning("Test data not available, skipping ranking comparison plot")
+            return None
+
+        y_pred = self.gam_model.predict(X_test)
+
+        # Compute ranks (1 = lowest, n = highest)
+        actual_rank = stats.rankdata(y_test, method='average')
+        predicted_rank = stats.rankdata(y_pred, method='average')
+
+        # Compute Spearman correlation
+        spearman_rho, spearman_p = stats.spearmanr(y_test, y_pred)
+
+        # Create figure with two subplots
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+        # Left: Rank vs Rank scatter plot
+        ax1.scatter(actual_rank, predicted_rank, alpha=0.5, s=40,
+                   edgecolors='black', linewidth=0.3, c='steelblue')
+
+        # Perfect ranking line
+        n = len(actual_rank)
+        ax1.plot([1, n], [1, n], 'r--', linewidth=2, alpha=0.8,
+                label='Perfect Ranking (ρ=1.0)')
+
+        # Regression line through ranks
+        z = np.polyfit(actual_rank, predicted_rank, 1)
+        p = np.poly1d(z)
+        x_fit = np.array([1, n])
+        ax1.plot(x_fit, p(x_fit), 'b-', linewidth=2, alpha=0.8,
+                label=f'Fitted (ρ={spearman_rho:.3f})')
+
+        ax1.set_xlabel('Actual Rank (Human Rating)', fontsize=12, fontweight='bold')
+        ax1.set_ylabel('Predicted Rank (GAM)', fontsize=12, fontweight='bold')
+        ax1.set_title('Ranking Comparison', fontsize=13, fontweight='bold')
+        ax1.legend(fontsize=10, loc='upper left')
+        ax1.grid(True, alpha=0.3)
+
+        # Add metrics text box
+        textstr = f'Spearman ρ = {spearman_rho:.4f}\np-value = {spearman_p:.2e}\nn = {n}'
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.8)
+        ax1.text(0.95, 0.05, textstr, transform=ax1.transAxes, fontsize=11,
+                verticalalignment='bottom', horizontalalignment='right', bbox=props)
+
+        # Right: Rank difference histogram
+        rank_diff = predicted_rank - actual_rank
+        percentile_positions = rank_diff / n * 100  # Normalize to percentile positions
+
+        ax2.hist(rank_diff, bins=30, edgecolor='black', alpha=0.7, color='steelblue')
+        ax2.axvline(x=0, color='red', linestyle='--', linewidth=2,
+                   label='Perfect Ranking (diff=0)')
+        ax2.axvline(x=rank_diff.mean(), color='green', linestyle='--', linewidth=2,
+                   label=f'Mean = {rank_diff.mean():.1f}')
+
+        ax2.set_xlabel('Rank Difference (Predicted - Actual)', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('Frequency', fontsize=12, fontweight='bold')
+        ax2.set_title('Ranking Error Distribution', fontsize=13, fontweight='bold')
+        ax2.legend(fontsize=10)
+        ax2.grid(True, alpha=0.3)
+
+        # Add rank difference stats
+        abs_rank_diff = np.abs(rank_diff)
+        textstr2 = (f'Mean |diff|: {abs_rank_diff.mean():.1f}\n'
+                   f'Median |diff|: {np.median(abs_rank_diff):.1f}\n'
+                   f'Max |diff|: {abs_rank_diff.max():.0f}\n'
+                   f'Std: {rank_diff.std():.1f}')
+        props2 = dict(boxstyle='round', facecolor='lightblue', alpha=0.8)
+        ax2.text(0.02, 0.98, textstr2, transform=ax2.transAxes, fontsize=10,
+                verticalalignment='top', bbox=props2)
+
+        fig.suptitle(f'Spearman Ranking Analysis - {dimension.title()} (Test Set)',
+                    fontsize=14, fontweight='bold')
+        plt.tight_layout()
+
+        # Save plot
+        output_path = self.plots_dir / f"spearman_ranking_{dimension}.png"
+        plt.savefig(output_path)
+        plt.close()
+
+        logger.info(f"✓ Spearman ranking comparison plot saved to {output_path}")
+        return output_path
+
     def plot_judge_correlation_heatmap(self, dimension: str) -> Path:
         """
         Create correlation matrix heatmap of judge scores.
@@ -681,6 +788,11 @@ class ExperimentVisualizer:
 
         logger.info("  → Residual distribution analysis...")
         path = self.plot_residual_distribution(dimension)
+        if path:
+            plot_paths.append(path)
+
+        logger.info("  → Spearman ranking comparison...")
+        path = self.plot_spearman_ranking_comparison(dimension)
         if path:
             plot_paths.append(path)
 

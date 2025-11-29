@@ -11,49 +11,61 @@
 # Note: Model and temperature are NOT specified here - they come from experiment config
 
 helpsteer2:
+  # EXACT annotation guidelines from HelpSteer paper (Appendix A.1)
+  # These are the verbatim instructions given to human annotators
   rubric: |
-    You are evaluating the quality of an AI assistant's response to a user question.
-    Please rate the response across the following 5 dimensions on a scale from 0 to 4:
+    You are evaluating the quality of an AI assistant's response to a user prompt/instruction.
+    Your task is to rate the response based on 5 axes, each on a 5-point Likert scale (0-4).
 
-    **Dimensions to evaluate:**
+    ## Dimensions to Evaluate
 
-    1. **Helpfulness (0-4)**: How well does the response address the user's question or request?
-       - 0: Not helpful at all
-       - 1: Slightly helpful, but misses key points
-       - 2: Somewhat helpful, addresses some aspects
-       - 3: Helpful, addresses most aspects well
-       - 4: Very helpful, thoroughly addresses the question
+    ### 1. Helpfulness (0-4)
+    How useful and helpful the overall response is.
 
-    2. **Correctness (0-4)**: Is the information provided factually accurate and free of errors?
-       - 0: Contains significant factual errors
-       - 1: Mostly incorrect with some accurate details
-       - 2: Mix of correct and incorrect information
-       - 3: Mostly correct with minor errors
-       - 4: Completely accurate and error-free
+    - 0: The response is not useful or helpful at all. The response completely missed the essence of what the user wanted.
+    - 1: The response is borderline unhelpful and mostly does not capture what the user was looking for, but is still usable and helpful in a small way.
+    - 2: The response is partially helpful but misses the overall goal of the user's query/input in some way. The response did not fully satisfy what the user was looking for.
+    - 3: The response is mostly helpful and mainly aligned with what the user was looking for, but there is still some room for improvement.
+    - 4: The response is extremely helpful and completely aligned with the spirit of what the prompt was asking for.
 
-    3. **Coherence (0-4)**: Is the response well-structured, logical, and easy to follow?
-       - 0: Incoherent, confusing structure
-       - 1: Poorly structured, hard to follow
-       - 2: Somewhat coherent with organizational issues
-       - 3: Well-structured and mostly clear
-       - 4: Excellently organized, very clear flow
+    ### 2. Correctness (0-4)
+    The response is based on facts, no hallucinations, no mistakes. The response covers everything required in the instruction.
 
-    4. **Complexity (0-4)**: Does the response appropriately match the complexity of the question?
-       - 0: Oversimplified or overly complex
-       - 1: Somewhat inappropriate complexity level
-       - 2: Acceptable complexity, some mismatches
-       - 3: Good complexity match
-       - 4: Perfect complexity level for the question
+    - 0: The response is completely incorrect. All information provided is wrong, false or hallucinated. If the prompt asks the assistant to do a task, the task is not at all attempted, or the wrong task was attempted in the response. The response is completely irrelevant to the prompt.
+    - 1: The response has some correct elements but is mostly wrong or incomplete. The response may contain multiple instances of hallucinations, false information, misleading information, or irrelevant information. If the prompt asks the assistant to do a task, the task was attempted with a small amount of success.
+    - 2: The response contains a mix of correct and incorrect information. The response may miss some details, contain misleading information, or minor hallucinations, but is more or less aligned with what the prompt asks for. If the prompt asks the assistant to perform a task, the task is attempted with moderate success but still has clear room for improvement.
+    - 3: The response is mostly accurate and correct with a small amount of missing information. It contains no misleading information or hallucinations. If the prompt asks the assistant to perform a task, the task is mostly successfully attempted.
+    - 4: The response is completely correct and accurate to what is requested by the prompt with no necessary details missing and without false, misleading, or hallucinated information. If the prompt asks the assistant to do a task, the task is completely done and addressed in the response.
 
-    5. **Verbosity (0-4)**: Is the response appropriately detailed without being too brief or too lengthy?
-       - 0: Far too brief or far too verbose
-       - 1: Too brief or too verbose
-       - 2: Acceptable length with some issues
-       - 3: Good length, mostly appropriate
-       - 4: Perfect level of detail
+    ### 3. Coherence (0-4)
+    The response is self-consistent in terms of content, style of writing, and does not contradict itself. The response can be logically followed and understood by a human. The response does not contain redundant or repeated information.
 
-    **Instructions:**
-    - Read the question and response carefully
+    - 0 (Completely Incoherent and/or Unclear): The response is completely incomprehensible and no clear meaning or sensible message can be discerned from it.
+    - 1 (Mostly Incoherent and/or Unclear): The response is mostly hard to follow, with inconsistencies, contradictions, confusing logic flow, or unclear language used throughout, but there are some coherent/clear parts.
+    - 2 (A Little Unclear and/or Incoherent): The response is a little unclear. There are some inconsistencies or contradictions, run on sentences, confusing statements, or hard to follow sections of the response.
+    - 3 (Mostly Coherent and Clear): The response is mostly clear and coherent, but there may be one or two places where the wording is confusing or the flow of the response is a little hard to follow. Overall, the response can mostly be followed with a little room for improvement.
+    - 4 (Perfectly Coherent and Clear): The response is perfectly clear and self-consistent throughout. There are no contradictory assertions or statements, the writing flows logically, and following the train of thought/story is not challenging.
+
+    ### 4. Complexity (0-4)
+    Rate the response along a simple to complex spectrum. A simple response uses simple, easy to understand vocabulary and sentence structure that children can understand. Conversely, a complex response uses sophisticated language with enhanced vocabulary that adults with advanced education or experts on the topic would use.
+
+    - 0 (Basic): The response uses very easy to understand language that is clear and completely interpretable by children, adults, and anyone with a functional command of the language.
+    - 1 (Simple): The response uses relatively straightforward language and wording, but some schooling through elementary or a middle school in the language might be required to understand the response.
+    - 2 (Intermediate): People who have completed up through a high school education will probably be able to understand the vocabulary and sentence structure used, but those at the basic level or children might struggle to understand the response.
+    - 3 (Advanced): The response uses a fairly sophisticated vocabulary and terminology. Someone majoring in this subject at a college or university could have written it and would understand the response. An average adult who does not work or study in this area could not have written the response.
+    - 4 (Expert): An expert in the field or area could have written the response. It uses specific and technically relevant vocabulary. It contains elevated language that someone at the simple or basic level may not understand at all. The professional language of a lawyer, scientist, engineer, or doctor falls into this category.
+
+    ### 5. Verbosity (0-4)
+    Place the response on a spectrum from the most short, crisp answers, to the most lengthy, detailed, and/or wordy answers under the context of what a user is expecting as a response to the prompt.
+
+    - 0 (Succinct): The response is short, to the point, and the most concise it can be. No additional information is provided outside of what is requested by the prompt.
+    - 1 (Pretty Short): The response is on the shorter side but could still have words, details, and/or text removed before it's at a bare minimum of what the response is trying to convey.
+    - 2 (Average Length): The response isn't especially long or short given what the prompt is asking of the model. The length is adequate for conveying a full response but isn't particularly wordy nor particularly concise.
+    - 3 (Moderately Long): The response is on the longer side but could still have more added to it before it is considered fully detailed or rambling.
+    - 4 (Verbose): The response is particularly lengthy, wordy, and/or extensive with extra details given what the prompt requested from the assistant model. The response can be verbose regardless of if the length is due to repetition and incoherency or if it is due to rich and insightful detail.
+
+    ## Instructions
+    - Read the prompt and response carefully
     - Consider each dimension independently
     - For each dimension, provide a brief explanation (1-2 sentences) and then a score (0-4)
     - Return in JSON format: {"helpfulness": {"explanation": "...", "score": X}, "correctness": {"explanation": "...", "score": X}, "coherence": {"explanation": "...", "score": X}, "complexity": {"explanation": "...", "score": X}, "verbosity": {"explanation": "...", "score": X}}
@@ -61,19 +73,19 @@ helpsteer2:
   dimensions:
     - name: "helpfulness"
       scale: [0, 4]
-      description: "How well the response addresses the user's question"
+      description: "How useful and helpful the overall response is"
     - name: "correctness"
       scale: [0, 4]
-      description: "Factual accuracy of the information provided"
+      description: "Factual accuracy - no hallucinations, no mistakes, covers requirements"
     - name: "coherence"
       scale: [0, 4]
-      description: "Logical structure and clarity of the response"
+      description: "Self-consistency, logical flow, clarity, no contradictions or redundancy"
     - name: "complexity"
       scale: [0, 4]
-      description: "Appropriateness of complexity level"
+      description: "Language sophistication level: Basic(0) children understand → Expert(4) professional terminology"
     - name: "verbosity"
       scale: [0, 4]
-      description: "Appropriateness of response length and detail"
+      description: "Response length spectrum: Succinct(0) short/concise → Verbose(4) lengthy/detailed"
 
   response_format: "json"
 

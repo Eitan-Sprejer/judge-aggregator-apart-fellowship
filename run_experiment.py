@@ -336,6 +336,8 @@ class ExperimentRunner:
             d['name']: d['description']
             for d in rubric_config.get('dimensions', [])
         }
+        # Get the full rubric text for judge creation context
+        full_rubric_text = rubric_config.get('rubric', None)
 
         # Validate target dimensions
         for dim in target_dimensions:
@@ -368,7 +370,8 @@ class ExperimentRunner:
                 dimensions=dimensions,
                 cache_strategy=cache_strategy,
                 decomposition_depth=decomposition_depth,
-                sample_qa_pairs=sample_qa_pairs
+                sample_qa_pairs=sample_qa_pairs,
+                full_rubric=full_rubric_text,
             )
 
             log_experiment_milestone(
