@@ -104,6 +104,7 @@ class ExperimentRunner:
         - Dataset size (to invalidate when n_samples changes)
         - Random seed (to invalidate when seed changes)
         - Split name (to invalidate when split changes)
+        - Judge model (to invalidate when scoring model changes)
 
         Args:
             df_size: Number of samples in dataset
@@ -125,7 +126,8 @@ class ExperimentRunner:
             f"{judges_str}_"
             f"n{df_size}_"  # Number of samples
             f"seed{self.config.random_seed}_"  # Random seed
-            f"split{self.config.dataset_kwargs.get('split', 'train')}"  # Dataset split
+            f"split{self.config.dataset_kwargs.get('split', 'train')}_"  # Dataset split
+            f"model{self.config.judge_model}"  # Judge scoring model
         )
 
         return hashlib.md5(cache_str.encode()).hexdigest()
@@ -793,8 +795,8 @@ class ExperimentRunner:
         # Get test subset
         df_test = df.iloc[test_indices].reset_index(drop=True)
 
-        # Cache key: dataset + dimension + test size + seed (for reproducibility)
-        cache_key_str = f"{self.config.dataset}_{dimension}_{len(df_test)}_{self.config.random_seed}"
+        # Cache key: dataset + dimension + test size + seed + model (for reproducibility)
+        cache_key_str = f"{self.config.dataset}_{dimension}_{len(df_test)}_{self.config.random_seed}_{self.config.judge_model}"
         cache_key = hashlib.md5(cache_key_str.encode()).hexdigest()
         cache_dir = Path("results") / "_baseline_cache"
         cache_dir.mkdir(parents=True, exist_ok=True)

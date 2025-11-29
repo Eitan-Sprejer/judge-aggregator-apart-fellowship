@@ -89,7 +89,7 @@ class ChatCompletionClient:
         try:
             self._client = OpenAI(
                 api_key=MARTIAN_API_KEY,
-                base_url=f"{MARTIAN_API_URL.rstrip('/')}/v1",
+                base_url=MARTIAN_API_URL,
             )
         except OpenAIError as exc:
             raise RuntimeError("Failed to initialize OpenAI client for Martian gateway.") from exc
