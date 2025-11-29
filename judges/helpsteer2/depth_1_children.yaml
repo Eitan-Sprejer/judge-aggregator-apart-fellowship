@@ -1,0 +1,641 @@
+judges:
+- id: helpsteer2-helpfulness-judge-relevance-to-intent
+  name: Relevance to User Intent
+  version: '1.0'
+  description: "Measures how directly a response targets the user\u2019s stated goal\
+    \ and avoids digressions. Penalizes restatements, filler, and tangents; rewards\
+    \ purpose-built content that prioritizes the core task and context. Higher scores\
+    \ indicate tighter focus and immediate, on-target guidance."
+  scoring_description: Score how well the response demonstrates relevance to user
+    intent
+  definition: "Measures how directly a response targets the user\u2019s stated goal\
+    \ and avoids digressions. Penalizes restatements, filler, and tangents; rewards\
+    \ purpose-built content that prioritizes the core task and context. Higher scores\
+    \ indicate tighter focus and immediate, on-target guidance."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Off-Topic/Not Aligned
+    indicators:
+    - 'No substantive relevance: addresses a different task or is purely filler/irrelevant.'
+    - Actively distracts or misleads from the goal (e.g., unrelated instructions,
+      promotions).
+    - Restates the prompt or offers empty disclaimers without any movement toward
+      the task.
+  - range: [1.0, 1.9]
+    label: Low Alignment
+    indicators:
+    - "\u226440% of content pertains to the goal; mostly generic, off-track, or rephrasing\
+      \ the question."
+    - Hints at the topic but lacks a direct answer or actionable targeting of the
+      core task.
+    - Misinterprets intent or focuses on secondary/adjacent issues.
+  - range: [2.0, 2.9]
+    label: Partial Alignment
+    indicators:
+    - "Approximately 40\u201370% of content is relevant; significant portions are\
+      \ generic, tangential, or restate the prompt."
+    - Addresses the main goal only partially or late; relevant points are buried among
+      filler.
+    - Peripheral details receive equal or greater emphasis than the core task.
+  - range: [3.0, 3.9]
+    label: Mostly Aligned
+    indicators:
+    - "About 70\u201390% of content directly targets the core goal, with minor tangents\
+      \ or brief restatement."
+    - Main answer appears early and remains the focus; small off-topic elements do
+      not impede use.
+    - "Some tailoring to the user\u2019s context; limited generic phrasing present."
+  - range: [4.0, 4.0]
+    label: Fully Aligned
+    indicators:
+    - "\u226590% of content is directly tied to executing the user\u2019s core goal;\
+      \ extraneous material is negligible."
+    - Core answer is provided immediately and maintained without tangents or unnecessary
+      restatement.
+    - "Content is purpose-built to the user\u2019s stated context/constraints, prioritizing\
+      \ the primary objective over peripheral details."
+  guidelines:
+  - Directly answers the question or task the user posed
+  - Avoids unrelated content or tangents
+  - "Frames content around the user\u2019s primary objective"
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-actionability-and-specificity
+  name: Actionability and Specific Detail
+  version: '1.0'
+  description: Measures how concretely a response enables immediate execution by providing
+    steps, commands, code, or examples. Higher scores indicate precise, ordered instructions
+    and runnable snippets with clear parameters and assumptions. Lower scores reflect
+    vague guidance without clear next actions.
+  scoring_description: Score how well the response demonstrates actionability and
+    specific detail
+  definition: Measures how concretely a response enables immediate execution by providing
+    steps, commands, code, or examples. Higher scores indicate precise, ordered instructions
+    and runnable snippets with clear parameters and assumptions. Lower scores reflect
+    vague guidance without clear next actions.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Not Actionable
+    indicators:
+    - Provides no steps, commands, or examples the user can execute.
+    - "Advice is abstract or generic (e.g., \u201Clook into X\u201D) with no next\
+      \ actions."
+    - User cannot determine what to do first or how to proceed.
+  - range: [1.0, 1.9]
+    label: Slightly Actionable
+    indicators:
+    - Mentions relevant tools or high-level actions but lacks procedure or ordering.
+    - Missing concrete details (syntax, file paths, parameters) needed to act.
+    - Requires substantial additional research to translate into steps.
+  - range: [2.0, 2.9]
+    label: Partially Actionable
+    indicators:
+    - Includes an outline or partial steps with some specifics, but key details are
+      absent (e.g., incomplete commands or code).
+    - Examples use placeholders without guidance on how to obtain or replace them.
+    - User can begin the task but must fill multiple gaps to make it work.
+  - range: [3.0, 3.9]
+    label: Mostly Actionable
+    indicators:
+    - Provides ordered steps and concrete commands/code that work with minor adaptation
+      (e.g., set one variable, install one prerequisite).
+    - Specifies key parameters, file names, or expected inputs/outputs.
+    - Notes main assumptions or prerequisites, with only small gaps remaining.
+  - range: [4.0, 4.0]
+    label: Fully Actionable
+    indicators:
+    - End-to-end, copy-pasteable commands or runnable code with precise syntax and
+      clearly labeled parameters/placeholders.
+    - Includes prerequisites, environment/setup, verification steps, and expected
+      results.
+    - Anticipates common pitfalls or variants and provides troubleshooting or alternatives.
+  guidelines:
+  - Includes executable code, commands, or step-by-step instructions
+  - Specifies parameters, values, and exact paths or settings where appropriate
+  - Provides examples that map directly to the task
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-completeness-of-solution
+  name: Completeness of the Solution
+  version: '1.0'
+  description: Measures how fully the response covers the steps, prerequisites, dependencies,
+    and deliverables required to achieve the user's goal. Judges whether the user
+    can execute the solution end-to-end without significant additional research or
+    reconstruction. Higher scores reflect complete, actionable coverage that anticipates
+    typical gaps.
+  scoring_description: Score how well the response demonstrates completeness of the
+    solution
+  definition: Measures how fully the response covers the steps, prerequisites, dependencies,
+    and deliverables required to achieve the user's goal. Judges whether the user
+    can execute the solution end-to-end without significant additional research or
+    reconstruction. Higher scores reflect complete, actionable coverage that anticipates
+    typical gaps.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Absent
+    indicators:
+    - Misses core requirements; provides no usable steps or deliverables.
+    - Content is off-target or contradicts the task, preventing any progress.
+    - Omits prerequisites/dependencies entirely so the user cannot begin.
+  - range: [1.0, 1.9]
+    label: Sparse
+    indicators:
+    - Touches on the task but omits critical steps or dependencies needed to achieve
+      the outcome.
+    - Provides only high-level or vague guidance with no actionable deliverables.
+    - User must perform extensive external research to proceed.
+  - range: [2.0, 2.9]
+    label: Partial
+    indicators:
+    - Covers some key steps but leaves major gaps (e.g., missing setup, configuration,
+      or finalization).
+    - Includes partial code/commands/examples that are not runnable as-is or lack
+      required inputs/context.
+    - User can start but must supply substantial missing pieces to complete the task.
+  - range: [3.0, 3.9]
+    label: Mostly Complete
+    indicators:
+    - Provides most prerequisites, steps, and primary deliverables; generally actionable
+      end-to-end.
+    - Only minor gaps or unstated assumptions remain, requiring small follow-up or
+      troubleshooting.
+    - Includes runnable or directly usable elements for the main path but limited
+      coverage of variants/edge cases.
+  - range: [4.0, 4.0]
+    label: Comprehensive
+    indicators:
+    - 'End-to-end coverage: prerequisites, setup, steps, and final deliverables are
+      explicit and actionable.'
+    - States assumptions/parameters and includes validation/verification steps and
+      common pitfalls or alternatives.
+    - Deliverables are immediately usable (e.g., runnable code/commands, exact configurations)
+      with minimal to no additional work.
+  guidelines:
+  - Covers prerequisites and all key steps end-to-end
+  - Addresses common edge cases or failure modes
+  - Minimizes need for additional information to finish the task
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-context-tailoring-and-assumptions
+  name: Context Tailoring and Assumption Handling
+  version: '1.0'
+  description: "Evaluates how well a response adapts recommendations to the user\u2019\
+    s stated environment and constraints, and how responsibly it handles missing details.\
+    \ Strong responses make relevant assumptions explicit, provide conditional paths\
+    \ or alternatives, and enable progress while clarifying unknowns. Weak responses\
+    \ ignore context, rely on hidden or incorrect assumptions, or ask for clarification\
+    \ without offering interim value."
+  scoring_description: Score how well the response demonstrates context tailoring
+    and assumption handling
+  definition: "Evaluates how well a response adapts recommendations to the user\u2019\
+    s stated environment and constraints, and how responsibly it handles missing details.\
+    \ Strong responses make relevant assumptions explicit, provide conditional paths\
+    \ or alternatives, and enable progress while clarifying unknowns. Weak responses\
+    \ ignore context, rely on hidden or incorrect assumptions, or ask for clarification\
+    \ without offering interim value."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Not Tailored
+    indicators:
+    - Contradicts or ignores stated context/constraints (e.g., recommends tools/platforms
+      the user cannot use).
+    - Relies on unstated or incorrect assumptions presented as facts, leading to unusable
+      or misleading guidance.
+    - Provides one-size-fits-all steps with no acknowledgement of missing information
+      or environment specifics.
+  - range: [1.0, 1.9]
+    label: Minimal
+    indicators:
+    - "Gives generic, boilerplate advice with little to no adaptation to the user\u2019\
+      s environment."
+    - Requests clarification but offers no provisional steps, options, or assumptions
+      to keep the user moving.
+    - Does not state assumptions or identify what details are missing and why they
+      matter.
+  - range: [2.0, 2.9]
+    label: Partial
+    indicators:
+    - References at least one user-specific detail but remains largely generic or
+      mismatched in places.
+    - Assumptions are implicit or only partly stated; uncertainties are noted superficially.
+    - Provides limited conditional guidance with few or no alternatives if assumptions
+      prove wrong.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Adapts guidance to the stated environment/constraints and avoids conflicting
+      recommendations.
+    - Explicitly states key assumptions or missing details and supplies conditional
+      steps based on them.
+    - Offers practical alternatives for common variations (e.g., platform/language
+      options) with minor gaps remaining.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "Fully aligns with the user\u2019s context/constraints and delivers immediately\
+      \ actionable, tailored steps or answers."
+    - Clearly enumerates assumptions and unknowns, justifies sensible defaults, and
+      provides branched paths for likely scenarios.
+    - Anticipates context-specific pitfalls or edge cases and specifies what additional
+      information would refine the solution without blocking progress.
+  guidelines:
+  - States relevant assumptions explicitly and keeps them reasonable
+  - Adapts guidance to stated constraints (platform, tools, skill level)
+  - Asks focused clarification questions while offering interim next steps
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-organization-for-immediate-application
+  name: Organization for Immediate Application
+  version: '1.0'
+  description: Measures how clearly a response is structured so a user can act on
+    it immediately, independent of length. Emphasizes scannability, sequencing, prioritization,
+    and labeling that reduce cognitive load and enable swift execution.
+  scoring_description: Score how well the response demonstrates organization for immediate
+    application
+  definition: Measures how clearly a response is structured so a user can act on it
+    immediately, independent of length. Emphasizes scannability, sequencing, prioritization,
+    and labeling that reduce cognitive load and enable swift execution.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Disorganized
+    indicators:
+    - Unstructured text with no logical sequence (no steps, headings, or lists).
+    - Critical actions are buried or mixed with background; the user must infer the
+      workflow.
+    - Ambiguities or undefined terms block immediate execution.
+  - range: [1.0, 1.9]
+    label: Minimally Organized
+    indicators:
+    - Some relevant points present but scattered; no clear order of operations.
+    - Long paragraphs or mixed topics without prioritization, labels, or separations.
+    - Requires substantial effort to extract steps, inputs, or outputs.
+  - range: [2.0, 2.9]
+    label: Partially Organized
+    indicators:
+    - Some structure (e.g., bullets or brief sections) but steps are incomplete, vague,
+      or out of order.
+    - Inputs, parameters, or prerequisites are mentioned but not clearly labeled or
+      grouped.
+    - Guidance is mixed with commentary; user must fill notable gaps to act.
+  - range: [3.0, 3.9]
+    label: Well Organized
+    indicators:
+    - Clear sequence of actionable steps (e.g., numbered list) with concise labels.
+    - Related information is grouped (prerequisites, commands/examples, alternatives)
+      and easy to scan.
+    - Minor omissions (e.g., edge cases or expected results) remain, but the user
+      can proceed immediately.
+  - range: [4.0, 4.0]
+    label: Optimized for Immediate Use
+    indicators:
+    - 'Task-ready layout: brief objective, prerequisites, and prioritized numbered
+      steps with labeled commands/placeholders.'
+    - Decision points and common pitfalls are called out; expected outcomes or verification
+      checks are included.
+    - Minimal cognitive load through consistent terminology and concise sections that
+      enable instant execution without rework.
+  guidelines:
+  - Uses ordered steps and clear sectioning (prerequisites, steps, verification)
+  - Labels parameters, inputs, and outputs for copy-paste readiness
+  - Prioritizes actions and highlights critical warnings or choices
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-correctness-judge-requirement-coverage
+  name: Requirement Coverage & Constraint Compliance
+  version: '1.0'
+  description: Assesses whether the response fulfills every explicit task, detail,
+    and constraint stated in the prompt by enumerating requirements and mapping each
+    to the output. Verifies presence, format, sequencing, limits, and prohibitions,
+    marking any missing, incorrect, or non-compliant elements. Partial fulfillment
+    is treated as incomplete; any missing or violated requirement reduces the score.
+  scoring_description: Score how well the response demonstrates requirement coverage
+    & constraint compliance
+  definition: Assesses whether the response fulfills every explicit task, detail,
+    and constraint stated in the prompt by enumerating requirements and mapping each
+    to the output. Verifies presence, format, sequencing, limits, and prohibitions,
+    marking any missing, incorrect, or non-compliant elements. Partial fulfillment
+    is treated as incomplete; any missing or violated requirement reduces the score.
+  criteria:
+  - range: [0.0, 0.9]
+    label: No Coverage
+    indicators:
+    - Addresses fewer than 10% of explicit requirements; core task not attempted or
+      off-topic.
+    - Multiple critical constraints violated (e.g., banned tools/languages used, wrong
+      output type) or responds to a different task.
+    - Most required outputs/sections absent.
+  - range: [1.0, 1.9]
+    label: Minimal Coverage
+    indicators:
+    - Addresses about 10-39% of explicit requirements; most core tasks missing or
+      delivered in the wrong form.
+    - At least one major constraint breach (e.g., format/length/step-order/tool restrictions)
+      that makes the response unusable as-is.
+    - Several required elements or steps omitted.
+  - range: [2.0, 2.9]
+    label: Partial Coverage
+    indicators:
+    - Addresses about 40-69% of explicit requirements; at least one major required
+      component/output is missing.
+    - Some constraints met, but notable lapses remain (e.g., incorrect format/units,
+      exceeds limits, missing mandatory sections).
+    - Delivers only a subset of required outputs or misorders mandatory steps.
+  - range: [3.0, 3.9]
+    label: Substantial Coverage
+    indicators:
+    - Addresses about 70-99% of explicit requirements; only minor elements are missing
+      or slightly off-spec.
+    - All major constraints satisfied; any deviations are minor and do not impede
+      use (e.g., small formatting variance or slight length drift).
+    - All primary outputs present in the requested form; edge-case or ancillary details
+      may be incomplete.
+  - range: [4.0, 4.0]
+    label: Complete Coverage
+    indicators:
+    - Satisfies 100% of explicit requirements with no omissions or substitutions.
+    - Fully compliant with all stated constraints (formats, steps, limits, tools/APIs,
+      language/safety rules).
+    - Outputs are complete, correctly structured, and aligned to every specified detail,
+      including conditional branches and edge cases.
+  guidelines:
+  - All requested outputs/steps are present and complete
+  - Specified constraints (formats, limits, data fields) are followed
+  - No required element is omitted or replaced with an unrelated item
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-factual-accuracy
+  name: Factual Claim Accuracy & Precision
+  version: '1.0'
+  description: Measures whether all factual claims, values, and conclusions are true,
+    precise, and non-misleading relative to the prompt and widely accepted knowledge.
+    Checks correctness of numbers, definitions, entities, and causal implications,
+    and whether uncertainty is properly acknowledged when applicable.
+  scoring_description: Score how well the response demonstrates factual claim accuracy
+    & precision
+  definition: Measures whether all factual claims, values, and conclusions are true,
+    precise, and non-misleading relative to the prompt and widely accepted knowledge.
+    Checks correctness of numbers, definitions, entities, and causal implications,
+    and whether uncertainty is properly acknowledged when applicable.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Incorrect
+    indicators:
+    - Most claims contradict the prompt or authoritative knowledge, or are irrelevant
+      to the task.
+    - Core conclusions rely on impossible or non-existent facts, entities, tools,
+      or relationships.
+    - Precision is grossly wrong (e.g., wrong units/dates/identities) with no acknowledgment
+      of uncertainty, making the response unusable.
+  - range: [1.0, 1.9]
+    label: Mostly Inaccurate
+    indicators:
+    - Multiple major factual errors or contradictions; only isolated elements are
+      correct.
+    - Several hallucinated or fabricated specifics (e.g., invented data/APIs) presented
+      as fact.
+    - Missing qualifiers/units or imprecise wording materially distorts meaning or
+      outcomes.
+  - range: [2.0, 2.9]
+    label: Partially Accurate
+    indicators:
+    - Mix of correct and incorrect claims; at least one material inaccuracy or several
+      minor ones that could mislead.
+    - Relies on unsupported assumptions or vague assertions where specific facts are
+      needed.
+    - Numbers/definitions partly right but with notable errors in magnitude, scope,
+      or qualifiers affecting some interpretations.
+  - range: [3.0, 3.9]
+    label: Mostly Accurate
+    indicators:
+    - All core claims are correct; only minor imprecision (e.g., small rounding or
+      generic naming) that does not affect conclusions.
+    - No material hallucinations; any assumptions are reasonable and consistent with
+      the prompt.
+    - Minor omissions in precision (units/qualifiers) but context keeps statements
+      non-misleading.
+  - range: [4.0, 4.0]
+    label: Fully Accurate
+    indicators:
+    - Every factual claim, number, definition, and reference is correct and verifiable
+      from the prompt or authoritative sources.
+    - No unsupported assumptions or hallucinated specifics; uncertainty is explicitly
+      and appropriately stated when relevant.
+    - Statements are precise (correct units, dates, names, scopes, API behavior) and
+      non-misleading throughout.
+  guidelines:
+  - Claims align with verifiable facts or given context
+  - Numerical results and derived outputs are correct
+  - No misleading implications, conflations, or overgeneralizations
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-grounding-and-non-hallucination
+  name: "Grounding & Non\u2011Hallucination"
+  version: '1.0'
+  description: Assesses whether the response anchors its claims to the provided context
+    or to widely accepted general knowledge, avoiding invented specifics. Rewards
+    explicit acknowledgment of uncertainty and cautious generalization, while penalizing
+    ungrounded details, fabricated citations, or overconfident speculation. Focuses
+    on support versus invention (grounding), not on factual accuracy alone.
+  scoring_description: "Score how well the response demonstrates grounding & non\u2011\
+    hallucination"
+  definition: Assesses whether the response anchors its claims to the provided context
+    or to widely accepted general knowledge, avoiding invented specifics. Rewards
+    explicit acknowledgment of uncertainty and cautious generalization, while penalizing
+    ungrounded details, fabricated citations, or overconfident speculation. Focuses
+    on support versus invention (grounding), not on factual accuracy alone.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Unfounded
+    indicators:
+    - 'Predominantly hallucinated: key claims lack support or contradict the provided
+      context.'
+    - Relies on non-existent entities, sources, data, or APIs as central elements.
+    - Shows no use of or alignment with the given context; content is essentially
+      made up.
+  - range: [1.0, 1.9]
+    label: Mostly Ungrounded
+    indicators:
+    - Frequent unsupported specifics (names, numbers, dates) not in the context or
+      common knowledge.
+    - Speculation is presented as certain; includes fabricated references/examples.
+    - Materially diverges from or ignores relevant context when making claims.
+  - range: [2.0, 2.9]
+    label: Partially Grounded
+    indicators:
+    - Mix of grounded and ungrounded content; some specific details are added without
+      support.
+    - Speculative inferences appear with weak or missing hedging.
+    - Occasionally overlooks or loosely interprets the provided context.
+  - range: [3.0, 3.9]
+    label: Mostly Grounded
+    indicators:
+    - Core claims are supported by the context or common knowledge; only minor unstated
+      generalities.
+    - No fabricated entities or sources; small extrapolations are clearly hedged.
+    - Avoids introducing specific unsupported numbers/names; background knowledge
+      use is appropriate.
+  - range: [4.0, 4.0]
+    label: Fully Grounded
+    indicators:
+    - All concrete details are supported by the prompt/context or widely accepted
+      knowledge; no new specific facts invented.
+    - Uncertainties and gaps are explicitly acknowledged; no speculation presented
+      as fact.
+    - No fabricated sources, quotes, statistics, APIs, or entities.
+  guidelines:
+  - No fabricated entities, data points, APIs, or citations
+  - Assumptions are explicitly labeled and not presented as facts
+  - References to context are faithful and not extrapolated beyond evidence
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-procedural-correctness
+  name: Procedural/Computational Correctness
+  version: '1.0'
+  description: Evaluates whether methods, algorithms, calculations, and code are technically
+    valid and produce correct results for the stated task. Checks logical soundness
+    of steps, correct use of APIs/libraries (names, signatures, parameter semantics),
+    and accuracy across typical and edge cases. Minor syntactic nits are acceptable;
+    logical, feasibility, or semantic errors are not.
+  scoring_description: Score how well the response demonstrates procedural/computational
+    correctness
+  definition: Evaluates whether methods, algorithms, calculations, and code are technically
+    valid and produce correct results for the stated task. Checks logical soundness
+    of steps, correct use of APIs/libraries (names, signatures, parameter semantics),
+    and accuracy across typical and edge cases. Minor syntactic nits are acceptable;
+    logical, feasibility, or semantic errors are not.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Incorrect
+    indicators:
+    - Procedure is irrelevant or incoherent; cannot produce the requested outcome.
+    - Relies on fabricated/non-existent entities or impossible math/operations.
+    - No valid API/function usage; outputs (if any) are demonstrably wrong.
+  - range: [1.0, 1.9]
+    label: Mostly Incorrect
+    indicators:
+    - Core method is unsuitable or misapplied; key steps are invalid or infeasible.
+    - Uses wrong or non-existent APIs/signatures as central steps; code would not
+      run or compile.
+    - Results are largely incorrect or missing; violates stated constraints.
+  - range: [2.0, 2.9]
+    label: Partially Correct
+    indicators:
+    - General approach aligns with the task but contains a major logical error or
+      multiple nontrivial mistakes.
+    - API/function usage shows misunderstandings (e.g., wrong signature/types or parameter
+      semantics), though some calls are valid.
+    - Produces incomplete or partly correct results; fails on typical edge cases or
+      provided tests.
+  - range: [3.0, 3.9]
+    label: Mostly Correct
+    indicators:
+    - Core logic/algorithm is correct; only minor, easily fixed issues (e.g., trivial
+      syntax, off-by-one, formatting).
+    - "APIs/libraries are appropriate with at most minor parameter/name imprecision\
+      \ that\u2019s trivially correctable."
+    - Correct for main cases; may miss a rare edge case or minor rounding/format detail
+      without altering the method.
+  - range: [4.0, 4.0]
+    label: Fully Correct
+    indicators:
+    - Algorithm/procedure is logically sound end-to-end and matches problem requirements
+      and constraints.
+    - Uses valid APIs/libraries with correct names, signatures, types, and parameter
+      semantics; feasible and reproducible.
+    - Produces correct results (including stated edge cases) with numerically accurate
+      outputs within declared tolerances; code is ready-to-run in a standard environment.
+  guidelines:
+  - Code uses valid functions/APIs and would run with trivial or no fixes
+  - Mathematical steps and algorithmic logic yield correct results
+  - Outputs are consistent with the described method and inputs
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-uncertainty-handling
+  name: Uncertainty & Unknowns Handling
+  version: '1.0'
+  description: This rubric measures how well a response handles uncertainty, missing
+    data, and probabilistic or future-dependent claims. It rewards clear qualification,
+    appropriate confidence calibration, and explicit assumptions, and penalizes unwarranted
+    certainty or invented specifics. It focuses on whether unknowns are acknowledged
+    and bounded rather than ignored.
+  scoring_description: Score how well the response demonstrates uncertainty & unknowns
+    handling
+  definition: This rubric measures how well a response handles uncertainty, missing
+    data, and probabilistic or future-dependent claims. It rewards clear qualification,
+    appropriate confidence calibration, and explicit assumptions, and penalizes unwarranted
+    certainty or invented specifics. It focuses on whether unknowns are acknowledged
+    and bounded rather than ignored.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Poor
+    indicators:
+    - States speculative or future outcomes as facts and provides precise figures/dates
+      without support.
+    - Ignores missing data or known uncertainty; fabricates details to fill gaps.
+    - Offers no caveats, assumptions, or limitations where they are necessary.
+  - range: [1.0, 1.9]
+    label: Weak
+    indicators:
+    - "Uses vague hedges (e.g., \u201Cprobably\u201D) but makes key claims with unwarranted\
+      \ certainty."
+    - Gives single-point estimates with no context, basis, or error bounds.
+    - Omits major assumptions or known unknowns relevant to the answer.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Acknowledges some uncertainty but misses one or more critical caveats or limitations.
+    - Mixes qualified language with occasional unsupported specifics (e.g., overly
+      narrow ranges or confident tone).
+    - Partially separates facts from speculation but blurs the boundary in places.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Clearly identifies unknowns and conditions key claims on stated assumptions.
+    - Provides ranges, scenarios, or probability qualifiers appropriate to the evidence;
+      avoids invented specifics.
+    - Only minor lapses in calibration or missing caveats that do not materially mislead.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Consistently distinguishes facts, estimates, and unknowns; explicitly states
+      relevant assumptions and data limits.
+    - Calibrates confidence with appropriate ranges/probabilities and briefly explains
+      the basis or evidence.
+    - Avoids asserting beyond available evidence and, when useful, suggests ways to
+      obtain missing information.
+  guidelines:
+  - Acknowledges when data is unavailable or inherently uncertain
+  - States assumptions and limits clearly for predictions/estimates
+  - Uses ranges or conditional phrasing where exact facts are unknown
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness

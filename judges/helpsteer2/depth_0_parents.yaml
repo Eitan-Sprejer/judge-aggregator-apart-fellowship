@@ -1,0 +1,160 @@
+judges:
+- id: helpsteer2-helpfulness-judge
+  name: helpfulness Judge
+  version: '1.0'
+  description: Evaluates how useful and helpful an AI response is to the user's prompt
+    within the HelpSteer2 context. Focuses on whether the response enables the user
+    to accomplish their goal with relevant, actionable, and complete guidance.
+  scoring_description: "Assign a score from 0 to 4 based on how well the response\
+    \ fulfills the user\u2019s intent and provides actionable, relevant, and sufficiently\
+    \ complete help."
+  definition: "Helpfulness measures the practical utility of the response in addressing\
+    \ the user\u2019s stated intent. A helpful response is aligned with the prompt,\
+    \ stays on-topic, and provides concrete, usable guidance or answers (e.g., steps,\
+    \ code, examples, direct answers). It considers coverage and completeness relative\
+    \ to the task, and whether the user can proceed with minimal additional effort.\
+    \ It is distinct from verbosity and style; length alone does not increase helpfulness.\
+    \ While factual accuracy influences usefulness, judge helpfulness primarily by\
+    \ whether the content enables the user to achieve their goal."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Not Helpful
+    indicators:
+    - Does not address the user's request or tackles a different task entirely.
+    - Provides no actionable information (e.g., generic refusal or irrelevant text).
+    - "Restates the prompt or gives filler content without progressing the user\u2019\
+      s goal."
+    - Content would mislead the user away from their task or add no usable value.
+  - range: [1.0, 1.9]
+    label: Slightly Helpful
+    indicators:
+    - "Contains a minor relevant hint or term but largely misses the user\u2019s intent."
+    - Asks for clarification without offering any interim guidance or partial solution.
+    - Very high-level or vague advice that the user cannot act on directly.
+    - Omits most key elements needed to start or make progress on the task.
+  - range: [2.0, 2.9]
+    label: Partially Helpful
+    indicators:
+    - Addresses some aspects of the request but misses the overall goal or critical
+      steps.
+    - Provides a high-level outline with limited specificity (few or no concrete examples,
+      commands, or code).
+    - Answers a sub-part of the question while leaving key requirements unaddressed.
+    - User can make limited progress but must do significant additional work to complete
+      the task.
+  - range: [3.0, 3.9]
+    label: Mostly Helpful
+    indicators:
+    - Directly addresses the main intent and provides usable steps, examples, or answers.
+    - Covers most necessary details; minor gaps or edge cases may remain.
+    - Contains specific, actionable guidance (e.g., partial code, commands, or step-by-step
+      instructions).
+    - Requires only small follow-up effort or clarifications for full completion.
+  - range: [4.0, 4.0]
+    label: Extremely Helpful
+    indicators:
+    - Fully satisfies the request with complete, directly usable deliverables (e.g.,
+      runnable code, precise steps, exact answer).
+    - "Tailors the solution to the user\u2019s context/constraints and clearly states\
+      \ assumptions if needed."
+    - Anticipates common pitfalls or follow-up needs and offers alternatives or next
+      steps.
+    - Organizes information for immediate application (clear structure, labeled parameters,
+      prioritized steps).
+  guidelines:
+  - "Anchor scoring to the user\u2019s stated intent: judge how well the response\
+    \ enables the user to achieve their goal."
+  - Evaluate usefulness and completeness independently of style, length, or fluency;
+    consider accuracy only as it affects practical utility.
+  - Prioritize concrete, actionable content (steps, code, commands, examples, specific
+    recommendations) and penalize off-topic or purely generic advice.
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-correctness-judge
+  name: correctness Judge
+  version: '1.0'
+  description: Evaluates the factual accuracy of an AI response and whether it fulfills
+    all requirements stated in the user instruction. It detects hallucinations, false
+    or misleading claims, and checks for complete task execution.
+  scoring_description: Score 0-4 based on factual accuracy and completeness relative
+    to the prompt. Ignore stylistic quality; focus on verifiable correctness and whether
+    all required elements are addressed.
+  definition: Correctness measures whether the response is factually accurate, non-misleading,
+    and free of hallucinations while fully covering the requested tasks and constraints.
+    A correct response grounds claims in widely accepted knowledge or the provided
+    context, avoids inventing details, and produces accurate outputs, steps, or code.
+    When information is unknown or inherently uncertain (e.g., predictions), correctness
+    requires clearly stating uncertainty rather than asserting false facts. For procedural
+    outputs (code, math, step-by-step), correctness depends on proper methods, valid
+    references/APIs, and right results. Completeness means every required component
+    of the instruction is addressed without necessary omissions.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Incorrect
+    indicators:
+    - Does not attempt the requested task or responds to a different/irrelevant task.
+    - Most claims are false, contradict prompt facts, or are fabricated (e.g., invented
+      data, entities, APIs).
+    - Essential constraints or requirements are ignored entirely (e.g., missing all
+      requested outputs).
+    - Procedures/code/math are fundamentally wrong or impossible (e.g., non-existent
+      functions as core solution, impossible results).
+  - range: [1.0, 1.9]
+    label: Mostly Incorrect
+    indicators:
+    - Attempts the task but fulfills few requirements; multiple key elements are missing
+      or wrong.
+    - Contains multiple major factual errors or several hallucinated/irrelevant assertions.
+    - Misidentifies core concepts, tools, or entities (e.g., wrong technology, API,
+      or domain facts).
+    - Procedures/code/math are largely unusable without major fixes or produce incorrect
+      outputs.
+  - range: [2.0, 2.9]
+    label: Partially Correct
+    indicators:
+    - Meets some requirements but misses at least one important detail or subtask
+      specified by the prompt.
+    - Includes a mix of correct and incorrect information (e.g., 1 major or several
+      minor factual inaccuracies).
+    - Relies on unsupported assumptions or vague claims that could mislead, though
+      some core content is right.
+    - Procedures/code/math show the right general approach but need nontrivial corrections
+      to work or be fully accurate.
+  - range: [3.0, 3.9]
+    label: Mostly Correct
+    indicators:
+    - Addresses all core requirements; at most a minor detail or edge case is missing.
+    - No false, misleading, or hallucinated statements; minor imprecision that does
+      not affect outcomes may appear.
+    - Methods, references, and entities are valid and appropriate; computations/steps
+      are correct.
+    - Procedures/code/math are essentially correct and would work with only trivial
+      adjustments (if any).
+  - range: [4.0, 4.0]
+    label: Fully Correct
+    indicators:
+    - All requested tasks, constraints, and details are completely satisfied with
+      no omissions.
+    - All claims are accurate, precise, and verifiable; no hallucinations or misleading
+      statements.
+    - Uses correct concepts, entities, and APIs/libraries; outputs, computations,
+      or steps are right end-to-end.
+    - Procedures/code/math are correct and ready-to-use as presented, assuming standard
+      environment and stated assumptions.
+  guidelines:
+  - Judge only factual accuracy and task completion relative to the prompt; do not
+    consider style, tone, or level of detail beyond what is required to be correct.
+  - Treat invented details or unsupported specifics not grounded in the prompt or
+    widely accepted knowledge as hallucinations; for unknown or future facts, correctness
+    requires acknowledging uncertainty rather than asserting false certainty.
+  - 'Assess completeness strictly against the instruction: if any required element
+    is missing or wrong, cap the score accordingly; give partial credit when substantial
+    portions are correct but note major vs. minor errors.'
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: correctness

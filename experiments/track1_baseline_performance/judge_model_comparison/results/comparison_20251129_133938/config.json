@@ -1,0 +1,17 @@
+{
+  "n_samples": 100,
+  "seed": 42,
+  "dimensions": [
+    "helpfulness",
+    "correctness"
+  ],
+  "models": {
+    "mini": "openai/gpt-5-mini",
+    "nano": "openai/gpt-5-nano"
+  },
+  "judge_files": [
+    "judges/helpsteer2/depth_1_children.yaml",
+    "judges/helpsteer2/depth_0_parents.yaml"
+  ],
+  "timestamp": "20251129_133938"
+}
