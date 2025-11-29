@@ -53,12 +53,13 @@ models:
   val_size: 0.15                          # 15% of training data for validation
 
   # Hyperparameter tuning (optional)
-  # If enabled, finds optimal hyperparameters before training
-  # Results always saved to run_dir/tuning_analysis/
+  # GAM tuning uses 5-fold CV with exhaustive search:
+  #   - n_splines: [3, 5, 8, 10, 15, 20, 25] (7 values)
+  #   - lambda: log-spaced from 0.1 to 100 (20 values per n_splines)
+  #   - Total: 7 × 20 = 140 configurations tested with 5-fold CV
+  # Results saved to run_dir/tuning_analysis/
   tuning:
     enabled: false                        # Set to true to enable tuning
-    method: "random"                      # "random" or "exhaustive" (both use exhaustive for GAM)
-    n_trials: 30                          # Ignored for GAM (3 configs tested)
 
   # Default hyperparameters (used if tuning disabled)
   gam:

@@ -618,8 +618,7 @@ class ExperimentRunner:
             return {}
 
         log_experiment_milestone(
-            f"Running hyperparameter tuning (method={self.config.models.tuning.method}, "
-            f"n_trials={self.config.models.tuning.n_trials})"
+            f"Running hyperparameter tuning."
         )
 
         optimal_params = {}
@@ -639,22 +638,37 @@ class ExperimentRunner:
                 random_seed=self.config.random_seed
             )
 
+            # Use K-fold CV by default (more robust)
             results = tuner.run_search(
                 X_train=data['X_train'],
                 y_train=data['y_train'],
-                X_val=data['X_val'],
+                X_val=data['X_val'],  # Used as test set in CV mode
                 y_val=data['y_val'],
-                method=self.config.models.tuning.method,
-                n_trials=self.config.models.tuning.n_trials
+                use_cv=True,  # Use K-fold CV for robust hyperparameter selection
+                n_folds=5     # 5-fold cross-validation
             )
 
             if results:
                 optimal_params['gam'] = results[0]['config']
-                log_experiment_milestone(
-                    f"✓ Optimal GAM: n_splines={optimal_params['gam']['n_splines']}, "
-                    f"lam={optimal_params['gam']['lam']:.2f}, "
-                    f"val_R²={results[0]['val_metrics']['r2']:.4f}"
-                )
+
+                # Log appropriate metrics based on CV vs single-split
+                if 'cv_summary' in results[0]:
+                    cv_r2 = results[0]['cv_summary']['val_r2_mean']
+                    cv_std = results[0]['cv_summary']['val_r2_std']
+                    log_msg = (
+                        f"✓ Optimal GAM: n_splines={optimal_params['gam']['n_splines']}, "
+                        f"lam={optimal_params['gam']['lam']:.2f}, "
+                        f"CV R²={cv_r2:.4f} ± {cv_std:.4f}"
+                    )
+                    if 'test_metrics' in results[0]:
+                        log_msg += f", test R²={results[0]['test_metrics']['r2']:.4f}"
+                else:
+                    log_msg = (
+                        f"✓ Optimal GAM: n_splines={optimal_params['gam']['n_splines']}, "
+                        f"lam={optimal_params['gam']['lam']:.2f}, "
+                        f"val_R²={results[0]['val_metrics']['r2']:.4f}"
+                    )
+                log_experiment_milestone(log_msg)
             else:
                 log_experiment_milestone("⚠ GAM tuning produced no results, using config defaults")
 

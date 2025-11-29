@@ -101,14 +101,15 @@ class HyperparameterTuningConfig:
     If enabled, runs optimization before training and always uses optimized params.
     Results are always saved to run_dir/tuning_analysis/.
 
+    GAM tuning uses 5-fold CV with exhaustive search over:
+    - n_splines: [3, 5, 8, 10, 15, 20, 25] (7 values)
+    - lambda: log-spaced from 0.1 to 100 (20 values per n_splines)
+    - Total: 140 configurations tested
+
     Attributes:
         enabled: Whether to run hyperparameter tuning
-        method: Search method ('random' or 'exhaustive')
-        n_trials: Number of random search trials (ignored for exhaustive)
     """
     enabled: bool = False
-    method: str = "random"
-    n_trials: int = 30
 
 
 @dataclass

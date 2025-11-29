@@ -568,11 +568,11 @@ class ExperimentVisualizer:
         configs = []
         for result in tuning_results:
             config = result['config']
-            val_metrics = result['val_metrics']
+            cv_summary = result['cv_summary']
             configs.append({
                 'n_splines': config['n_splines'],
                 'lam': config['lam'],
-                'val_r2': val_metrics['r2']
+                'val_r2': cv_summary['val_r2_mean']
             })
 
         df = pd.DataFrame(configs)

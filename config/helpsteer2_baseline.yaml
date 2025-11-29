@@ -13,7 +13,7 @@ target_dimensions: ["helpfulness", "correctness", "coherence", "complexity", "ve
 
 # Dataset configuration
 dataset_kwargs:
-  n_samples: 100                    # 100 samples for testing
+  n_samples: 1000                    # 1000 samples for testing
   random_seed: 42
   split: "train"
 
@@ -39,8 +39,6 @@ models:
   # Hyperparameter tuning
   tuning:
     enabled: true                   # Find optimal GAM params
-    method: "exhaustive"
-    n_trials: 10
 
   # Default GAM hyperparameters
   gam:
