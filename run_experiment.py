@@ -568,28 +568,45 @@ class ExperimentRunner:
         else:
             raise ValueError(f"Invalid target: {self.config.target}")
 
-        # Filter out NaN targets
-        valid_mask = ~np.isnan(y)
-        valid_indices = np.where(valid_mask)[0]
-        X = X[valid_mask]
-        y = y[valid_mask]
+        # === NEW: Split FIRST (before NaN filtering) ===
+        if not hasattr(self, 'shared_test_indices'):
+            # First dimension: compute shared test indices for ALL samples
+            all_indices = np.arange(len(df))
+            indices_train, indices_test = train_test_split(
+                all_indices,
+                test_size=self.config.models.test_size,
+                random_state=self.config.random_seed
+            )
+            self.shared_test_indices = indices_test
+            self.shared_train_indices = indices_train
+            log_experiment_milestone(
+                f"  Computed shared test indices: {len(indices_test)} test, {len(indices_train)} train"
+            )
+        else:
+            # Subsequent dimensions: reuse shared indices
+            indices_train = self.shared_train_indices
+            indices_test = self.shared_test_indices
+
+        # === Filter NaN AFTER split (within train/test subsets) ===
+        # Train subset
+        X_train_all = X[indices_train]
+        y_train_all = y[indices_train]
+        valid_mask_train = ~np.isnan(y_train_all)
+        X_train = X_train_all[valid_mask_train]
+        y_train = y_train_all[valid_mask_train]
+
+        # Test subset
+        X_test_all = X[indices_test]
+        y_test_all = y[indices_test]
+        valid_mask_test = ~np.isnan(y_test_all)
+        X_test = X_test_all[valid_mask_test]
+        y_test = y_test_all[valid_mask_test]
 
         log_experiment_milestone(
-            f"  Training data: {len(X)} samples with {X.shape[1]} judges for {dimension}"
+            f"  Training data: {len(X_train)} train, {len(X_test)} test samples with {X.shape[1]} judges for {dimension}"
         )
 
-        # Train/test split
-        indices = np.arange(len(X))
-        indices_train, indices_test, X_train, X_test, y_train, y_test = train_test_split(
-            indices, X, y,
-            test_size=self.config.models.test_size,
-            random_state=self.config.random_seed
-        )
-
-        # Map back to original df indices
-        test_indices_in_full = valid_indices[indices_test]
-
-        # Train/val split
+        # Train/val split (within train subset)
         X_train, X_val, y_train, y_val = train_test_split(
             X_train, y_train,
             test_size=self.config.models.val_size,
@@ -605,7 +622,7 @@ class ExperimentRunner:
             'y_test': y_test,
             'judge_names': dimension_judge_names,  # Dimension-specific judges
             'judge_ids': dimension_judge_ids,       # For caching/traceability
-            'test_indices_in_full': test_indices_in_full
+            'test_indices_in_full': self.shared_test_indices  # SHARED across dimensions
         }
 
     def tune_hyperparameters(self, data: Dict[str, Any], output_dir: Optional[Path] = None) -> Dict[str, Any]:
@@ -775,87 +792,93 @@ class ExperimentRunner:
         return baseline_results
 
     def run_human_rubric_evaluation(self, df: pd.DataFrame, test_indices: np.ndarray, dimension: str) -> Optional[np.ndarray]:
-        """Evaluate test set using human annotation rubric via MartianClient.
+        """Evaluate shared test set with human rubric for all dimensions, with smart caching.
+
+        First dimension triggers evaluation of all dimensions and caches results.
+        Subsequent dimensions extract from in-memory cache.
 
         Args:
             df: Full dataset
-            test_indices: Indices of test samples
-            dimension: Dimension to evaluate (e.g., "helpfulness")
+            test_indices: Shared test indices (same for all dimensions)
+            dimension: Dimension to extract
 
         Returns:
-            Predictions for test samples only
+            Predictions for test samples (length = len(test_indices))
         """
         import hashlib
         import yaml
         from pathlib import Path
         from pipeline.utils.martian_client import MartianClient
 
-        log_experiment_milestone(f"Running human-rubric evaluation for {dimension} on test set")
+        # === Check in-memory cache first (for subsequent dimensions) ===
+        if hasattr(self, '_human_rubric_cache') and self._human_rubric_cache is not None:
+            if dimension in self._human_rubric_cache:
+                log_experiment_milestone(
+                    f"Using cached human-rubric scores for {dimension} (from memory)"
+                )
+                return self._human_rubric_cache[dimension]
 
-        # Get test subset
-        df_test = df.iloc[test_indices].reset_index(drop=True)
-
-        # Cache key: dataset + dimension + test size + seed + model (for reproducibility)
-        cache_key_str = f"{self.config.dataset}_{dimension}_{len(df_test)}_{self.config.random_seed}_{self.config.judge_model}"
+        # === Disk cache check (shared across all dimensions) ===
+        cache_key_str = f"{self.config.dataset}_all_dims_test_{len(test_indices)}_{self.config.random_seed}_{self.config.judge_model}"
         cache_key = hashlib.md5(cache_key_str.encode()).hexdigest()
         cache_dir = Path("results") / "_baseline_cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_path = cache_dir / f"human_rubric_{cache_key}.pkl"
+        cache_path = cache_dir / f"human_rubric_shared_{cache_key}.pkl"
+
         if cache_path.exists():
             try:
                 with open(cache_path, 'rb') as f:
-                    cached_predictions = pickle.load(f)
-                if len(cached_predictions) == len(df_test):
-                    log_experiment_milestone(f"Loaded human-rubric scores from cache: {cache_path}")
-                    return cached_predictions
+                    all_dimension_scores = pickle.load(f)
+                if isinstance(all_dimension_scores, dict):
+                    if all(dim in all_dimension_scores for dim in self.config.target_dimensions):
+                        log_experiment_milestone(
+                            f"Loaded shared human-rubric cache from disk: {cache_path}"
+                        )
+                        # Store in memory for subsequent dimensions
+                        self._human_rubric_cache = all_dimension_scores
+                        return all_dimension_scores[dimension]
             except Exception as e:
                 log_experiment_milestone(f"Cache load failed: {e}, regenerating...")
+
+        # === API Evaluation (first dimension only) ===
+        log_experiment_milestone(
+            f"Evaluating shared test set with human rubric (all {len(self.config.target_dimensions)} dimensions)..."
+        )
+
+        # Load rubric
         rubric_path = Path(__file__).parent / "pipeline" / "utils" / "dataset_rubrics.yaml"
         if not rubric_path.exists():
-            log_experiment_milestone(f"Rubric file not found: {rubric_path}, skipping human-rubric baseline")
+            log_experiment_milestone(f"Rubric file not found: {rubric_path}")
             return None
 
         with open(rubric_path) as f:
             rubrics = yaml.safe_load(f)
 
         if self.config.dataset not in rubrics:
-            log_experiment_milestone(
-                f"Dataset '{self.config.dataset}' not in rubrics, skipping human-rubric baseline"
-            )
+            log_experiment_milestone(f"Dataset '{self.config.dataset}' not in rubrics")
             return None
 
         rubric_config = rubrics[self.config.dataset]
         rubric_text = rubric_config['rubric']
-        dimensions = [d['name'] for d in rubric_config['dimensions']]
 
-        # Validate target dimension
-        if dimension not in dimensions:
-            log_experiment_milestone(
-                f"Target dimension '{dimension}' not in rubric dimensions {dimensions}"
-            )
-            return None
-
-        # Initialize Martian client (uses same model as judge evaluation)
+        # Initialize Martian client
         try:
             client = MartianClient(default_model=self.config.judge_model)
         except Exception as e:
             log_experiment_milestone(f"Failed to initialize MartianClient: {e}")
             return None
 
-        # Prepare batch evaluations for test set only
+        # Get test subset
+        df_test = df.iloc[test_indices].reset_index(drop=True)
         question_col = 'question' if 'question' in df_test.columns else 'instruction'
         response_col = 'response' if 'response' in df_test.columns else 'answer'
 
         evaluations = [
-            {
-                'rubric': rubric_text,
-                'question': row[question_col],
-                'answer': row[response_col]
-            }
+            {'rubric': rubric_text, 'question': row[question_col], 'answer': row[response_col]}
             for _, row in df_test.iterrows()
         ]
 
-        log_experiment_milestone(f"Batch evaluating {len(evaluations)} test samples with human rubric...")
+        # Batch evaluate (all dimensions returned in one call)
         results = client.evaluate_batch(
             evaluations,
             dataset=self.config.dataset,
@@ -863,34 +886,38 @@ class ExperimentRunner:
             max_workers=self.config.concurrency
         )
 
-        predictions = []
+        # Parse all dimensions from results
+        all_dimension_scores = {dim: [] for dim in self.config.target_dimensions}
         for idx, result in enumerate(results):
             try:
                 if "error" in result:
-                    log_experiment_milestone(f"Sample {idx} evaluation failed: {result['error']}")
-                    predictions.append(float('nan'))
+                    for dim in self.config.target_dimensions:
+                        all_dimension_scores[dim].append(float('nan'))
                 else:
-                    dim_data = result.get(dimension)
-                    if dim_data and isinstance(dim_data, dict):
-                        score = dim_data.get('score', float('nan'))
-                    else:
-                        score = float('nan')
-                    predictions.append(float(score))
+                    for dim in self.config.target_dimensions:
+                        dim_data = result.get(dim)
+                        score = dim_data.get('score', float('nan')) if (dim_data and isinstance(dim_data, dict)) else float('nan')
+                        all_dimension_scores[dim].append(float(score))
             except Exception as e:
                 log_experiment_milestone(f"Error parsing sample {idx}: {e}")
-                predictions.append(float('nan'))
+                for dim in self.config.target_dimensions:
+                    all_dimension_scores[dim].append(float('nan'))
 
-        predictions = np.array(predictions)
+        # Convert to numpy arrays
+        all_dimension_scores = {dim: np.array(scores) for dim, scores in all_dimension_scores.items()}
 
-        # Cache results
+        # Cache to disk
         with open(cache_path, 'wb') as f:
-            pickle.dump(predictions, f)
+            pickle.dump(all_dimension_scores, f)
+
+        # Cache to memory
+        self._human_rubric_cache = all_dimension_scores
 
         log_experiment_milestone(
-            f"Human-rubric evaluation complete. Cached to: {cache_path}"
+            f"Human-rubric evaluation complete. Cached {len(self.config.target_dimensions)} dimensions to: {cache_path}"
         )
 
-        return predictions
+        return all_dimension_scores[dimension]
 
     def save_results(
         self,
