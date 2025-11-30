@@ -810,3 +810,303 @@ class ExperimentVisualizer:
         logger.info(f"✓ Generated {len(plot_paths)} visualizations in {self.plots_dir}")
 
         return plot_paths
+
+
+class CrossDimensionVisualizer:
+    """Generate cross-dimension aggregated visualizations."""
+
+    def __init__(self, run_dir: Path):
+        """
+        Initialize cross-dimension visualizer.
+
+        Args:
+            run_dir: Experiment output directory containing dimensions/ subdirectory
+        """
+        self.run_dir = Path(run_dir)
+        self.dimensions_dir = self.run_dir / "dimensions"
+
+        # Create global plots directory
+        self.plots_dir = self.run_dir / "plots_global"
+        self.plots_dir.mkdir(exist_ok=True)
+
+        # Set style
+        sns.set_style("whitegrid")
+        plt.rcParams['figure.dpi'] = 150
+        plt.rcParams['savefig.dpi'] = 150
+        plt.rcParams['savefig.bbox'] = 'tight'
+
+        # Load results from all dimensions
+        self.dimension_results = self._load_all_dimension_results()
+
+        logger.info(f"Loaded results for {len(self.dimension_results)} dimensions")
+
+    def _load_all_dimension_results(self) -> Dict[str, Dict]:
+        """Load experiment_summary.json from all dimension subdirectories."""
+        results = {}
+
+        if not self.dimensions_dir.exists():
+            logger.warning(f"Dimensions directory not found: {self.dimensions_dir}")
+            return results
+
+        for dimension_dir in self.dimensions_dir.iterdir():
+            if not dimension_dir.is_dir():
+                continue
+
+            summary_path = dimension_dir / "experiment_summary.json"
+            if not summary_path.exists():
+                logger.warning(f"No summary found for dimension: {dimension_dir.name}")
+                continue
+
+            with open(summary_path, 'r') as f:
+                results[dimension_dir.name] = json.load(f)
+
+        return results
+
+    def plot_cross_dimension_performance(
+        self,
+        metric: str = 'spearman_rho',
+        split: str = 'test'
+    ) -> Path:
+        """
+        Create bar chart comparing performance across all dimensions.
+
+        Args:
+            metric: Performance metric to use ('spearman_rho', 'kendall_tau', 'r2', etc.)
+            split: Data split to use ('train', 'val', 'test')
+
+        Returns:
+            Path to saved plot
+        """
+        if not self.dimension_results:
+            logger.warning("No dimension results available")
+            return None
+
+        # Extract performance for each dimension
+        dimensions = []
+        gam_scores = []
+        baseline_scores = []
+
+        for dim_name, results in sorted(self.dimension_results.items()):
+            dimensions.append(dim_name.title())
+
+            # Get GAM score
+            gam_metrics = results.get('gam_results', {}).get(split, {})
+            gam_scores.append(gam_metrics.get(metric, 0.0))
+
+            # Get baseline score (human_rubric_judge)
+            baseline_metrics = results.get('baseline_results', {}).get('human_rubric_judge', {})
+            baseline_scores.append(baseline_metrics.get(metric, 0.0))
+
+        # Create grouped bar chart
+        x = np.arange(len(dimensions))
+        width = 0.35
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        bars1 = ax.bar(x - width/2, gam_scores, width, label='GAM',
+                      color='steelblue', alpha=0.8, edgecolor='black', linewidth=1.2)
+        bars2 = ax.bar(x + width/2, baseline_scores, width, label='Human Rubric Baseline',
+                      color='coral', alpha=0.8, edgecolor='black', linewidth=1.2)
+
+        # Add value labels on bars
+        for bars in [bars1, bars2]:
+            for bar in bars:
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width()/2., height,
+                       f'{height:.3f}',
+                       ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+        # Formatting
+        metric_labels = {
+            'spearman_rho': "Spearman's ρ",
+            'kendall_tau': "Kendall's τ",
+            'r2': 'R²',
+            'pearson_r': "Pearson's r",
+            'mae': 'MAE',
+            'mse': 'MSE'
+        }
+
+        ax.set_xlabel('Dimension', fontsize=12, fontweight='bold')
+        ax.set_ylabel(metric_labels.get(metric, metric), fontsize=12, fontweight='bold')
+        ax.set_title(f'Cross-Dimension Performance Comparison ({split.title()} Set)',
+                    fontsize=14, fontweight='bold', pad=20)
+        ax.set_xticks(x)
+        ax.set_xticklabels(dimensions, rotation=0, ha='center')
+        ax.legend(fontsize=11, loc='upper right', framealpha=0.9)
+        ax.grid(True, alpha=0.3, axis='y')
+        ax.set_ylim(0, max(max(gam_scores), max(baseline_scores)) * 1.15)
+
+        # Add average lines
+        gam_avg = np.mean(gam_scores)
+        baseline_avg = np.mean(baseline_scores)
+        ax.axhline(y=gam_avg, color='steelblue', linestyle='--', linewidth=1.5,
+                  alpha=0.6, label=f'GAM Avg: {gam_avg:.3f}')
+        ax.axhline(y=baseline_avg, color='coral', linestyle='--', linewidth=1.5,
+                  alpha=0.6, label=f'Baseline Avg: {baseline_avg:.3f}')
+        ax.legend(fontsize=10, loc='upper right', framealpha=0.9)
+
+        plt.tight_layout()
+
+        # Save plot
+        output_path = self.plots_dir / f"cross_dimension_performance_{metric}_{split}.png"
+        plt.savefig(output_path)
+        plt.close()
+
+        logger.info(f"✓ Cross-dimension performance plot saved to {output_path}")
+        return output_path
+
+    def plot_judge_importance_grouped_bars(self) -> Path:
+        """
+        Create grouped horizontal bar plot showing judge importance across all dimensions.
+
+        Judges are grouped by their source dimension (parent dimension), making it easy
+        to see cross-dimension patterns (e.g., do helpfulness-judges help predict correctness?).
+
+        Returns:
+            Path to saved plot
+        """
+        if not self.dimension_results:
+            logger.warning("No dimension results available")
+            return None
+
+        # Collect all judge names and importance scores
+        importance_data = {}
+
+        for dim_name, results in self.dimension_results.items():
+            # Load GAM tuning results to get feature importance
+            dim_dir = self.dimensions_dir / dim_name
+            tuning_path = dim_dir / "tuning_analysis" / "gam" / "gam_tuning_results.json"
+
+            if not tuning_path.exists():
+                logger.warning(f"No tuning results for {dim_name}, skipping importance data")
+                continue
+
+            with open(tuning_path, 'r') as f:
+                tuning_results = json.load(f)
+
+            # Get best model's feature importance
+            if not tuning_results:
+                continue
+
+            best_result = max(tuning_results, key=lambda x: x['cv_summary']['val_r2_mean'])
+            feature_importance = best_result.get('feature_importance', {})
+
+            importance_data[dim_name] = feature_importance
+
+        if not importance_data:
+            logger.warning("No importance data available, skipping plot")
+            return None
+
+        # Extract judge list from first dimension
+        sample_dim = list(importance_data.keys())[0]
+        all_judges = list(importance_data[sample_dim].keys())
+
+        # Group judges by parent dimension (extract from judge name)
+        judge_groups = {}
+        for judge in all_judges:
+            # Extract parent dimension from judge name (e.g., "Helpsteer2 Helpfulness Judge ...")
+            parts = judge.split()
+            if len(parts) >= 3:
+                parent_dim = parts[1].lower()  # e.g., "helpfulness", "correctness"
+                if parent_dim not in judge_groups:
+                    judge_groups[parent_dim] = []
+                judge_groups[parent_dim].append(judge)
+
+        # Sort dimensions for consistent ordering
+        target_dimensions = sorted(importance_data.keys())
+        n_dims = len(target_dimensions)
+        n_groups = len(judge_groups)
+
+        # Create subplots - one per judge group
+        fig, axes = plt.subplots(
+            n_groups, 1,
+            figsize=(12, n_groups * 3),
+            squeeze=False
+        )
+        axes = axes.flatten()
+
+        # Color palette for target dimensions
+        colors = plt.cm.Set3(np.linspace(0, 1, n_dims))
+
+        for group_idx, (parent_dim, judges) in enumerate(sorted(judge_groups.items())):
+            ax = axes[group_idx]
+
+            # Calculate positions
+            n_judges = len(judges)
+            y_positions = np.arange(n_judges)
+            bar_height = 0.15
+            offset_step = bar_height
+
+            # Plot bars for each target dimension
+            for dim_idx, target_dim in enumerate(target_dimensions):
+                importances = [
+                    importance_data[target_dim].get(judge, 0.0)
+                    for judge in judges
+                ]
+
+                offset = (dim_idx - n_dims/2) * offset_step
+                bars = ax.barh(
+                    y_positions + offset,
+                    importances,
+                    bar_height,
+                    label=target_dim.title(),
+                    color=colors[dim_idx],
+                    alpha=0.8,
+                    edgecolor='black',
+                    linewidth=0.8
+                )
+
+            # Formatting
+            ax.set_yticks(y_positions)
+            # Extract last part of judge name (e.g., "Relevance To Intent" from "Helpsteer2 Helpfulness Judge Relevance To Intent")
+            ax.set_yticklabels([' '.join(j.split()[3:]) for j in judges], fontsize=9)
+            ax.set_xlabel('Importance Score (1 - p-value)', fontsize=10, fontweight='bold')
+            ax.set_title(f'{parent_dim.title()} Judges',
+                        fontsize=11, fontweight='bold', pad=10)
+            ax.set_xlim(0, 1.0)
+            ax.grid(True, alpha=0.3, axis='x')
+            ax.legend(loc='lower right', fontsize=8, ncol=n_dims, framealpha=0.9)
+
+        fig.suptitle('Judge Importance Across Target Dimensions',
+                     fontsize=14, fontweight='bold', y=0.995)
+        plt.tight_layout()
+
+        # Save plot
+        output_path = self.plots_dir / "judge_importance_grouped_bars.png"
+        plt.savefig(output_path, bbox_inches='tight')
+        plt.close()
+
+        logger.info(f"✓ Judge importance grouped bar plot saved to {output_path}")
+        return output_path
+
+    def generate_all_global_plots(self) -> List[Path]:
+        """
+        Generate all cross-dimension visualizations.
+
+        Returns:
+            List of paths to generated plots
+        """
+        if not self.dimension_results:
+            logger.warning("No dimension results available, skipping global plots")
+            return []
+
+        plot_paths = []
+
+        logger.info("🌍 Generating cross-dimension visualizations...")
+
+        # Performance comparison with different metrics
+        for metric in ['spearman_rho', 'kendall_tau', 'r2']:
+            logger.info(f"  → Cross-dimension performance ({metric})...")
+            path = self.plot_cross_dimension_performance(metric=metric, split='test')
+            if path:
+                plot_paths.append(path)
+
+        # Judge importance grouped bar plot
+        logger.info("  → Judge importance grouped bars...")
+        path = self.plot_judge_importance_grouped_bars()
+        if path:
+            plot_paths.append(path)
+
+        logger.info(f"✓ Generated {len(plot_paths)} global visualizations in {self.plots_dir}")
+
+        return plot_paths
