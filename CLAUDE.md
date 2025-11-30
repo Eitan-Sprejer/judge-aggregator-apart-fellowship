@@ -244,14 +244,12 @@ The framework includes multiple baseline methods for comparison:
 **How it works**:
 - Uses the same rubric that human annotators received for each dataset
 - Evaluates all dimensions simultaneously (multi-dimensional JSON response)
-- Model and temperature configured per experiment (default: GPT-4, temp=0.0)
+- Uses the same model as judge evaluation (`judge_model` parameter, default: gpt-5-mini)
 - Results are cached in `results/_baseline_cache/` for reuse
 
 **Configuration** (in experiment YAML):
 ```yaml
-baseline_judge_model: "gpt-4"  # Optional, defaults to gpt-4
-baseline_judge_temperature: 0.0  # Optional, defaults to 0.0
-run_human_rubric_baseline: true  # Optional, defaults to true
+judge_model: "gpt-5-mini"  # Used for both judge evaluation AND baselines
 ```
 
 **Rubrics** are stored in `pipeline/utils/dataset_rubrics.yaml` and match the exact instructions given to human annotators.

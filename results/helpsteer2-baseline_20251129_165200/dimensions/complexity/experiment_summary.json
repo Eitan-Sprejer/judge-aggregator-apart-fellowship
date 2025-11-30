@@ -1,0 +1,58 @@
+{
+  "experiment_name": "helpsteer2-baseline",
+  "dimension": "complexity",
+  "dataset": "helpsteer2",
+  "target": "target_human_aggregated",
+  "judge_files": [
+    "judges/helpsteer2/depth_0_parents.yaml",
+    "judges/helpsteer2/depth_1_children.yaml"
+  ],
+  "judges": [
+    "helpsteer2-complexity-judge-lexical-sophistication",
+    "helpsteer2-complexity-judge-terminology-density",
+    "helpsteer2-complexity-judge-syntactic-complexity",
+    "helpsteer2-complexity-judge-assumed-knowledge",
+    "helpsteer2-complexity-judge-formalism-and-references"
+  ],
+  "n_judges": 5,
+  "random_seed": 42,
+  "gam_results": {
+    "train": {
+      "mse": 0.34929504957748064,
+      "mae": 0.4664397904116487,
+      "r2": 0.2681042105291982,
+      "spearman_rho": 0.448966338142878,
+      "kendall_tau": 0.3613287191331533,
+      "pearson_r": 0.5178983254031924
+    },
+    "val": {
+      "mse": 0.4008881108877372,
+      "mae": 0.5003344558169839,
+      "r2": 0.31398825944344444,
+      "spearman_rho": 0.5027719044247413,
+      "kendall_tau": 0.3985428220848645,
+      "pearson_r": 0.5660006276164139
+    },
+    "test": {
+      "mse": 0.3148657701196214,
+      "mae": 0.4419096626371608,
+      "r2": 0.2552403284971404,
+      "spearman_rho": 0.48195009368600394,
+      "kendall_tau": 0.3886080054055374,
+      "pearson_r": 0.5090012107679422
+    }
+  },
+  "baseline_results": {
+    "human_rubric_judge": {
+      "mse": 0.48,
+      "mae": 0.47,
+      "r2": -0.13535568564839484,
+      "spearman_rho": 0.3705348611206854,
+      "kendall_tau": 0.3557520903052217,
+      "pearson_r": 0.40346636519826407
+    }
+  },
+  "run_dir": "results/helpsteer2-baseline_20251129_165200",
+  "dimension_dir": "results/helpsteer2-baseline_20251129_165200/dimensions/complexity",
+  "timestamp": "2025-11-29T18:29:38.328993"
+}

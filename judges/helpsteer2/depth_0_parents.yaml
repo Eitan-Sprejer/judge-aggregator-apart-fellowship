@@ -1,0 +1,404 @@
+judges:
+- id: helpsteer2-helpfulness-judge
+  name: helpfulness Judge
+  version: '1.0'
+  description: Evaluates how useful and helpful an AI response is to the user's prompt
+    within the HelpSteer2 context. Focuses on whether the response enables the user
+    to accomplish their goal with relevant, actionable, and complete guidance.
+  scoring_description: "Assign a score from 0 to 4 based on how well the response\
+    \ fulfills the user\u2019s intent and provides actionable, relevant, and sufficiently\
+    \ complete help."
+  definition: "Helpfulness measures the practical utility of the response in addressing\
+    \ the user\u2019s stated intent. A helpful response is aligned with the prompt,\
+    \ stays on-topic, and provides concrete, usable guidance or answers (e.g., steps,\
+    \ code, examples, direct answers). It considers coverage and completeness relative\
+    \ to the task, and whether the user can proceed with minimal additional effort.\
+    \ It is distinct from verbosity and style; length alone does not increase helpfulness.\
+    \ While factual accuracy influences usefulness, judge helpfulness primarily by\
+    \ whether the content enables the user to achieve their goal."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Not Helpful
+    indicators:
+    - Does not address the user's request or tackles a different task entirely.
+    - Provides no actionable information (e.g., generic refusal or irrelevant text).
+    - "Restates the prompt or gives filler content without progressing the user\u2019\
+      s goal."
+    - Content would mislead the user away from their task or add no usable value.
+  - range: [1.0, 1.9]
+    label: Slightly Helpful
+    indicators:
+    - "Contains a minor relevant hint or term but largely misses the user\u2019s intent."
+    - Asks for clarification without offering any interim guidance or partial solution.
+    - Very high-level or vague advice that the user cannot act on directly.
+    - Omits most key elements needed to start or make progress on the task.
+  - range: [2.0, 2.9]
+    label: Partially Helpful
+    indicators:
+    - Addresses some aspects of the request but misses the overall goal or critical
+      steps.
+    - Provides a high-level outline with limited specificity (few or no concrete examples,
+      commands, or code).
+    - Answers a sub-part of the question while leaving key requirements unaddressed.
+    - User can make limited progress but must do significant additional work to complete
+      the task.
+  - range: [3.0, 3.9]
+    label: Mostly Helpful
+    indicators:
+    - Directly addresses the main intent and provides usable steps, examples, or answers.
+    - Covers most necessary details; minor gaps or edge cases may remain.
+    - Contains specific, actionable guidance (e.g., partial code, commands, or step-by-step
+      instructions).
+    - Requires only small follow-up effort or clarifications for full completion.
+  - range: [4.0, 4.0]
+    label: Extremely Helpful
+    indicators:
+    - Fully satisfies the request with complete, directly usable deliverables (e.g.,
+      runnable code, precise steps, exact answer).
+    - "Tailors the solution to the user\u2019s context/constraints and clearly states\
+      \ assumptions if needed."
+    - Anticipates common pitfalls or follow-up needs and offers alternatives or next
+      steps.
+    - Organizes information for immediate application (clear structure, labeled parameters,
+      prioritized steps).
+  guidelines:
+  - "Anchor scoring to the user\u2019s stated intent: judge how well the response\
+    \ enables the user to achieve their goal."
+  - Evaluate usefulness and completeness independently of style, length, or fluency;
+    consider accuracy only as it affects practical utility.
+  - Prioritize concrete, actionable content (steps, code, commands, examples, specific
+    recommendations) and penalize off-topic or purely generic advice.
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-correctness-judge
+  name: correctness Judge
+  version: '1.0'
+  description: Evaluates the factual accuracy of an AI response and whether it fulfills
+    all requirements stated in the user instruction. It detects hallucinations, false
+    or misleading claims, and checks for complete task execution.
+  scoring_description: Score 0-4 based on factual accuracy and completeness relative
+    to the prompt. Ignore stylistic quality; focus on verifiable correctness and whether
+    all required elements are addressed.
+  definition: Correctness measures whether the response is factually accurate, non-misleading,
+    and free of hallucinations while fully covering the requested tasks and constraints.
+    A correct response grounds claims in widely accepted knowledge or the provided
+    context, avoids inventing details, and produces accurate outputs, steps, or code.
+    When information is unknown or inherently uncertain (e.g., predictions), correctness
+    requires clearly stating uncertainty rather than asserting false facts. For procedural
+    outputs (code, math, step-by-step), correctness depends on proper methods, valid
+    references/APIs, and right results. Completeness means every required component
+    of the instruction is addressed without necessary omissions.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Incorrect
+    indicators:
+    - Does not attempt the requested task or responds to a different/irrelevant task.
+    - Most claims are false, contradict prompt facts, or are fabricated (e.g., invented
+      data, entities, APIs).
+    - Essential constraints or requirements are ignored entirely (e.g., missing all
+      requested outputs).
+    - Procedures/code/math are fundamentally wrong or impossible (e.g., non-existent
+      functions as core solution, impossible results).
+  - range: [1.0, 1.9]
+    label: Mostly Incorrect
+    indicators:
+    - Attempts the task but fulfills few requirements; multiple key elements are missing
+      or wrong.
+    - Contains multiple major factual errors or several hallucinated/irrelevant assertions.
+    - Misidentifies core concepts, tools, or entities (e.g., wrong technology, API,
+      or domain facts).
+    - Procedures/code/math are largely unusable without major fixes or produce incorrect
+      outputs.
+  - range: [2.0, 2.9]
+    label: Partially Correct
+    indicators:
+    - Meets some requirements but misses at least one important detail or subtask
+      specified by the prompt.
+    - Includes a mix of correct and incorrect information (e.g., 1 major or several
+      minor factual inaccuracies).
+    - Relies on unsupported assumptions or vague claims that could mislead, though
+      some core content is right.
+    - Procedures/code/math show the right general approach but need nontrivial corrections
+      to work or be fully accurate.
+  - range: [3.0, 3.9]
+    label: Mostly Correct
+    indicators:
+    - Addresses all core requirements; at most a minor detail or edge case is missing.
+    - No false, misleading, or hallucinated statements; minor imprecision that does
+      not affect outcomes may appear.
+    - Methods, references, and entities are valid and appropriate; computations/steps
+      are correct.
+    - Procedures/code/math are essentially correct and would work with only trivial
+      adjustments (if any).
+  - range: [4.0, 4.0]
+    label: Fully Correct
+    indicators:
+    - All requested tasks, constraints, and details are completely satisfied with
+      no omissions.
+    - All claims are accurate, precise, and verifiable; no hallucinations or misleading
+      statements.
+    - Uses correct concepts, entities, and APIs/libraries; outputs, computations,
+      or steps are right end-to-end.
+    - Procedures/code/math are correct and ready-to-use as presented, assuming standard
+      environment and stated assumptions.
+  guidelines:
+  - Judge only factual accuracy and task completion relative to the prompt; do not
+    consider style, tone, or level of detail beyond what is required to be correct.
+  - Treat invented details or unsupported specifics not grounded in the prompt or
+    widely accepted knowledge as hallucinations; for unknown or future facts, correctness
+    requires acknowledging uncertainty rather than asserting false certainty.
+  - 'Assess completeness strictly against the instruction: if any required element
+    is missing or wrong, cap the score accordingly; give partial credit when substantial
+    portions are correct but note major vs. minor errors.'
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-coherence-judge
+  name: coherence Judge
+  version: '1.0'
+  description: "Evaluates how clear, self-consistent, and logically ordered an assistant\u2019\
+    s response is. Focuses on whether the writing is easy to follow, free of internal\
+    \ contradictions, and avoids unnecessary repetition or redundancy."
+  scoring_description: Score based on clarity, logical flow, internal consistency,
+    and absence of redundancy. Ignore correctness or helpfulness; assess only how
+    coherent the response is as written.
+  definition: Coherence measures whether a response maintains a single, logical line
+    of thought without contradicting itself, confusing shifts, or unclear references.
+    A coherent answer uses consistent terminology, keeps pronouns and variables unambiguous,
+    and presents ideas in a logical order with smooth transitions. It should not repeat
+    the same point needlessly or include extraneous text that disrupts flow. Formatting
+    and structure (lists, steps, code blocks) should aid readability and not introduce
+    confusion.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Incoherent
+    indicators:
+    - Frequent contradictions or mutually incompatible statements render the message
+      nonsensical.
+    - Sentences or fragments are disjointed (word salad), with no logical progression
+      between parts.
+    - Abrupt topic shifts unrelated to the prompt or to prior sentences with no connective
+      logic.
+    - Heavy redundancy or looping text that obscures meaning (e.g., repeated paragraphs/lines).
+    - Broken structure or formatting makes content unintelligible (e.g., mangled lists/code).
+  - range: [1.0, 1.9]
+    label: Mostly Incoherent
+    indicators:
+    - Overall hard to follow with multiple confusing passages; only small portions
+      are clear.
+    - At least one clear internal inconsistency or contradiction that undermines the
+      message.
+    - Frequent unclear references (pronouns, variables, terms) that the reader cannot
+      resolve.
+    - Noticeable repetition of ideas or steps that adds little meaning and disrupts
+      flow.
+    - Disorganized structure with poor or missing transitions between major points.
+  - range: [2.0, 2.9]
+    label: Somewhat Coherent
+    indicators:
+    - Main idea is discernible but there are a few confusing sentences or awkward
+      jumps.
+    - Minor inconsistency in terminology or framing (e.g., changes terms mid-answer)
+      without direct contradiction.
+    - Some redundancy (repeating points) or run-on sentences that mildly hinder flow.
+    - Structure is present but ordering is suboptimal, requiring reader effort to
+      follow.
+    - References (pronouns/variables) are occasionally ambiguous but usually inferable
+      from context.
+  - range: [3.0, 3.9]
+    label: Mostly Coherent
+    indicators:
+    - Clear overall flow with logical ordering of ideas and mostly smooth transitions.
+    - No substantive contradictions; statements align with each other throughout.
+    - Terminology and references are largely consistent; minor phrasing hiccups only.
+    - Little to no unnecessary repetition; occasional mild verbosity does not impede
+      clarity.
+    - Formatting and structure (lists, steps, code) generally support readability.
+  - range: [4.0, 4.0]
+    label: Perfectly Coherent
+    indicators:
+    - Consistently clear, logically sequenced, and easy to follow from start to finish.
+    - Zero internal contradictions or mixed signals; stance and statements remain
+      aligned.
+    - No redundant content; each sentence advances the explanation or task.
+    - Consistent terminology, pronouns, and variable names; references are unambiguous.
+    - Structure and transitions are crisp and purposeful, enhancing readability (e.g.,
+      well-ordered steps).
+  guidelines:
+  - Evaluate coherence independently of correctness, helpfulness, complexity, or verbosity;
+    a wrong or brief answer can still be coherent.
+  - Weigh internal contradictions and disruptive redundancy heavily; if a clear contradiction
+    exists, do not assign the top score.
+  - "Use the overall reading experience: if most text matches a level\u2019s indicators,\
+    \ choose that level; minor typos that do not affect clarity should not lower the\
+    \ score below 3."
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-complexity-judge
+  name: complexity Judge
+  version: '1.0'
+  description: "Evaluates the sophistication of language used in an AI assistant\u2019\
+    s response. It measures vocabulary level, use of domain-specific terminology,\
+    \ acronyms, and sentence structure. This is a descriptive rating of linguistic\
+    \ complexity, not a judgment of quality or appropriateness."
+  scoring_description: Select the score that best matches the predominant language
+    complexity of the response. Occasional higher- or lower-level phrases should not
+    outweigh the overall, dominant style.
+  definition: 'Complexity captures how simple or sophisticated the language is, ranging
+    from child-accessible wording to expert-level professional terminology. Signals
+    include vocabulary sophistication, frequency and treatment of acronyms and jargon,
+    clause density and sentence structure, and assumptions about reader background
+    knowledge. This dimension is independent of helpfulness, correctness, or length:
+    a response can be simple but correct, or complex and incorrect. Mixed responses
+    should be scored by the dominant register across the response, not brief outliers.
+    Consider both the density and consistency of specialized terms and advanced constructions.'
+  criteria:
+  - range: [0.0, 0.9]
+    label: Basic
+    indicators:
+    - Everyday, child-accessible vocabulary; no specialized or technical terms.
+    - Very short, single-clause sentences; simple instructions (e.g., "Click the button").
+    - No acronyms or jargon appear.
+    - Concepts explained with concrete, familiar examples; zero assumed prior knowledge.
+    - Direct, plain wording with no qualifiers or abstractions.
+  - range: [1.0, 1.9]
+    label: Simple
+    indicators:
+    - Mostly common vocabulary with an occasional light technical word that is explained
+      (e.g., app, settings).
+    - Simple to mildly compound sentences; minimal subordination or abstraction.
+    - Rare acronyms; expanded on first use if present.
+    - Instructions are direct and non-technical; steps avoid domain-specific phrasing.
+    - Assumes minimal background knowledge beyond everyday computer or life experience.
+  - range: [2.0, 2.9]
+    label: Intermediate
+    indicators:
+    - Blend of general and moderately technical terms familiar to a high-school graduate
+      (e.g., configure, parameter, optimize).
+    - Multi-clause sentences appear; some nominalization and abstractions but still
+      broadly accessible.
+    - Several domain terms or acronyms used with brief definitions or context.
+    - Introduces basic trade-offs or conceptual distinctions without heavy jargon.
+    - Assumes general literacy/technical comfort but not field-specific expertise.
+  - range: [3.0, 3.9]
+    label: Advanced
+    indicators:
+    - Frequent discipline-specific terminology used correctly without lay rephrasing.
+    - Acronyms or terms often used without definition (e.g., SDK, OAuth, heteroskedasticity)
+      and relied upon for meaning.
+    - Complex sentence structures with subordination, hedging, and precise modality.
+    - References to methodologies, standards, frameworks, or API/CLI parameters as
+      shared knowledge.
+    - Assumes domain familiarity; omits introductory explanations and simplifications.
+  - range: [4.0, 4.0]
+    label: Expert
+    indicators:
+    - Dense professional jargon and technical nomenclature used fluently throughout.
+    - Multiple specialized acronyms/terms introduced without explanation; may include
+      formal notation, schemas, or definitions.
+    - Highly precise qualifiers and edge-case distinctions characteristic of expert
+      discourse.
+    - Interlinks specialized concepts, protocols, theorems, or system internals with
+      minimal scaffolding.
+    - Tone and register mirror professional documentation, scholarly writing, or field-specific
+      practice.
+  guidelines:
+  - Score the dominant linguistic register across the response; do not let brief jargon
+    or a single simple summary override the overall style.
+  - Do not consider helpfulness, correctness, or length; long text can be simple,
+    and short text can be expert-level.
+  - For code-heavy responses, judge complexity by surrounding prose and the density
+    of specialized terms (APIs, protocols, patterns); basic syntax alone does not
+    imply high complexity.
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-verbosity-judge
+  name: verbosity Judge
+  version: '1.0'
+  description: "Evaluates how long or wordy an assistant\u2019s response is relative\
+    \ to what the user\u2019s prompt appears to call for. This is a descriptive measure\
+    \ of length/wordiness on a 0\u20134 spectrum from succinct to verbose, not a quality\
+    \ judgment."
+  scoring_description: Estimate the minimally sufficient response length for the prompt
+    type, then score where the actual response sits on the succinct-to-verbose spectrum
+    (0 = most concise, 4 = most verbose). Focus on length and added detail, not on
+    correctness or usefulness.
+  definition: "Verbosity measures the amount of text and degree of elaboration provided\
+    \ compared to what the prompt likely requires. It considers absolute length (e.g.,\
+    \ word/line count), structural expansion (paragraphs, lists, sections), and density\
+    \ of extras (examples, caveats, background, repetition). The scale is descriptive:\
+    \ a response can be appropriately short or long yet still be scored low or high\
+    \ purely on its length/wordiness. Code blocks count toward length; surrounding\
+    \ explanations, options, and disclaimers increase verbosity. Do not conflate verbosity\
+    \ with helpfulness or correctness\u2014only the quantity and expansiveness of\
+    \ the response content is rated."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Succinct
+    indicators:
+    - "Extremely brief: typically 1\u20132 sentences or \u226450 words, or a single\
+      \ short code snippet (\u2248\u226410 lines) with no added narrative."
+    - Contains only the requested item (direct answer, single command/result) with
+      no examples, caveats, or background.
+    - No lists, headings, or multi-step procedures; no filler or repetition.
+  - range: [1.0, 1.9]
+    label: Pretty Short
+    indicators:
+    - "Brief: about 2\u20134 sentences or ~50\u2013100 words; code roughly \u2264\
+      20 lines with minimal commentary."
+    - Includes the core answer plus at most one brief clarifying clause or note; little
+      to no extra context.
+    - "At most one short list (\u22643 items) and no extended examples, caveats, or\
+      \ background; no noticeable repetition."
+  - range: [2.0, 2.9]
+    label: Average Length
+    indicators:
+    - "Moderate length: ~100\u2013200 words, 1\u20132 short paragraphs, or a compact\
+      \ list of ~3\u20136 items; code with minimal inline comments."
+    - Core answer plus brief supporting explanation or steps; stays close to the request.
+    - May include a single small example or caveat; little to no redundancy and minimal
+      structural expansion (few/no headings).
+  - range: [3.0, 3.9]
+    label: Moderately Long
+    indicators:
+    - "Longer: ~200\u2013400 words, multiple paragraphs, or multi-step lists (\u2265\
+      6 steps); code accompanied by explanatory narrative and options."
+    - 'Adds several extras beyond the minimum: examples, variations, caveats, tips,
+      or brief background.'
+    - May include headings/sections and minor repetition or restatement, indicating
+      expanded detail.
+  - range: [4.0, 4.0]
+    label: Verbose
+    indicators:
+    - 'Very long: >400 words or lengthy multi-section content; extensive lists or
+      large code blocks with substantial narrative.'
+    - Exhaustive detail with multiple examples, edge cases, background theory, and
+      tangential information beyond the request.
+    - Noticeable redundancy (repeated points or disclaimers), extended preambles/postambles,
+      and heavy structural expansion (headings, sub-bullets).
+  guidelines:
+  - Anchor your judgment to a minimally sufficient response for the specific prompt
+    type (e.g., fact lookup vs. step-by-step tutorial), then assess how much more
+    or less text was provided.
+  - Count both absolute length (words/lines) and added detail (examples, caveats,
+    background, repetition); code lines count toward length, and surrounding explanations
+    increase verbosity.
+  - "Do not consider correctness, helpfulness, tone, or formatting aesthetics\u2014\
+    only the quantity and expansiveness of the response content on the succinct-to-verbose\
+    \ spectrum."
+  score_range: [0.0, 4.0]
+  dataset: helpsteer2
+  parent_id: null
+  auto_generated: true
+  dimension: verbosity

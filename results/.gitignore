@@ -1,7 +1,39 @@
 # Ignore shared judged data cache (expensive API calls)
 _judged_cache/
+_judged_cache_backup_wrong_rubric/
+_baseline_cache/
+_baseline_cache_backup_wrong_rubric/
 
-# Optionally ignore experiment directories if they become too large
-# Uncomment the following lines if experiment results are too large to commit:
-*/
-!.gitignore
+# Exclude large files from ALL experiments
+# Note: These patterns are relative to the results/ directory
+
+# Checkpoint files (evaluation progress, can regenerate)
+**/checkpoints/
+**/checkpoints/*.pkl
+
+# Data pickle files (judge scores, 2-5 MB for 1000 samples)
+**/data/
+**/data/*.pkl
+
+# Log files
+**/*.log
+**/logs/
+
+# Keep these important files (they'll still be tracked)
+# (No negation needed - files not matching above patterns are tracked by default)
+
+# Optionally ignore all experiment directories if they become too large
+# Uncomment the following lines to ignore everything except explicitly allowed:
+# */
+# !.gitignore
+# !.gitkeep
+# !*/config.yaml
+# !*/config.json
+# !*/experiment_summary.json
+# !*/analysis_summary.json
+# !*/*.png
+# !*/*.csv
+# !*/README.md
+
+# Ignore some experiments that had mistakes
+helpsteer2-baseline_20251128_170942_wrong_rubric/

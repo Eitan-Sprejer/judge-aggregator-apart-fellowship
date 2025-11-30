@@ -19,28 +19,41 @@ class JudgeConfig:
     """Configuration for judge selection and scoring.
 
     Attributes:
-        judge_ids: List of Martian judge IDs to use
-        judge_names: Human-readable names for judges (for plots/reports)
-        score_range: Score range for judges (default: 0.0-4.0 for Martian)
+        judge_file: Path to single YAML file with judge definitions
+        judge_files: List of paths to YAML files (for multi-depth experiments)
+        score_range: Score range for judges (default: 0.0-4.0)
     """
-    judge_ids: List[str]
-    judge_names: List[str]
+    judge_file: Optional[str] = None
+    judge_files: Optional[List[str]] = None
     score_range: Tuple[float, float] = (0.0, 4.0)
 
     def __post_init__(self):
         """Validate judge configuration."""
-        if len(self.judge_ids) != len(self.judge_names):
-            raise ValueError(f"judge_ids and judge_names must have same length "
-                           f"(got {len(self.judge_ids)} vs {len(self.judge_names)})")
-        if len(self.judge_ids) == 0:
-            raise ValueError("Must specify at least one judge")
+        # Must specify either judge_file or judge_files (or neither for auto-detection)
+        if self.judge_file is not None and self.judge_files is not None:
+            raise ValueError("Cannot specify both 'judge_file' and 'judge_files' - choose one")
+
         if self.score_range[0] >= self.score_range[1]:
             raise ValueError(f"Invalid score_range: {self.score_range}")
 
     @property
-    def n_judges(self) -> int:
-        """Number of judges in this configuration."""
-        return len(self.judge_ids)
+    def file_paths(self) -> List[str]:
+        """Get list of judge file paths to load.
+
+        Returns:
+            List of file paths (empty if no files specified)
+        """
+        if self.judge_file:
+            return [self.judge_file]
+        elif self.judge_files:
+            return self.judge_files
+        else:
+            return []
+
+    @property
+    def has_files(self) -> bool:
+        """Check if any judge files are specified."""
+        return bool(self.file_paths)
 
 
 @dataclass
@@ -82,6 +95,24 @@ class MLPConfig:
 
 
 @dataclass
+class HyperparameterTuningConfig:
+    """Hyperparameter tuning configuration.
+
+    If enabled, runs optimization before training and always uses optimized params.
+    Results are always saved to run_dir/tuning_analysis/.
+
+    GAM tuning uses 5-fold CV with exhaustive search over:
+    - n_splines: [3, 5, 8, 10, 15, 20, 25] (7 values)
+    - lambda: log-spaced from 0.1 to 100 (20 values per n_splines)
+    - Total: 140 configurations tested
+
+    Attributes:
+        enabled: Whether to run hyperparameter tuning
+    """
+    enabled: bool = False
+
+
+@dataclass
 class ModelConfig:
     """Configuration for aggregation models.
 
@@ -92,13 +123,15 @@ class ModelConfig:
         train_mlp: Whether to train MLP model
         test_size: Fraction of data for test set
         val_size: Fraction of training data for validation set
+        tuning: Hyperparameter tuning configuration
     """
     gam: GAMConfig = field(default_factory=GAMConfig)
     mlp: MLPConfig = field(default_factory=MLPConfig)
     train_gam: bool = True
     train_mlp: bool = True
     test_size: float = 0.2
-    val_size: float = 0.15  # Of remaining training data
+    val_size: float = 0.15
+    tuning: HyperparameterTuningConfig = field(default_factory=HyperparameterTuningConfig)
 
 
 @dataclass
@@ -115,6 +148,11 @@ class ExperimentConfig:
         models: Model configuration and hyperparameters
         concurrency: Max concurrent API calls for judge evaluation and persona simulation
         random_seed: Random seed for reproducibility
+        target_dimensions: Optional list of dimensions for automatic judge creation
+        judge_cache_strategy: Strategy for judge caching ('auto', 'force_create', 'load_only')
+        judge_decomposition_depth: Depth of judge decomposition (0 = no decomposition, parents only)
+        judge_creation_config: Optional dict with judge creation settings (model, temperature, max_tokens)
+        judge_model: Model to use for judge evaluation (default: 'gpt-5-mini')
 
     Note:
         Persona simulation runs automatically when target='target_synthetic' and the dataset
@@ -123,18 +161,40 @@ class ExperimentConfig:
     name: str
     dataset: str  # 'ultrafeedback', 'judge_bench', 'helpsteer2', etc.
     target: str  # 'target_human_aggregated', 'target_human_individual', 'target_synthetic'
-    target_dimension: str  # Specific dimension name (e.g., 'helpfulness', 'overall')
+    target_dimensions: List[str]  # List of dimensions to train on (e.g., ['helpfulness', 'overall'])
     judges: JudgeConfig
     models: ModelConfig = field(default_factory=ModelConfig)
     dataset_kwargs: Dict[str, Any] = field(default_factory=dict)
     concurrency: int = 1  # Conservative default for API rate limiting
     random_seed: int = 42
 
+    # Judge creation fields
+    judge_cache_strategy: str = 'auto'  # 'auto' | 'force_create' | 'load_only'
+    judge_decomposition_depth: int = 1  # 0 = no decomposition (parent only), 1 = one level of children, etc.
+    judge_creation_config: Optional[Dict[str, Any]] = None
+
+    # Judge evaluation model (default: gpt-5-mini)
+    judge_model: str = 'gpt-5-mini'
+
     def __post_init__(self):
         """Validate experiment configuration."""
         valid_targets = ['target_human_aggregated', 'target_human_individual', 'target_synthetic']
         if self.target not in valid_targets:
             raise ValueError(f"target must be one of {valid_targets}, got: {self.target}")
+
+        # Validate judge cache strategy
+        valid_cache_strategies = ['auto', 'force_create', 'load_only']
+        if self.judge_cache_strategy not in valid_cache_strategies:
+            raise ValueError(
+                f"judge_cache_strategy must be one of {valid_cache_strategies}, "
+                f"got: {self.judge_cache_strategy}"
+            )
+
+        # Validate judge decomposition depth
+        if self.judge_decomposition_depth < 0:
+            raise ValueError(
+                f"judge_decomposition_depth must be >= 0, got: {self.judge_decomposition_depth}"
+            )
 
     @property
     def needs_persona_simulation(self) -> bool:
@@ -164,23 +224,24 @@ class ExperimentConfig:
                 f"Using all {len(df)} samples."
             )
 
-        # Check target dimension exists in dataset
+        # Check target dimensions exist in dataset
         first_row = df.iloc[0]
         dimensions = first_row.get('dimensions', [])
 
         if not dimensions:
             raise ValueError(
                 f"Dataset '{self.dataset}' has no dimensions field. "
-                f"Cannot use target_dimension."
+                f"Cannot use target_dimensions."
             )
 
-        if self.target_dimension not in dimensions:
-            raise ValueError(
-                f"target_dimension '{self.target_dimension}' not found in dataset dimensions: {dimensions}. "
-                f"Available dimensions: {', '.join(dimensions)}"
-            )
+        for dim in self.target_dimensions:
+            if dim not in dimensions:
+                raise ValueError(
+                    f"target_dimension '{dim}' not found in dataset dimensions: {dimensions}. "
+                    f"Available dimensions: {', '.join(dimensions)}"
+                )
 
-        logger.info(f"✓ Using target dimension: {self.target_dimension}")
+        logger.info(f"✓ Using target dimensions: {self.target_dimensions}")
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert config to dictionary."""
@@ -201,19 +262,71 @@ class ExperimentConfig:
     def from_dict(cls, config_dict: Dict[str, Any]) -> 'ExperimentConfig':
         """Create config from dictionary.
 
+        Supports both old and new config structures:
+        - Old: target_dimensions, judge_cache_strategy, judge_decomposition_depth at top level
+        - New: judges.create.{dimensions, cache, depth, model, temperature}
+
         Args:
             config_dict: Dictionary with configuration values
 
         Returns:
             ExperimentConfig instance
         """
-        # Parse nested configs
-        judges = JudgeConfig(**config_dict['judges'])
+        judges_dict = config_dict['judges']
+
+        # Get target_dimensions (required)
+        target_dimensions = config_dict.get('target_dimensions')
+        if not target_dimensions:
+            raise ValueError("target_dimensions is required in config")
+        if isinstance(target_dimensions, str):
+            target_dimensions = [target_dimensions]  # Convert single string to list
+
+        # Check if new simplified structure is used
+        if 'create' in judges_dict:
+            # New structure: judges.create.{cache, depth, model, temperature}
+            create_config = judges_dict['create']
+            judge_cache_strategy = create_config.get('cache', 'auto')
+            judge_decomposition_depth = create_config.get('depth', 1)
+            judge_creation_config = {
+                'model': create_config.get('model', 'openai/gpt-5.1'),
+                'temperature': create_config.get('temperature', 0.4),
+                'max_tokens': create_config.get('max_tokens', 10000)
+            }
+        else:
+            # Old structure: top-level judge_cache_strategy, etc.
+            judge_cache_strategy = config_dict.get('judge_cache_strategy', 'auto')
+            judge_decomposition_depth = config_dict.get('judge_decomposition_depth', 1)
+            judge_creation_config = config_dict.get('judge_creation_config')
+
+        # Handle judge_model (can be in judges.judge_model or top-level)
+        judge_model = judges_dict.get('judge_model') or config_dict.get('judge_model', 'gpt-5-mini')
+
+        # Handle use_files (new) vs judge_file/judge_files (old)
+        if 'use_files' in judges_dict:
+            # New structure: judges.use_files
+            use_files = judges_dict['use_files']
+            if isinstance(use_files, list):
+                judge_config_dict = {'judge_files': use_files}
+            else:
+                judge_config_dict = {'judge_file': use_files}
+        else:
+            # Old structure: judges.judge_file or judges.judge_files
+            judge_config_dict = {}
+            if 'judge_file' in judges_dict:
+                judge_config_dict['judge_file'] = judges_dict['judge_file']
+            if 'judge_files' in judges_dict:
+                judge_config_dict['judge_files'] = judges_dict['judge_files']
+
+        # Add score_range
+        judge_config_dict['score_range'] = tuple(judges_dict.get('score_range', [0.0, 4.0]))
+
+        judges = JudgeConfig(**judge_config_dict)
 
         # Parse model configs with defaults
         models_dict = config_dict.get('models', {})
         gam_dict = models_dict.get('gam', {})
         mlp_dict = models_dict.get('mlp', {})
+        tuning_dict = models_dict.get('tuning', {})
 
         models = ModelConfig(
             gam=GAMConfig(**gam_dict),
@@ -221,19 +334,25 @@ class ExperimentConfig:
             train_gam=models_dict.get('train_gam', True),
             train_mlp=models_dict.get('train_mlp', True),
             test_size=models_dict.get('test_size', 0.2),
-            val_size=models_dict.get('val_size', 0.15)
+            val_size=models_dict.get('val_size', 0.15),
+            tuning=HyperparameterTuningConfig(**tuning_dict)
         )
 
         return cls(
             name=config_dict['name'],
             dataset=config_dict['dataset'],
             target=config_dict['target'],
-            target_dimension=config_dict['target_dimension'],
+            target_dimensions=target_dimensions,
             judges=judges,
             models=models,
             dataset_kwargs=config_dict.get('dataset_kwargs', {}),
             concurrency=config_dict.get('concurrency', 1),
-            random_seed=config_dict.get('random_seed', 42)
+            random_seed=config_dict.get('random_seed', 42),
+            # Judge creation fields (resolved from new or old structure)
+            judge_cache_strategy=judge_cache_strategy,
+            judge_decomposition_depth=judge_decomposition_depth,
+            judge_creation_config=judge_creation_config,
+            judge_model=judge_model
         )
 
     @classmethod
@@ -255,30 +374,7 @@ class ExperimentConfig:
 # Default configurations for common use cases
 
 DEFAULT_10_JUDGES = JudgeConfig(
-    judge_ids=[
-        "truthfulness-judge",
-        "harmlessness-judge",
-        "helpfulness-judge",
-        "honesty-judge",
-        "explanatory-depth-judge",
-        "instruction-following-judge",
-        "clarity-judge",
-        "conciseness-judge",
-        "logical-consistency-judge",
-        "creativity-judge"
-    ],
-    judge_names=[
-        "Truthfulness",
-        "Harmlessness",
-        "Helpfulness",
-        "Honesty",
-        "Explanatory Depth",
-        "Instruction Following",
-        "Clarity",
-        "Conciseness",
-        "Logical Consistency",
-        "Creativity"
-    ],
+    judge_file="judges/ultrafeedback/depth_0_parents.yaml",  # Generic 10 baseline judges
     score_range=(0.0, 4.0)
 )
 

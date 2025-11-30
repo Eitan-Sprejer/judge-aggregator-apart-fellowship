@@ -89,7 +89,7 @@ class ChatCompletionClient:
         try:
             self._client = OpenAI(
                 api_key=MARTIAN_API_KEY,
-                base_url=f"{MARTIAN_API_URL.rstrip('/')}/v1",
+                base_url=MARTIAN_API_URL,
             )
         except OpenAIError as exc:
             raise RuntimeError("Failed to initialize OpenAI client for Martian gateway.") from exc
@@ -108,13 +108,20 @@ class ChatCompletionClient:
             messages.extend(history)
         messages.append({"role": "user", "content": user})
 
+        is_gpt5 = "gpt-5" in self._config.model.lower()
+        tokens_param = "max_completion_tokens" if is_gpt5 else "max_tokens"
+
+        request_params = {
+            "model": self._config.model,
+            tokens_param: self._config.max_tokens,
+            "messages": cast(List[Any], messages),
+        }
+
+        if not is_gpt5:
+            request_params["temperature"] = self._config.temperature
+
         try:
-            response = self._client.chat.completions.create(
-                model=self._config.model,
-                temperature=self._config.temperature,
-                max_tokens=self._config.max_tokens,
-                messages=cast(List[Any], messages),
-            )
+            response = self._client.chat.completions.create(**request_params)
         except OpenAIError as exc:
             raise RuntimeError(f"OpenAI chat completion failed: {exc}") from exc
 
@@ -344,6 +351,156 @@ If is_valid is false, explain what needs adjustment.
 """
         response = self._client.complete(self._system_prompt, user_prompt)
         data = _load_json(response)
+        return data
+
+
+class ParentJudgeCreatorAgent:
+    """Agent that creates parent judges from dataset dimension descriptions.
+
+    This agent is used to create initial parent judges for dataset-specific dimensions
+    (e.g., HelpSteer2's 'helpfulness', 'correctness') before decomposition.
+    """
+
+    def __init__(self, client: ChatCompletionClient):
+        self._client = client
+        self._system_prompt = (
+            "You are JudgeArchitect, an expert in designing comprehensive evaluation rubrics for AI systems. "
+            "You create detailed, well-structured parent judges that capture the essence of evaluation dimensions. "
+            "Your rubrics are concrete, measurable, and provide clear guidance for assessing AI responses. "
+            "Always respond with valid JSON only."
+        )
+
+    def create_parent_judge(
+        self,
+        dimension_name: str,
+        dimension_description: str,
+        dataset_name: str,
+        sample_qa_pairs: Optional[List[Dict[str, str]]] = None,
+        full_rubric: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Create a parent judge definition from a dimension description.
+
+        Args:
+            dimension_name: Name of the dimension (e.g., 'helpfulness', 'correctness')
+            dimension_description: Description of what this dimension measures
+            dataset_name: Name of the dataset this judge is for (e.g., 'helpsteer2')
+            sample_qa_pairs: Optional sample Q&A pairs to inform rubric creation
+            full_rubric: Optional full annotation rubric text from human guidelines.
+                        This provides the complete context of what human annotators
+                        were asked to evaluate, ensuring semantic alignment.
+
+        Returns:
+            Complete judge definition in judges.yaml format
+        """
+        # Build sample context if provided
+        samples_context = ""
+        if sample_qa_pairs:
+            samples_context = "\n\nExample Q&A pairs from the dataset:\n"
+            for i, pair in enumerate(sample_qa_pairs[:3], 1):  # Limit to 3 samples
+                samples_context += f"\nExample {i}:\n"
+                samples_context += f"Q: {pair.get('question', 'N/A')}\n"
+                samples_context += f"A: {pair.get('response', 'N/A')[:200]}...\n"
+
+        # Build full rubric context if provided
+        rubric_context = ""
+        if full_rubric:
+            rubric_context = f"""
+
+## IMPORTANT: Human Annotation Guidelines
+
+The following is the EXACT rubric that human annotators used when labeling this dataset.
+Your judge MUST align with these guidelines to ensure the judge measures the same thing humans measured.
+
+<human_annotation_rubric>
+{full_rubric}
+</human_annotation_rubric>
+
+CRITICAL: Pay careful attention to how each dimension is defined in the human rubric above.
+Some dimensions (like complexity and verbosity) may be DESCRIPTIVE scales (measuring what level
+something IS) rather than QUALITY judgments (measuring how appropriate something is).
+Your judge must match the human annotators' interpretation exactly.
+"""
+
+        user_prompt = f"""
+Dataset: {dataset_name}
+Dimension: {dimension_name}
+Description: {dimension_description}
+{rubric_context}{samples_context}
+
+Task: Create a comprehensive parent judge rubric for evaluating "{dimension_name}" in the context of {dataset_name}.
+
+The judge should:
+1. Capture the essence of what "{dimension_name}" means in this evaluation context
+2. Provide a detailed 5-level scoring rubric (scores 0-4)
+3. Be concrete and measurable, with observable indicators at each level
+4. Align with the dimension description provided above
+
+Respond with JSON matching this structure:
+{{
+    "id": "Use kebab-case: {dataset_name}-{dimension_name.lower().replace(' ', '-')}-judge",
+    "name": "{dimension_name} Judge",
+    "version": "1.0",
+    "description": "2-3 sentence description of what this judge evaluates",
+    "scoring_description": "Brief instruction on how to score (1-2 sentences)",
+    "definition": "Detailed explanation of this dimension (3-5 sentences)",
+    "criteria": [
+        {{
+            "range": [0.0, 0.9],
+            "label": "Label for level 0 (e.g., 'Very Poor')",
+            "indicators": ["Observable indicator 1", "Observable indicator 2", "Observable indicator 3"]
+        }},
+        {{
+            "range": [1.0, 1.9],
+            "label": "Label for level 1 (e.g., 'Poor')",
+            "indicators": ["Observable indicator 1", "Observable indicator 2", "Observable indicator 3"]
+        }},
+        {{
+            "range": [2.0, 2.9],
+            "label": "Label for level 2 (e.g., 'Fair')",
+            "indicators": ["Observable indicator 1", "Observable indicator 2", "Observable indicator 3"]
+        }},
+        {{
+            "range": [3.0, 3.9],
+            "label": "Label for level 3 (e.g., 'Good')",
+            "indicators": ["Observable indicator 1", "Observable indicator 2", "Observable indicator 3"]
+        }},
+        {{
+            "range": [4.0, 4.0],
+            "label": "Label for level 4 (e.g., 'Excellent')",
+            "indicators": ["Observable indicator 1", "Observable indicator 2", "Observable indicator 3"]
+        }}
+    ],
+    "guidelines": [
+        "Guideline 1 for scoring",
+        "Guideline 2 for scoring",
+        "Guideline 3 for scoring"
+    ],
+    "score_range": [0.0, 4.0],
+    "dataset": "{dataset_name}",
+    "parent_id": null,
+    "auto_generated": true
+}}
+
+IMPORTANT:
+- Use exactly 5 criteria levels with the ranges shown above
+- Ensure each level has 3-5 concrete, observable indicators
+- Make indicators specific to the dimension and dataset context
+- Guidelines should help evaluators apply the rubric consistently
+"""
+        response = self._client.complete(self._system_prompt, user_prompt)
+        data = _load_json(response)
+
+        # Validate required fields
+        required_fields = ["id", "name", "version", "description", "scoring_description",
+                         "definition", "criteria", "guidelines", "score_range"]
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f"ParentJudgeCreatorAgent output missing required field: {field}")
+
+        # Validate criteria structure
+        if len(data["criteria"]) != 5:
+            raise ValueError(f"Expected 5 criteria levels, got {len(data['criteria'])}")
+
         return data
 
 

@@ -1,0 +1,296 @@
+[
+  {
+    "config": {
+      "n_splines": 5,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.325967659655916,
+      "mae": 0.9134412271702312,
+      "r2": 0.191768767598252,
+      "spearman_rho": 0.34491149993454484,
+      "kendall_tau": 0.2670253269267262,
+      "pearson_r": 0.43791412013194525
+    },
+    "gam_metrics": {
+      "aic": 2163.893336017022,
+      "edof": 6.216744362295351,
+      "gcv": 1.3605732136741704,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Helpfulness Judge Relevance To Intent": 0.9999999999998461,
+      "Helpsteer2 Helpfulness Judge Actionability And Specificity": 0.9055480579166169,
+      "Helpsteer2 Helpfulness Judge Completeness Of Solution": 0.9757961896215472,
+      "Helpsteer2 Helpfulness Judge Context Tailoring And Assumptions": 0.8127456912573328,
+      "Helpsteer2 Helpfulness Judge Organization For Immediate Application": 0.38365870134025404
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.1942474585603478,
+      "train_r2_std": 0.031918370265968735,
+      "val_r2_mean": 0.14154974862787467,
+      "val_r2_std": 0.1157876871430141,
+      "train_mse_mean": 1.31987504575933,
+      "train_mse_std": 0.037847372381559066,
+      "val_mse_mean": 1.380768272289357,
+      "val_mse_std": 0.15754927691422194,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.2904205441369496,
+      "mae": 0.9098971702344443,
+      "r2": 0.26608255319830654,
+      "spearman_rho": 0.3844354569787665,
+      "kendall_tau": 0.30406783185541,
+      "pearson_r": 0.5197020537171056
+    }
+  },
+  {
+    "config": {
+      "n_splines": 8,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.3190716683993522,
+      "mae": 0.9114457787805877,
+      "r2": 0.1959721548161354,
+      "spearman_rho": 0.3462464877613976,
+      "kendall_tau": 0.2681940410774242,
+      "pearson_r": 0.4427104378755246
+    },
+    "gam_metrics": {
+      "aic": 2165.9000279486636,
+      "edof": 8.779720282871304,
+      "gcv": 1.3680833238375218,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Helpfulness Judge Relevance To Intent": 0.999999999577892,
+      "Helpsteer2 Helpfulness Judge Actionability And Specificity": 0.7457835645955186,
+      "Helpsteer2 Helpfulness Judge Completeness Of Solution": 0.9953511240339217,
+      "Helpsteer2 Helpfulness Judge Context Tailoring And Assumptions": 0.8562382861179116,
+      "Helpsteer2 Helpfulness Judge Organization For Immediate Application": 0.8448090292806608
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.19885390868245417,
+      "train_r2_std": 0.0316150260850634,
+      "val_r2_mean": 0.13892555251838423,
+      "val_r2_std": 0.11527409374325376,
+      "train_mse_mean": 1.312312144648313,
+      "train_mse_std": 0.03669566468442931,
+      "val_mse_mean": 1.3846191366125709,
+      "val_mse_std": 0.1538880163875926,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.294553607747687,
+      "mae": 0.9111774463922647,
+      "r2": 0.26373190285687853,
+      "spearman_rho": 0.3806217142018911,
+      "kendall_tau": 0.30165732809211676,
+      "pearson_r": 0.5177690005685711
+    }
+  },
+  {
+    "config": {
+      "n_splines": 10,
+      "lam": 83.24755347837745,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.3074524248691142,
+      "mae": 0.9081003253191305,
+      "r2": 0.2030545564491112,
+      "spearman_rho": 0.34911109186448147,
+      "kendall_tau": 0.27042804334778486,
+      "pearson_r": 0.4507388782293402
+    },
+    "gam_metrics": {
+      "aic": 2165.2417003761557,
+      "edof": 11.518324671968767,
+      "gcv": 1.3717404577839258,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Helpfulness Judge Relevance To Intent": 0.9999999956321929,
+      "Helpsteer2 Helpfulness Judge Actionability And Specificity": 0.6042649160513414,
+      "Helpsteer2 Helpfulness Judge Completeness Of Solution": 0.9843301305668026,
+      "Helpsteer2 Helpfulness Judge Context Tailoring And Assumptions": 0.7529598759987994,
+      "Helpsteer2 Helpfulness Judge Organization For Immediate Application": 0.9737699070510218
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.2095992870497212,
+      "train_r2_std": 0.02512895860569644,
+      "val_r2_mean": 0.1354213334498272,
+      "val_r2_std": 0.11283748943174651,
+      "train_mse_mean": 1.2951584949597303,
+      "train_mse_std": 0.03971660556794067,
+      "val_mse_mean": 1.3906314850958967,
+      "val_mse_std": 0.15254602703860387,
+      "best_lam_mean": 83.24755347837745,
+      "best_lam_std": 33.50489304324511
+    },
+    "test_metrics": {
+      "mse": 1.3028076827464659,
+      "mae": 0.9139118832999242,
+      "r2": 0.2590374567894028,
+      "spearman_rho": 0.3771022067727866,
+      "kendall_tau": 0.2992468243288236,
+      "pearson_r": 0.513775139466685
+    }
+  },
+  {
+    "config": {
+      "n_splines": 15,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.2846654207497066,
+      "mae": 0.9004066330580334,
+      "r2": 0.21694416249497184,
+      "spearman_rho": 0.35828804157290345,
+      "kendall_tau": 0.27747135606128326,
+      "pearson_r": 0.46611911298422737
+    },
+    "gam_metrics": {
+      "aic": 2162.6932822515187,
+      "edof": 16.46343926427921,
+      "gcv": 1.3763904767787363,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Helpfulness Judge Relevance To Intent": 0.99999989869623,
+      "Helpsteer2 Helpfulness Judge Actionability And Specificity": 0.5908297996321455,
+      "Helpsteer2 Helpfulness Judge Completeness Of Solution": 0.9195123030806109,
+      "Helpsteer2 Helpfulness Judge Context Tailoring And Assumptions": 0.44877606741356135,
+      "Helpsteer2 Helpfulness Judge Organization For Immediate Application": 0.9677030202799384
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.2222665347627358,
+      "train_r2_std": 0.028113537636203573,
+      "val_r2_mean": 0.13287983918173935,
+      "val_r2_std": 0.1149043851153967,
+      "train_mse_mean": 1.2740344323136998,
+      "train_mse_std": 0.03238267969536083,
+      "val_mse_mean": 1.3931649342549175,
+      "val_mse_std": 0.14457259406699507,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.3250329797181333,
+      "mae": 0.9198154740666751,
+      "r2": 0.2463969782400126,
+      "spearman_rho": 0.36510268573100574,
+      "kendall_tau": 0.2882273785537691,
+      "pearson_r": 0.501214848478725
+    }
+  },
+  {
+    "config": {
+      "n_splines": 20,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.2662959024476133,
+      "mae": 0.8930431379910732,
+      "r2": 0.22814113122027257,
+      "spearman_rho": 0.3666488981020723,
+      "kendall_tau": 0.283749316145121,
+      "pearson_r": 0.47807684047719856
+    },
+    "gam_metrics": {
+      "aic": 2162.381928164085,
+      "edof": 21.208746727590732,
+      "gcv": 1.3845707781179313,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Helpfulness Judge Relevance To Intent": 0.9999994117163619,
+      "Helpsteer2 Helpfulness Judge Actionability And Specificity": 0.37907934526594045,
+      "Helpsteer2 Helpfulness Judge Completeness Of Solution": 0.8367863497255537,
+      "Helpsteer2 Helpfulness Judge Context Tailoring And Assumptions": 0.43385733272704874,
+      "Helpsteer2 Helpfulness Judge Organization For Immediate Application": 0.9917706750290716
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.23564088617024231,
+      "train_r2_std": 0.02581401431265359,
+      "val_r2_mean": 0.12613692829033876,
+      "val_r2_std": 0.11359863483870121,
+      "train_mse_mean": 1.2521855819526886,
+      "train_mse_std": 0.030055060681464546,
+      "val_mse_mean": 1.4037749708989558,
+      "val_mse_std": 0.1399524351876474,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.3452596405853845,
+      "mae": 0.9233655579000712,
+      "r2": 0.23489320966746174,
+      "spearman_rho": 0.3670793437083378,
+      "kendall_tau": 0.2896048092756509,
+      "pearson_r": 0.48809196686749845
+    }
+  },
+  {
+    "config": {
+      "n_splines": 25,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.252326632494869,
+      "mae": 0.8878416225657065,
+      "r2": 0.23665596956300328,
+      "spearman_rho": 0.37568933701711554,
+      "kendall_tau": 0.2907305732399982,
+      "pearson_r": 0.48693677246592537
+    },
+    "gam_metrics": {
+      "aic": 2163.5029278119464,
+      "edof": 25.39478833567511,
+      "gcv": 1.3943141344972698,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Helpfulness Judge Relevance To Intent": 0.9999964828011104,
+      "Helpsteer2 Helpfulness Judge Actionability And Specificity": 0.3081638165798669,
+      "Helpsteer2 Helpfulness Judge Completeness Of Solution": 0.7892652342247278,
+      "Helpsteer2 Helpfulness Judge Context Tailoring And Assumptions": 0.4409660895099645,
+      "Helpsteer2 Helpfulness Judge Organization For Immediate Application": 0.9943955512788437
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.24592828526233382,
+      "train_r2_std": 0.024617802040094266,
+      "val_r2_mean": 0.1186032800607387,
+      "val_r2_std": 0.11320783624302569,
+      "train_mse_mean": 1.2353341186163906,
+      "train_mse_std": 0.027689262991398088,
+      "val_mse_mean": 1.4154567445289588,
+      "val_mse_std": 0.13484322356910217,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.360134983994807,
+      "mae": 0.9255444643251433,
+      "r2": 0.2264329645908124,
+      "spearman_rho": 0.36217164899744275,
+      "kendall_tau": 0.2844394440685941,
+      "pearson_r": 0.4778913047414581
+    }
+  }
+]
