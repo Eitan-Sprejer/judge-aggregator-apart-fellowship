@@ -639,3 +639,961 @@ judges:
   dataset: helpsteer2
   auto_generated: true
   dimension: correctness
+- id: helpsteer2-coherence-judge-logical-flow-and-sequencing
+  name: Logical Flow & Sequencing
+  version: '1.0'
+  description: Measures how clearly and logically ideas progress from start to finish,
+    with attention to ordered sequencing and smooth transitions. Evaluates whether
+    the response presents a clear beginning, middle, and end without disjoint jumps
+    that force the reader to backtrack.
+  scoring_description: Score how well the response demonstrates logical flow & sequencing
+  definition: Measures how clearly and logically ideas progress from start to finish,
+    with attention to ordered sequencing and smooth transitions. Evaluates whether
+    the response presents a clear beginning, middle, and end without disjoint jumps
+    that force the reader to backtrack.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Chaotic
+    indicators:
+    - No discernible beginning, middle, and end; content feels unordered.
+    - Ideas or steps appear out of sequence with abrupt, unexplained jumps.
+    - Reader must repeatedly backtrack to connect points.
+  - range: [1.0, 1.9]
+    label: Disjointed
+    indicators:
+    - Weak or inconsistent structure; sections are misgrouped or partially shuffled.
+    - Transitions are missing or misleading, causing confusion about how points relate.
+    - Frequent sequencing errors force the reader to re-interpret earlier parts.
+  - range: [2.0, 2.9]
+    label: Partial Order
+    indicators:
+    - Basic opening/body/closing exists but ordering is suboptimal with occasional
+      jumps.
+    - Some transitions or signposts are present, yet gaps require the reader to fill
+      in links.
+    - A few instances of mild backtracking or re-reading to follow the progression.
+  - range: [3.0, 3.9]
+    label: Well-Ordered
+    indicators:
+    - Clear overall progression where most ideas build on prior points in a sensible
+      order.
+    - Transitions generally guide the reader; only minor rough spots or brief tangents.
+    - Beginning, middle, and end are evident with little to no backtracking needed.
+  - range: [4.0, 4.0]
+    label: Seamless
+    indicators:
+    - Strong opening frames the path; body proceeds in a clean, logical sequence;
+      closing consolidates the message.
+    - Smooth, purposeful transitions make relationships explicit and eliminate ambiguity.
+    - No disjoint jumps or reordering; the reader moves forward without needing to
+      backtrack.
+  guidelines:
+  - Each sentence/point follows logically from the previous one
+  - Uses signposting or transitions to connect steps or sections
+  - Avoids abrupt topic shifts or unexplained jumps
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-internal-consistency
+  name: Internal Consistency
+  version: '1.0'
+  description: "Assesses whether the response maintains a stable stance without contradicting\
+    \ itself. It checks for mutually incompatible statements, reversals, or conflicting\
+    \ details (e.g., terms, numbers, conditions). Contradictions are weighed heavily\
+    \ regardless of the response\u2019s correctness or usefulness."
+  scoring_description: Score how well the response demonstrates internal consistency
+  definition: "Assesses whether the response maintains a stable stance without contradicting\
+    \ itself. It checks for mutually incompatible statements, reversals, or conflicting\
+    \ details (e.g., terms, numbers, conditions). Contradictions are weighed heavily\
+    \ regardless of the response\u2019s correctness or usefulness."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Inconsistent
+    indicators:
+    - Multiple direct contradictions or mutually incompatible claims on core points.
+    - Later statements explicitly reverse or negate earlier statements without acknowledgement.
+    - Conflicting figures/conditions (e.g., different numbers, definitions, or constraints)
+      appear for the same item.
+  - range: [1.0, 1.9]
+    label: Mostly Inconsistent
+    indicators:
+    - At least one clear contradiction on a major point that undermines the overall
+      message.
+    - Key terms, variables, or criteria shift meaning mid-response without explanation.
+    - Important numbers, assumptions, or rules change inconsistently across sections.
+  - range: [2.0, 2.9]
+    label: Some Inconsistencies
+    indicators:
+    - Main stance is identifiable but contains minor conflicting statements or unresolved
+      qualifiers.
+    - Small numerical/detail mismatches (e.g., counts, thresholds) that create localized
+      inconsistency.
+    - "Occasional conditional claims that don\u2019t align perfectly with later statements."
+  - range: [3.0, 3.9]
+    label: Mostly Consistent
+    indicators:
+    - No substantive contradictions; overall stance and conclusions align.
+    - Terminology, variables, and figures are largely consistent; only minor wording
+      could be read ambiguously.
+    - Caveats and conditions remain compatible with subsequent statements.
+  - range: [4.0, 4.0]
+    label: Perfectly Consistent
+    indicators:
+    - All statements reinforce a single, stable stance with zero contradictions or
+      reversals.
+    - Terminology, variables, and quantitative details remain uniform throughout.
+    - Qualifiers and conditions are applied consistently, and later parts build on
+      earlier points without conflict.
+  guidelines:
+  - No claims that conflict with earlier assertions or conditions
+  - Stable stance and recommendations throughout
+  - No mixed directives (e.g., advising both to do and not do something)
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-referential-clarity-and-terminology
+  name: Referential Clarity & Terminology
+  version: '1.0'
+  description: Assesses how clearly and consistently an answer refers to entities,
+    variables, acronyms, and terms so that references are unambiguous. Evaluates whether
+    pronouns have clear antecedents, terms and symbols are defined and used consistently,
+    and wording changes do not shift meaning. Minor stylistic variation is acceptable
+    when the intended referent remains unmistakable.
+  scoring_description: Score how well the response demonstrates referential clarity
+    & terminology
+  definition: Assesses how clearly and consistently an answer refers to entities,
+    variables, acronyms, and terms so that references are unambiguous. Evaluates whether
+    pronouns have clear antecedents, terms and symbols are defined and used consistently,
+    and wording changes do not shift meaning. Minor stylistic variation is acceptable
+    when the intended referent remains unmistakable.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Unclear
+    indicators:
+    - Pronouns or references lack antecedents or have multiple unresolved candidates,
+      making mapping impossible.
+    - Terms/symbols change meaning mid-response or contradict earlier usage.
+    - Inconsistent or incorrect naming (e.g., variables, acronyms) prevents understanding
+      of what refers to what.
+  - range: [1.0, 1.9]
+    label: Mostly Unclear
+    indicators:
+    - Frequent ambiguous pronouns/references; readers must guess the intended entity.
+    - Terminology or symbols switch labels or meanings in ways that cause sustained
+      confusion.
+    - Key acronyms/variables introduced without definition and used inconsistently.
+  - range: [2.0, 2.9]
+    label: Somewhat Clear
+    indicators:
+    - Several ambiguous or weakly specified references that require effort or backtracking
+      to resolve.
+    - At least one instance of inconsistent terminology or symbol reuse that creates
+      momentary uncertainty.
+    - Some terms/acronyms are undefined or renamed later, though the intended meaning
+      can usually be inferred.
+  - range: [3.0, 3.9]
+    label: Mostly Clear
+    indicators:
+    - Pronouns and variables have clear antecedents with only minor, easily resolvable
+      ambiguities.
+    - Terminology, acronyms, and symbols are largely consistent; any variation (e.g.,
+      synonyms) does not shift meaning.
+    - Nonstandard terms are defined or evident from context; disambiguation is used
+      when similar entities appear.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All pronouns, variables, and cross-references have unambiguous antecedents;
+      no competing candidates.
+    - Terms, acronyms, and symbols are defined when needed and used consistently with
+      no unexplained switches.
+    - Multiple similar entities are clearly distinguished with precise labels or qualifiers
+      throughout.
+  guidelines:
+  - Pronouns have clear antecedents; variables/symbols are used consistently
+  - Terminology remains stable or changes are explicitly signaled
+  - Avoids vague deictics (this/that/it) when multiple candidates exist
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-concision-and-non-redundancy
+  name: Concision & Non-Redundancy
+  version: '1.0'
+  description: "Measures how efficiently the response communicates without unnecessary\
+    \ repetition or filler. Assesses whether each sentence adds new value, avoids\
+    \ duplicating prior content, and omits tangents or boilerplate that do not advance\
+    \ the point. Correctness is not judged\u2014only brevity, lack of duplication,\
+    \ and whether redundancy impairs flow."
+  scoring_description: Score how well the response demonstrates concision & non-redundancy
+  definition: "Measures how efficiently the response communicates without unnecessary\
+    \ repetition or filler. Assesses whether each sentence adds new value, avoids\
+    \ duplicating prior content, and omits tangents or boilerplate that do not advance\
+    \ the point. Correctness is not judged\u2014only brevity, lack of duplication,\
+    \ and whether redundancy impairs flow."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Severely Redundant
+    indicators:
+    - Verbatim or near-verbatim sentences/paragraphs are duplicated, or the text loops
+      back to the same point repeatedly.
+    - Large portions are filler (e.g., long prefaces, disclaimers, tangents) that
+      do not advance the task.
+    - Redundancy overwhelms the message; core content is hard to locate or follow.
+  - range: [1.0, 1.9]
+    label: Mostly Redundant
+    indicators:
+    - Same ideas or instructions are restated multiple times with minor rephrasing.
+    - Noticeable nonessential content (e.g., extended meta-commentary, unnecessary
+      examples) inflates length.
+    - Redundancy disrupts flow, causing the reader to skim past repeated material.
+  - range: [2.0, 2.9]
+    label: Some Redundancy
+    indicators:
+    - Occasional repetition or recap reiterates earlier points instead of synthesizing
+      them.
+    - Some filler words/phrases or verbose constructions that could be tightened without
+      loss of meaning.
+    - Slightly longer than necessary; redundancy mildly affects pacing but main points
+      remain clear.
+  - range: [3.0, 3.9]
+    label: Mostly Concise
+    indicators:
+    - Minimal repetition; any brief recap is purposeful and adds clarity (e.g., short
+      summary without restating details).
+    - Little to no filler or tangents; wording is generally tight and focused on the
+      task.
+    - Length is appropriate; minor verbosity does not impede flow.
+  - range: [4.0, 4.0]
+    label: Optimal Concision
+    indicators:
+    - No unnecessary repetition; each sentence contributes new, relevant information.
+    - Zero filler or irrelevant meta-commentary; phrasing is compact without sacrificing
+      clarity.
+    - If present, summaries are succinct and non-duplicative, clearly enhancing comprehension.
+  guidelines:
+  - No repeated points or steps without added value
+  - Each sentence advances the message; minimal filler or looping text
+  - No verbose restatements that obscure the main idea
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-structure-and-formatting-support
+  name: Structure & Formatting Support
+  version: '1.0'
+  description: "Assesses how well the response\u2019s structure and formatting (headings,\
+    \ lists, tables, code blocks) make the content easier to read and follow. Rewards\
+    \ clear, consistent organization that supports comprehension and task execution,\
+    \ and penalizes broken, inconsistent, or misleading formatting. Stylistic choices\
+    \ are not penalized if the structure remains functionally clear and coherent."
+  scoring_description: Score how well the response demonstrates structure & formatting
+    support
+  definition: "Assesses how well the response\u2019s structure and formatting (headings,\
+    \ lists, tables, code blocks) make the content easier to read and follow. Rewards\
+    \ clear, consistent organization that supports comprehension and task execution,\
+    \ and penalizes broken, inconsistent, or misleading formatting. Stylistic choices\
+    \ are not penalized if the structure remains functionally clear and coherent."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Completely Broken
+    indicators:
+    - Formatting errors render content hard to parse (e.g., mangled or nested lists,
+      unclosed code fences, misaligned tables).
+    - Structure misleads or contradicts content (e.g., mislabeled sections/steps,
+      headings that do not match the text).
+    - Intrusive or chaotic layout (random line breaks, repeated blocks) fragments
+      the message and obscures flow.
+  - range: [1.0, 1.9]
+    label: Mostly Deficient
+    indicators:
+    - Disorganized or inconsistent structure (abrupt list level changes, missing or
+      illogical headings).
+    - Frequent formatting inaccuracies that impede reading (misnumbered steps, mixed
+      bullet styles, uneven indentation).
+    - Misuse of structural elements (e.g., code blocks for prose or tables for simple
+      lists) that creates confusion.
+  - range: [2.0, 2.9]
+    label: Partially Effective
+    indicators:
+    - Basic structure present (some headings/lists), but ordering or grouping is suboptimal
+      and requires reader effort.
+    - Occasional inconsistencies or minor errors (e.g., a mislabeled step or uneven
+      spacing) that mildly hinder clarity.
+    - Some helpful formatting coexists with unnecessary or distracting elements (e.g.,
+      redundant sections or overly long blocks).
+  - range: [3.0, 3.9]
+    label: Effective
+    indicators:
+    - Clear, logical organization with consistent headings and correctly formatted
+      lists/code that support the message.
+    - Formatting aids skimming and execution (concise sections, sensible step order)
+      with minimal distraction.
+    - No substantive structural errors; stylistic variations are consistent and do
+      not impede understanding.
+  - range: [4.0, 4.0]
+    label: Exemplary
+    indicators:
+    - Purposeful, well-scoped structure (descriptive headings, well-ordered steps,
+      correctly scoped code/examples) that enhances comprehension.
+    - Consistent, unambiguous conventions (numbering, bullets, labels, references)
+      with precise alignment between structure and content.
+    - Formatting anticipates reader needs (e.g., brief summaries, callouts, or tables
+      where appropriate) without redundancy or clutter.
+  guidelines:
+  - Lists/steps are complete, parallel, and properly ordered
+  - Headings and grouping align with the logical structure
+  - No broken or mangled formatting that hinders readability
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-complexity-judge-lexical-sophistication
+  name: Vocabulary Sophistication
+  version: '1.0'
+  description: Measures the breadth and rarity of word choice, emphasizing abstraction
+    and nominalization beyond everyday lexicon. Ratings are anchored to proportions
+    of low-frequency content words (Zipf bands) and nominalizations per 100 words,
+    calibrated with CEFR vocabulary bands. This rubric assesses lexical sophistication,
+    not correctness or clarity.
+  scoring_description: Score how well the response demonstrates vocabulary sophistication
+  definition: Measures the breadth and rarity of word choice, emphasizing abstraction
+    and nominalization beyond everyday lexicon. Ratings are anchored to proportions
+    of low-frequency content words (Zipf bands) and nominalizations per 100 words,
+    calibrated with CEFR vocabulary bands. This rubric assesses lexical sophistication,
+    not correctness or clarity.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Basic
+    indicators:
+    - "CEFR mostly A1-A2; low-frequency content tokens (Zipf < 3.5) \u2264 2%; nominalizations\
+      \ \u2264 1 per 100 words."
+    - Vocabulary is concrete and everyday (e.g., get, make, fix, thing), avoiding
+      Latinate/technical words and abstract nouns.
+  - range: [1.0, 1.9]
+    label: Simple
+    indicators:
+    - "CEFR largely A1-B1; low-frequency content tokens (Zipf < 3.5) 2\u20135%; nominalizations\
+      \ 1\u20132 per 100 words."
+    - Occasional mildly specific words but prefers basic phrasal verbs over single-word
+      Latinate alternatives (e.g., set up vs configure; help vs assistance).
+  - range: [2.0, 2.9]
+    label: Intermediate
+    indicators:
+    - "Mix of A2-B2 with some C1; low-frequency content tokens (Zipf < 3.5) 5\u2013\
+      10%; nominalizations 2\u20134 per 100 words."
+    - Regular use of mid-level abstract/technical terms and some Latinate choices
+      (e.g., configure, parameter, optimize, mitigate) with limited domain jargon.
+    - Shows lexical variation via single-word verbs and precise adjectives (e.g.,
+      assemble, allocate, robust) instead of only basic verbs.
+  - range: [3.0, 3.9]
+    label: Advanced
+    indicators:
+    - "Many B2-C1 items; low-frequency content tokens (Zipf < 3.5) 10\u201318%; nominalizations\
+      \ 4\u20137 per 100 words."
+    - Frequent abstract/Latinate lexis and unglossed discipline terms (e.g., facilitate,
+      orthogonal, granular, throughput), replacing phrasal verbs with compact verbs.
+    - Preference for derived nouns (-tion, -ity, -ance) and noun phrases (e.g., implementation
+      details, risk mitigation strategy).
+  - range: [4.0, 4.0]
+    label: Expert
+    indicators:
+    - Dominant C1-C2; low-frequency content tokens (Zipf < 3.5) > 18%; nominalizations
+      > 7 per 100 words.
+    - Dense specialized terminology and rare items used fluently without explanation
+      (e.g., heteroskedasticity, manifold, epistemic status, operationalization, orthogonality).
+    - Highly abstract, noun-heavy style with layered nominal compounds and precise
+      qualifiers (e.g., marginal identifiability constraints; calibration monotonicity),
+      minimal reliance on everyday verbs.
+  guidelines:
+  - High proportion of low-frequency words or advanced synonyms instead of common
+    equivalents
+  - Frequent nominalizations and abstract nouns (e.g., optimization, heterogeneity)
+  - Preference for precise qualifiers over plain wording (e.g., necessary and sufficient,
+    orthogonal)
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-terminology-density
+  name: Technical Terminology and Acronyms
+  version: '1.0'
+  description: Measures the density of domain-specific terms and acronyms and whether
+    they are defined or expanded on first use. Count unique technical terms/acronyms
+    per 100 words (types, not tokens), excluding everyday vocabulary, and record the
+    share that are explicitly defined at first mention. For texts shorter or longer
+    than 100 words, scale counts proportionally to a per-100-words rate.
+  scoring_description: Score how well the response demonstrates technical terminology
+    and acronyms
+  definition: Measures the density of domain-specific terms and acronyms and whether
+    they are defined or expanded on first use. Count unique technical terms/acronyms
+    per 100 words (types, not tokens), excluding everyday vocabulary, and record the
+    share that are explicitly defined at first mention. For texts shorter or longer
+    than 100 words, scale counts proportionally to a per-100-words rate.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Basic
+    indicators:
+    - "0\u20131 unique technical terms/acronyms per 100 words."
+    - Any rare term is immediately defined in plain language; acronyms expanded on
+      first use.
+    - Meaning does not rely on specialized terminology.
+  - range: [1.0, 1.9]
+    label: Simple
+    indicators:
+    - "2\u20134 unique technical terms/acronyms per 100 words."
+    - "\u226590% of terms/acronyms are expanded or clearly defined on first use."
+    - General wording carries the meaning; jargon is optional and sparing.
+  - range: [2.0, 2.9]
+    label: Intermediate
+    indicators:
+    - "5\u20138 unique technical terms/acronyms per 100 words."
+    - "About 50\u201380% of terms/acronyms are defined on first use; some assumed\
+      \ knowledge."
+    - Some reliance on introduced terms, with brief context mitigating ambiguity.
+  - range: [3.0, 3.9]
+    label: Advanced
+    indicators:
+    - "9\u201314 unique technical terms/acronyms per 100 words."
+    - <50% of terms/acronyms are defined on first use; several left implicit.
+    - Understanding substantially depends on jargon familiarity with limited scaffolding.
+  - range: [4.0, 4.0]
+    label: Expert
+    indicators:
+    - "\u226515 unique technical terms/acronyms per 100 words."
+    - "\u226410% of terms/acronyms are defined on first use; acronyms and shorthand\
+      \ used without expansion."
+    - Heavy reliance on dense, domain-specific terminology throughout; assumes reader
+      fluency.
+  guidelines:
+  - Multiple domain terms or acronyms per 100 words (e.g., SDK, OAuth, heteroskedasticity)
+  - Acronyms introduced without expansion and relied upon for meaning
+  - Jargon integrated as core semantics rather than paraphrased for lay readers
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-syntactic-complexity
+  name: Syntactic and Structural Complexity
+  version: '1.0'
+  description: Measures how structurally complex the writing is, focusing on clause
+    embedding, subordination, hedging/modality, and variation in sentence length.
+    Scoring emphasizes quantitative markers (mean sentence length, clauses per sentence,
+    frequency of subordinators/modals) and the dominant syntactic register, independent
+    of correctness or content. Anchor examples illustrate typical sentences at each
+    level.
+  scoring_description: Score how well the response demonstrates syntactic and structural
+    complexity
+  definition: Measures how structurally complex the writing is, focusing on clause
+    embedding, subordination, hedging/modality, and variation in sentence length.
+    Scoring emphasizes quantitative markers (mean sentence length, clauses per sentence,
+    frequency of subordinators/modals) and the dominant syntactic register, independent
+    of correctness or content. Anchor examples illustrate typical sentences at each
+    level.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Basic
+    indicators:
+    - "Quantitative markers: Mean sentence length (MSL) \u2264 10 words; Clauses per\
+      \ sentence (C/S) \u2248 1.0\u20131.1; Subordinators per 100 words (SUB/100)\
+      \ \u2264 1; sentence-length variation low (CV \u2264 0.25)."
+    - 'Structure/features: Single independent clauses; imperatives or simple declaratives;
+      no hedging or modals beyond can/will used literally; minimal coordination, virtually
+      no subordination.'
+    - 'Anchor example: "Click Save. Enter your name. The form closes."'
+  - range: [1.0, 1.9]
+    label: Simple
+    indicators:
+    - "Quantitative markers: MSL 11\u201315 words; C/S 1.0\u20131.3; SUB/100 1\u2013\
+      3; CV 0.25\u20130.40."
+    - 'Structure/features: Mostly simple or coordinated clauses (and, but); rare subordination
+      (because/when) and few relative clauses; hedging/modals are rare and unlayered
+      (may, might used sparingly).'
+    - 'Anchor example: "Open the app and sign in, then choose Settings. If prompted,
+      enter your PIN."'
+  - range: [2.0, 2.9]
+    label: Intermediate
+    indicators:
+    - "Quantitative markers: MSL 16\u201322 words; C/S 1.4\u20131.9; SUB/100 4\u2013\
+      7; CV 0.35\u20130.55."
+    - 'Structure/features: Mix of compound and complex sentences with some relative
+      and adverbial clauses; occasional non-finite clauses (to/ing) and hedging/modals
+      appear (e.g., may, generally, typically).'
+    - 'Anchor example: "If the service is unavailable, the client retries the request,
+      which may increase latency during peak hours."'
+  - range: [3.0, 3.9]
+    label: Advanced
+    indicators:
+    - "Quantitative markers: MSL 23\u201330 words; C/S 2.0\u20132.7; SUB/100 8\u2013\
+      12; CV 0.50\u20130.70."
+    - 'Structure/features: Frequent subordination and embedded relative/non-finite
+      clauses; layered conditionals and concessives; routine hedging with precise
+      modality (may/might/should/likely) and parenthetical qualifiers.'
+    - 'Anchor example: "Although the cache typically reduces fetch times, which it
+      often does in steady state, it can, under contention, exacerbate tail latency
+      and should therefore be tuned cautiously."'
+  - range: [4.0, 4.0]
+    label: Expert
+    indicators:
+    - "Quantitative markers: MSL \u2265 31 words; C/S \u2265 2.8; SUB/100 \u2265 13;\
+      \ CV \u2265 0.70 (very short sentences interspersed with highly embedded ones)."
+    - 'Structure/features: Dense, nested embedding with stacked relative, concessive,
+      and conditional clauses; frequent non-finite and appositive structures; pervasive
+      hedging and precise modality interwoven with parentheticals or asides.'
+    - "Anchor example: \"While the estimator\u2014which, when regularized appropriately,\
+      \ can mitigate variance under small-n regimes\u2014often outperforms naive baselines,\
+      \ it may, if hyperparameters drift or covariate shift intensifies, induce bias\
+      \ that is nontrivial to diagnose. Proceed cautiously.\""
+  guidelines:
+  - Average clauses per sentence exceeds simple baseline (e.g., frequent subordination/relative
+    clauses)
+  - Regular use of hedges/modality and precise conditionals (e.g., may, unless, provided
+    that)
+  - Long or nested sentences with appositives, parentheticals, or complex coordination
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-assumed-knowledge
+  name: Assumed Background Knowledge
+  version: '1.0'
+  description: Rates how much prior domain familiarity a response presumes from the
+    reader. Low scores indicate extensive scaffolding with definitions, lay rephrasing,
+    and examples; high scores indicate expert-only discourse with little to no onboarding
+    or context.
+  scoring_description: Score how well the response demonstrates assumed background
+    knowledge
+  definition: Rates how much prior domain familiarity a response presumes from the
+    reader. Low scores indicate extensive scaffolding with definitions, lay rephrasing,
+    and examples; high scores indicate expert-only discourse with little to no onboarding
+    or context.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Fully Scaffolded
+    indicators:
+    - Defines all domain terms and expands acronyms at first use with plain-language
+      rephrasing.
+    - Provides step-by-step context and concrete examples or analogies before and
+      during tasks.
+    - States prerequisites explicitly and avoids assuming any prior familiarity.
+  - range: [1.0, 1.9]
+    label: Light Scaffolding
+    indicators:
+    - Explains key terms in simple language and expands most acronyms; includes a
+      brief overview.
+    - Offers at least one example or analogy and clarifies why steps are taken.
+    - Assumes only everyday knowledge; notes basic prerequisites.
+  - range: [2.0, 2.9]
+    label: Moderate Scaffolding
+    indicators:
+    - Uses several domain terms with brief parenthetical definitions or quick clarifications.
+    - Provides a concise overview and high-level steps but omits detailed explanations
+      and some context.
+    - Assumes general technical literacy or familiarity with common tools, not specialized
+      frameworks.
+  - range: [3.0, 3.9]
+    label: Familiarity Assumed
+    indicators:
+    - Employs specialized terms and acronyms with minimal or no definitions; may include
+      terse references.
+    - Presents directives or procedures without examples or justification.
+    - Expects readers to infer prerequisites and context from domain norms.
+  - range: [4.0, 4.0]
+    label: Expert-Only
+    indicators:
+    - Dense, unexpanded jargon and multiple acronyms used throughout with no lay rephrasing.
+    - Provides instructions or arguments that omit context, rationale, examples, and
+      prerequisites entirely.
+    - Relies on advanced references (e.g., standards, theorems, specs) as assumed
+      knowledge.
+  guidelines:
+  - Minimal or no definitions/explanations for nontrivial concepts
+  - References to domain practices or concepts without context or analogies
+  - Instructions that skip foundational steps, implying shared expertise
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-formalism-and-references
+  name: Formalism and Professional Conventions
+  version: '1.0'
+  description: Measures how strongly a response employs professional standards, protocols,
+    formal notation, schemas, and cross-references typical of scholarly or industry
+    documentation. Distinguishes casual jargon from true formal artifacts (e.g., RFC/ISO
+    identifiers, section citations, typed schemas, equations). Higher scores reflect
+    frequent, central, and precise use of such artifacts to structure and justify
+    the content.
+  scoring_description: Score how well the response demonstrates formalism and professional
+    conventions
+  definition: Measures how strongly a response employs professional standards, protocols,
+    formal notation, schemas, and cross-references typical of scholarly or industry
+    documentation. Distinguishes casual jargon from true formal artifacts (e.g., RFC/ISO
+    identifiers, section citations, typed schemas, equations). Higher scores reflect
+    frequent, central, and precise use of such artifacts to structure and justify
+    the content.
+  criteria:
+  - range: [0.0, 0.9]
+    label: None
+    indicators:
+    - No standards/protocol citations, identifiers, sections, or formal notation;
+      relies on generic prose.
+    - Jargon may appear, but there are no schemas, equations, parameter names, or
+      cross-references.
+    - Units, definitions, and constraints are omitted or expressed informally.
+  - range: [1.0, 1.9]
+    label: Limited
+    indicators:
+    - Incidental, non-specific nods to formality (e.g., "use HTTPS" or "follow ISO")
+      without IDs, versions, or sections; not central to the argument.
+    - Occasional parameter or field names appear but lack formal definitions, types,
+      or constraints; no schemas/equations.
+    - No normative language, versioning, or cross-references; units used inconsistently
+      or not at all.
+  - range: [2.0, 2.9]
+    label: Moderate
+    indicators:
+    - Includes at least one precise formal reference (e.g., RFC/ISO number) or exact
+      API/CLI parameter names with types or defaults.
+    - Provides a small, correct formal artifact (e.g., minimal JSON/XML snippet, simple
+      equation, brief error code list) that supports but does not organize the whole
+      response.
+    - Limited cross-referencing or versioning; formal elements appear in parts rather
+      than consistently throughout.
+  - range: [3.0, 3.9]
+    label: Advanced
+    indicators:
+    - "Multiple specific standards/protocol references (e.g., RFC 7231 \xA74.3.1;\
+      \ ISO/IEC 27001:2013) or spec-compliant terminology used correctly and centrally."
+    - 'Structured formal artifacts shape the response: validated schemas, function
+      signatures, configuration stanzas, units and constraints, or state-machine descriptions.'
+    - 'Consistent professional conventions: normative keywords (MUST/SHOULD), versioning,
+      and internal cross-references that tie claims to sources or sections.'
+  - range: [4.0, 4.0]
+    label: Expert
+    indicators:
+    - 'Dense, integrated use of formalism across the response: interlinked standards
+      with identifiers and sections, formal definitions and invariants, precise parameterization
+      with units/domains, and explicit assumptions.'
+    - Provides comprehensive, specification-grade artifacts (e.g., full JSON Schema/OpenAPI
+      fragment, UML/ER constraints, algorithm pseudocode with complexity, or mathematical
+      notation) that govern structure and behavior.
+    - "Traceable citations and cross-references (e.g., \"per RFC 5280 \xA74.2.1.2\"\
+      ), accurate normative language, documented versioning/change control, and edge-case\
+      \ handling aligned to the cited standards."
+  guidelines:
+  - Cites or relies on standards/frameworks/protocols (e.g., RFCs, ISO, API/CLI flags)
+    as shared knowledge
+  - Includes formal notation, schemas, parameter signatures, or precise definitions
+  - Interlinks specialized concepts across subdomains with minimal scaffolding
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-verbosity-judge-minimal-overage
+  name: Minimal Sufficiency Overage
+  version: '1.0'
+  description: "Measures how far a response\u2019s length exceeds the minimally sufficient\
+    \ amount for its prompt type. Establish a minimal baseline (e.g., one sentence\
+    \ for fact lookup, one command for shell tasks, a minimal patch for short fixes),\
+    \ then compute the overage ratio r = actual length \xF7 baseline length using\
+    \ words for prose-heavy responses and code lines for code-first responses. Under-length\
+    \ or exactly minimal responses are treated as zero overage."
+  scoring_description: Score how well the response demonstrates minimal sufficiency
+    overage
+  definition: "Measures how far a response\u2019s length exceeds the minimally sufficient\
+    \ amount for its prompt type. Establish a minimal baseline (e.g., one sentence\
+    \ for fact lookup, one command for shell tasks, a minimal patch for short fixes),\
+    \ then compute the overage ratio r = actual length \xF7 baseline length using\
+    \ words for prose-heavy responses and code lines for code-first responses. Under-length\
+    \ or exactly minimal responses are treated as zero overage."
+  criteria:
+  - range: [0.0, 0.9]
+    label: No Overage
+    indicators:
+    - "Overage ratio r \u2264 1.05 relative to the defined minimal baseline (use words\
+      \ for prose-heavy, lines for code-first)."
+    - Contains only the direct output with no added examples, options, or structural
+      expansion (lists/sections).
+  - range: [1.0, 1.9]
+    label: Slight Overage
+    indicators:
+    - "1.05 < r \u2264 1.20 above the minimal baseline."
+    - "At most one brief extra clause or note in prose, or \u22642 extra code lines;\
+      \ no lists, headings, or multi-step expansions."
+  - range: [2.0, 2.9]
+    label: Moderate Overage
+    indicators:
+    - "1.20 < r \u2264 1.60 above the minimal baseline."
+    - "One short supporting sentence or a compact list (\u22643 bullets), or small\
+      \ code additions/wrappers (e.g., minor boilerplate) without extended narrative."
+  - range: [3.0, 3.9]
+    label: Large Overage
+    indicators:
+    - "1.60 < r \u2264 2.50 above the minimal baseline."
+    - Multiple sentences/paragraphs or multi-step list; code accompanied by notable
+      commentary, options, or examples that expand length substantially.
+  - range: [4.0, 4.0]
+    label: Extreme Overage
+    indicators:
+    - r > 2.50 above the minimal baseline.
+    - 'Extensive expansion: multiple sections/examples, long lists, or large code
+      blocks with substantial narrative well beyond what the prompt minimally requires.'
+  guidelines:
+  - "Word/line count ratio to estimated minimum (e.g., >2\xD7 indicates overage)."
+  - Code lines exceed the minimal functional snippet by a large margin.
+  - Includes additional sentences where a single direct line would suffice.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-structural-expansion
+  name: Structural Expansion
+  version: '1.0'
+  description: "Measures how much organizational structure (headings, sections, lists,\
+    \ sub-bullets, tables/callouts) is added beyond a direct, linear answer. Scoring\
+    \ reflects the volume and complexity of structure relative to a minimally structured\
+    \ response for the task type. It does not judge content quality or correctness\u2014\
+    only the extent of structural buildup."
+  scoring_description: Score how well the response demonstrates structural expansion
+  definition: "Measures how much organizational structure (headings, sections, lists,\
+    \ sub-bullets, tables/callouts) is added beyond a direct, linear answer. Scoring\
+    \ reflects the volume and complexity of structure relative to a minimally structured\
+    \ response for the task type. It does not judge content quality or correctness\u2014\
+    only the extent of structural buildup."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Minimal
+    indicators:
+    - 'No explicit structure: a single sentence or compact paragraph; or a single
+      short code block with no headings.'
+    - No lists, steps, sections, tables, callouts, or nesting.
+    - Structure matches a direct answer only (no organizational scaffolding).
+  - range: [1.0, 1.9]
+    label: Low
+    indicators:
+    - "One light structural element: a short list (up to 3 items) or a brief 2\u2013\
+      3 step sequence; no headings or sections."
+    - No nesting or sub-bullets; no tables/callouts; mostly linear text.
+    - "May include a simple label (e.g., \u201CAnswer:\u201D) but no additional partitioning."
+  - range: [2.0, 2.9]
+    label: Moderate
+    indicators:
+    - "One primary list of about 3\u20136 items or a single section with a heading\
+      \ plus one list."
+    - "At most 1 level of sub-bullets for 1\u20132 items; no more than one section\
+      \ heading overall."
+    - No tables/callouts; minimal intro/outro beyond the single structured block.
+  - range: [3.0, 3.9]
+    label: High
+    indicators:
+    - "Multiple structured parts: 2\u20133 sections with headings or a multi-step\
+      \ procedure of 6+ steps."
+    - Some nesting (sub-bullets up to depth 2) and/or inclusion of one auxiliary element
+      (e.g., a single table or callout).
+    - Clear scaffolding with intro plus sections and lists, but limited to a small
+      set of sections.
+  - range: [4.0, 4.0]
+    label: Extensive
+    indicators:
+    - "Several sections (4+), or a long step-by-step broken into subsections; multiple\
+      \ lists with nested bullets (depth \u22652) in multiple places."
+    - Use of multiple structural elements across the response (headings/subheadings,
+      numbered and bulleted lists, tables/callouts, labeled tips/FAQs).
+    - Heavy organizational scaffolding well beyond a direct answer (overview, prerequisites,
+      steps, alternatives, conclusions, etc.).
+  guidelines:
+  - Presence and count of headings/sections beyond none.
+  - List length and depth (e.g., number of bullets/steps, sub-bullets).
+  - Multi-paragraph layout instead of a single sentence or snippet.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-extras-density
+  name: Extra Details Density
+  version: '1.0'
+  description: "Measures how much optional content is added beyond the core answer.\
+    \ Identify the minimal direct answer, then count discrete extras such as examples,\
+    \ caveats, background points, alternatives/options, tips, references, or edge\
+    \ cases. Do not judge correctness\u2014only the volume of add-ons."
+  scoring_description: Score how well the response demonstrates extra details density
+  definition: "Measures how much optional content is added beyond the core answer.\
+    \ Identify the minimal direct answer, then count discrete extras such as examples,\
+    \ caveats, background points, alternatives/options, tips, references, or edge\
+    \ cases. Do not judge correctness\u2014only the volume of add-ons."
+  criteria:
+  - range: [0.0, 0.9]
+    label: None
+    indicators:
+    - Adds 0 extras; only the direct answer with no examples, caveats, background,
+      options, tips, or references.
+    - No side notes or expansions; strictly the minimal response.
+  - range: [1.0, 1.9]
+    label: Few
+    indicators:
+    - "Adds 1\u20132 extras total (e.g., one brief example or a single caveat/background\
+      \ note)."
+    - Extras are concise and occupy a small fraction of the response; the core answer
+      clearly dominates.
+  - range: [2.0, 2.9]
+    label: Several (Low)
+    indicators:
+    - "Adds about 3 extras total, or 2\u20133 with modest elaboration."
+    - Extras provide limited breadth (e.g., a couple of examples and one caveat) without
+      separate sections or extensive detail.
+  - range: [3.0, 3.9]
+    label: Several (High)
+    indicators:
+    - "Adds 4\u20135 extras total, spanning multiple types (examples, caveats, background,\
+      \ options, tips, references)."
+    - Extras are prominent and comparable in space to the core answer but do not dominate
+      the entire response.
+  - range: [4.0, 4.0]
+    label: Many
+    indicators:
+    - Adds more than 5 extras (6+), often including multiple examples plus caveats,
+      background sections, options/variations, tips, or references.
+    - Extras dominate the response length or structure, with noticeable expansion
+      (e.g., dedicated sections or extended lists of add-ons).
+  guidelines:
+  - Number of examples or variations provided.
+  - Count of caveats, tips, or background explanations included.
+  - Alternative approaches/options presented beyond the primary answer.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-redundancy
+  name: Redundancy and Repetition
+  version: '1.0'
+  description: "Measures how much a response repeats the same information or ideas\
+    \ without adding new value. Counts both explicit repeats and paraphrased restatements\
+    \ that inflate length, while excluding legitimate cross-references (e.g., \u201C\
+    see step 2\u201D). Emphasis is on unique information density versus duplicated\
+    \ content."
+  scoring_description: Score how well the response demonstrates redundancy and repetition
+  definition: "Measures how much a response repeats the same information or ideas\
+    \ without adding new value. Counts both explicit repeats and paraphrased restatements\
+    \ that inflate length, while excluding legitimate cross-references (e.g., \u201C\
+    see step 2\u201D). Emphasis is on unique information density versus duplicated\
+    \ content."
+  criteria:
+  - range: [0.0, 0.9]
+    label: None
+    indicators:
+    - No repeated statements or paraphrased restatements (0 repeats).
+    - Each sentence/bullet introduces new information; no echoing of prior points.
+    - No duplicated headings, recap sentences, or redundant disclaimers.
+  - range: [1.0, 1.9]
+    label: Minor
+    indicators:
+    - Exactly 1 repeated point (one repeat or brief paraphrase of the same idea).
+    - Redundancy limited to a short clause or single sentence; otherwise unique content.
+    - "Estimated duplicated content \u226410% and not beyond legitimate step references."
+  - range: [2.0, 2.9]
+    label: Moderate
+    indicators:
+    - "2\u20133 repeated points or paraphrased restatements of the same idea."
+    - "Some recap phrasing (e.g., re-stating the request or repeating a caveat) across\
+      \ 1\u20132 places."
+    - "Estimated duplicated content ~10\u201320%; repetition is noticeable but not\
+      \ pervasive."
+  - range: [3.0, 3.9]
+    label: Heavy
+    indicators:
+    - "4\u20135 repeated points or paraphrased restatements across multiple sentences/sections."
+    - Multiple bullets or paragraphs restate the same guidance or caveats without
+      new detail.
+    - "Estimated duplicated content ~20\u201335%; redundancy materially inflates length."
+  - range: [4.0, 4.0]
+    label: Severe
+    indicators:
+    - "\u22656 repeats or entire sentences/paragraphs that restate prior content,\
+      \ including duplicated headings or summaries."
+    - Redundancy is pervasive across the response, with circular restatement of key
+      points.
+    - Estimated duplicated content >35%; clear padding or verbosity driven by repetition.
+  guidelines:
+  - Restates the same point in multiple sentences.
+  - Duplicated disclaimers or instructions.
+  - Paraphrased repetition across sections or bullets.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-framing-padding
+  name: Framing and Padding
+  version: '1.0'
+  description: Measures the amount of non-essential preambles, meta-commentary, and
+    sign-offs that wrap the core answer. Isolates opening and closing material and
+    evaluates its length and necessity relative to the task. Brief, essential context
+    may be acceptable; otherwise it counts as padding.
+  scoring_description: Score how well the response demonstrates framing and padding
+  definition: Measures the amount of non-essential preambles, meta-commentary, and
+    sign-offs that wrap the core answer. Isolates opening and closing material and
+    evaluates its length and necessity relative to the task. Brief, essential context
+    may be acceptable; otherwise it counts as padding.
+  criteria:
+  - range: [0.0, 0.9]
+    label: None
+    indicators:
+    - "No greeting, apology, sign-off, or meta-statements (e.g., \u201CAs an AI\u2026\
+      \u201D); begins directly with core content."
+    - Zero standalone framing sentences; any context is embedded and clearly necessary
+      for understanding.
+    - No closing filler or calls-to-action beyond the answer itself.
+  - range: [1.0, 1.9]
+    label: Brief
+    indicators:
+    - At most one short framing sentence (opening or closing) that is clearly task-relevant
+      or necessary.
+    - No greeting/sign-off; no generic disclaimers or apologies.
+    - "Framing \u226410% of total response length."
+  - range: [2.0, 2.9]
+    label: Moderate
+    indicators:
+    - "Noticeable framing: 2\u20133 sentences or a short paragraph across opening/closing."
+    - "May include a brief greeting, apology, or generic caveat (e.g., \u201CI can\
+      \ help with\u2026\u201D); limited redundancy."
+    - "Framing occupies roughly 10\u201325% of the total response."
+  - range: [3.0, 3.9]
+    label: Long
+    indicators:
+    - "Heavy framing: \u22651 full paragraph combined across preamble/closing, or\
+      \ multiple sentences at both start and end."
+    - Includes generic disclaimers, restatements, and/or greeting plus sign-off; noticeable
+      template language.
+    - "Framing occupies roughly 25\u201340% of the total response."
+  - range: [4.0, 4.0]
+    label: Excessive
+    indicators:
+    - Multiple paragraphs or extended sections of preamble/closing; often longer than
+      the core answer.
+    - Extensive boilerplate, policy/legal disclaimers, repeated apologies or greetings/sign-offs,
+      or meta-context that overwhelms content.
+    - Framing >40% of total length; core content is buried within or after padding.
+  guidelines:
+  - Lengthy introductions, apologies, or context-setting not required by the prompt.
+  - Extended sign-offs or postambles.
+  - Boilerplate safety/format notes unrelated to user constraints.
+  score_range: [0.0, 4.0]
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
