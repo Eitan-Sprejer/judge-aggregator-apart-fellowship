@@ -52,13 +52,13 @@ class GAMHyperparameterTuner:
 
         Returns:
             Dictionary with:
-                - n_splines: List of spline counts to test (7 values)
+                - n_splines: List of spline counts to test (10 values)
                 - lam_grid: Log-spaced lambda values from 0.1 to 100 (20 values)
                 - max_iter: Fixed iteration limit
                 - tol: Fixed convergence tolerance
         """
         return {
-            'n_splines': [3, 5, 8, 10, 15, 20, 25],  # Expanded from 3 to 7 values
+            'n_splines': [5, 7, 10, 12, 15, 18, 20, 25, 30, 35],  # 10 values (n_splines=3 removed due to PyGAM constraint: n_splines must be > spline_order=3)
             'lam_grid': np.logspace(-1, 2, 20),  # Log-spaced: 0.1 to 100 (20 values)
             'max_iter': 100,
             'tol': 1e-4
@@ -380,7 +380,7 @@ class GAMHyperparameterTuner:
         Note:
             GAM search is always exhaustive over n_splines values.
             PyGAM's gridsearch finds optimal lambda for each n_splines.
-            Search space: 7 n_splines × 20 lambda values = 140 total evaluations.
+            Search space: 10 n_splines × 20 lambda values = 200 total evaluations.
         """
 
         search_space = self.define_search_space()
