@@ -169,6 +169,9 @@ Provide your evaluation following the rubric criteria."""
 
                 if not is_gpt5:
                     request_params["temperature"] = self.temperature
+                else:
+                    # For gpt-5 models, reduce reasoning effort for simple judge evaluations
+                    request_params["reasoning"] = {"effort": "low"}
 
                 response = self.client.responses.parse(**request_params)
                 return response.output_parsed.model_dump()
