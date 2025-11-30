@@ -1,0 +1,296 @@
+[
+  {
+    "config": {
+      "n_splines": 5,
+      "lam": 3.722961127500555,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.3092493150707114,
+      "mae": 0.9015266705181796,
+      "r2": 0.2148104027279487,
+      "spearman_rho": 0.3874985524730314,
+      "kendall_tau": 0.3029354458027928,
+      "pearson_r": 0.46362765047968757
+    },
+    "gam_metrics": {
+      "aic": 2159.8209602932393,
+      "edof": 8.905838292198721,
+      "gcv": 1.3586144438261272,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Correctness Judge Requirement Coverage": 0.8118389679747389,
+      "Helpsteer2 Correctness Judge Factual Accuracy": 0.9517862679774766,
+      "Helpsteer2 Correctness Judge Grounding And Non Hallucination": 0.9994147935859561,
+      "Helpsteer2 Correctness Judge Procedural Correctness": 0.9978742123708413,
+      "Helpsteer2 Correctness Judge Uncertainty Handling": 0.7604285721792158
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.21642873752209796,
+      "train_r2_std": 0.03297731386089876,
+      "val_r2_mean": 0.17019818489572205,
+      "val_r2_std": 0.1059646413357282,
+      "train_mse_mean": 1.3043138996423846,
+      "train_mse_std": 0.029055993351526466,
+      "val_mse_mean": 1.3566388374240257,
+      "val_mse_std": 0.12909320377360117,
+      "best_lam_mean": 3.722961127500555,
+      "best_lam_std": 1.623886364993946
+    },
+    "test_metrics": {
+      "mse": 1.0027344785055132,
+      "mae": 0.8339786245994965,
+      "r2": 0.3709977134309379,
+      "spearman_rho": 0.40204956940127773,
+      "kendall_tau": 0.3119054906656916,
+      "pearson_r": 0.6362742213669629
+    }
+  },
+  {
+    "config": {
+      "n_splines": 10,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.3009310117634045,
+      "mae": 0.8980093752318992,
+      "r2": 0.21979909750797866,
+      "spearman_rho": 0.3910895000991595,
+      "kendall_tau": 0.30606284856359167,
+      "pearson_r": 0.46896447221868687
+    },
+    "gam_metrics": {
+      "aic": 2160.6720447238336,
+      "edof": 11.403863172452448,
+      "gcv": 1.364239703519934,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Correctness Judge Requirement Coverage": 0.3748393953862911,
+      "Helpsteer2 Correctness Judge Factual Accuracy": 0.9295973097352047,
+      "Helpsteer2 Correctness Judge Grounding And Non Hallucination": 0.9875533587165282,
+      "Helpsteer2 Correctness Judge Procedural Correctness": 0.9743140195247788,
+      "Helpsteer2 Correctness Judge Uncertainty Handling": 0.49953250433302476
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.22175957749541658,
+      "train_r2_std": 0.03322890087944158,
+      "val_r2_mean": 0.17013414544773972,
+      "val_r2_std": 0.10765621659176536,
+      "train_mse_mean": 1.295446909432097,
+      "train_mse_std": 0.030725320063777713,
+      "val_mse_mean": 1.3559188333456014,
+      "val_mse_std": 0.12611769779815682,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.00206321034996,
+      "mae": 0.8349798451169543,
+      "r2": 0.3714187912075526,
+      "spearman_rho": 0.38850123493670113,
+      "kendall_tau": 0.29817948181184534,
+      "pearson_r": 0.6375633730898763
+    }
+  },
+  {
+    "config": {
+      "n_splines": 8,
+      "lam": 83.56971640069472,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.3082820724789135,
+      "mae": 0.901395505398593,
+      "r2": 0.2153904823295768,
+      "spearman_rho": 0.38695496149327374,
+      "kendall_tau": 0.3024916927083551,
+      "pearson_r": 0.4642684482607236
+    },
+    "gam_metrics": {
+      "aic": 2160.264006129562,
+      "edof": 9.332265549435181,
+      "gcv": 1.3600423149303642,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Correctness Judge Requirement Coverage": 0.5885653199534777,
+      "Helpsteer2 Correctness Judge Factual Accuracy": 0.9766734319893005,
+      "Helpsteer2 Correctness Judge Grounding And Non Hallucination": 0.9985952435586005,
+      "Helpsteer2 Correctness Judge Procedural Correctness": 0.9909545017627321,
+      "Helpsteer2 Correctness Judge Uncertainty Handling": 0.6296724372635414
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.21673098984861233,
+      "train_r2_std": 0.032867201720124896,
+      "val_r2_mean": 0.16980731866075385,
+      "val_r2_std": 0.10644706228208851,
+      "train_mse_mean": 1.3038264507606376,
+      "train_mse_std": 0.02953186007083745,
+      "val_mse_mean": 1.357220237736668,
+      "val_mse_std": 0.12969905751204164,
+      "best_lam_mean": 83.56971640069472,
+      "best_lam_std": 21.209263123452253
+    },
+    "test_metrics": {
+      "mse": 0.9988846542068565,
+      "mae": 0.8322834475153734,
+      "r2": 0.3734126581033833,
+      "spearman_rho": 0.40161050300659246,
+      "kendall_tau": 0.31046064762844466,
+      "pearson_r": 0.6387381595474172
+    }
+  },
+  {
+    "config": {
+      "n_splines": 15,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.2890746426829012,
+      "mae": 0.8917282468680603,
+      "r2": 0.22690965892379755,
+      "spearman_rho": 0.3967994249641501,
+      "kendall_tau": 0.3110075259016116,
+      "pearson_r": 0.47643869284024687
+    },
+    "gam_metrics": {
+      "aic": 2166.905029879997,
+      "edof": 16.96633504140545,
+      "gcv": 1.3840795613369246,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Correctness Judge Requirement Coverage": 0.3486832404287734,
+      "Helpsteer2 Correctness Judge Factual Accuracy": 0.9983092947595886,
+      "Helpsteer2 Correctness Judge Grounding And Non Hallucination": 0.9883773519064264,
+      "Helpsteer2 Correctness Judge Procedural Correctness": 0.8738305711012926,
+      "Helpsteer2 Correctness Judge Uncertainty Handling": 0.683155974123099
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.23161478025110185,
+      "train_r2_std": 0.0344177808025899,
+      "val_r2_mean": 0.15869378319837696,
+      "val_r2_std": 0.11120737793750603,
+      "train_mse_mean": 1.278973594495349,
+      "train_mse_std": 0.03207196402494809,
+      "val_mse_mean": 1.3737482431710737,
+      "val_mse_std": 0.12577076091093578,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.0127819695858937,
+      "mae": 0.8403959634306707,
+      "r2": 0.3646950530564179,
+      "spearman_rho": 0.39143357121549266,
+      "kendall_tau": 0.29926311408978057,
+      "pearson_r": 0.6330436285377874
+    }
+  },
+  {
+    "config": {
+      "n_splines": 20,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.2794891652486295,
+      "mae": 0.8871299608978284,
+      "r2": 0.23265830975724844,
+      "spearman_rho": 0.402444077808282,
+      "kendall_tau": 0.3157620233420154,
+      "pearson_r": 0.4824574379273077
+    },
+    "gam_metrics": {
+      "aic": 2172.440148178386,
+      "edof": 21.663093787161976,
+      "gcv": 1.401737143994654,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Correctness Judge Requirement Coverage": 0.26899770096757736,
+      "Helpsteer2 Correctness Judge Factual Accuracy": 0.9943194966915332,
+      "Helpsteer2 Correctness Judge Grounding And Non Hallucination": 0.9672432814596854,
+      "Helpsteer2 Correctness Judge Procedural Correctness": 0.8655081830292344,
+      "Helpsteer2 Correctness Judge Uncertainty Handling": 0.6728336429551023
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.23915473140842244,
+      "train_r2_std": 0.035460507083146825,
+      "val_r2_mean": 0.14657637574226945,
+      "val_r2_std": 0.11492192756955183,
+      "train_mse_mean": 1.2663779730035256,
+      "train_mse_std": 0.03387429691244135,
+      "val_mse_mean": 1.3931856596935872,
+      "val_mse_std": 0.1301037941062484,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.0162415598960537,
+      "mae": 0.8429631042089997,
+      "r2": 0.362524897085591,
+      "spearman_rho": 0.39389547921426404,
+      "kendall_tau": 0.3010691678863393,
+      "pearson_r": 0.6322603945204999
+    }
+  },
+  {
+    "config": {
+      "n_splines": 25,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 1.2709519403643148,
+      "mae": 0.8830888595767764,
+      "r2": 0.23777829728870947,
+      "spearman_rho": 0.40886708305983777,
+      "kendall_tau": 0.320569348531757,
+      "pearson_r": 0.4877647427677646
+    },
+    "gam_metrics": {
+      "aic": 2176.812600616715,
+      "edof": 25.63118835766704,
+      "gcv": 1.4165056980961444,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Correctness Judge Requirement Coverage": 0.16192965548281757,
+      "Helpsteer2 Correctness Judge Factual Accuracy": 0.9951151856859565,
+      "Helpsteer2 Correctness Judge Grounding And Non Hallucination": 0.9971755431794581,
+      "Helpsteer2 Correctness Judge Procedural Correctness": 0.8632355764045341,
+      "Helpsteer2 Correctness Judge Uncertainty Handling": 0.5962942390185433
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.24570417085305934,
+      "train_r2_std": 0.036223301897199925,
+      "val_r2_mean": 0.13690164785887526,
+      "val_r2_std": 0.11836484925765364,
+      "train_mse_mean": 1.2554495058671933,
+      "train_mse_std": 0.03553022654323358,
+      "val_mse_mean": 1.408762589294491,
+      "val_mse_std": 0.13540420042295775,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 1.0185264677248722,
+      "mae": 0.8446535854364148,
+      "r2": 0.36109160414540165,
+      "spearman_rho": 0.39106506906281024,
+      "kendall_tau": 0.29962432484909235,
+      "pearson_r": 0.631638266643981
+    }
+  }
+]

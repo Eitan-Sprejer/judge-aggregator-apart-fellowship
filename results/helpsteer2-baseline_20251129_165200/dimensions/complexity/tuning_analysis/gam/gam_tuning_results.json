@@ -1,0 +1,296 @@
+[
+  {
+    "config": {
+      "n_splines": 10,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.34929504957748064,
+      "mae": 0.4664397904116483,
+      "r2": 0.2681042105291982,
+      "spearman_rho": 0.448966338142878,
+      "kendall_tau": 0.3613287191331533,
+      "pearson_r": 0.5178983254031924
+    },
+    "gam_metrics": {
+      "aic": 1749.2720253114203,
+      "edof": 11.292649036880709,
+      "gcv": 0.36612148043719894,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Complexity Judge Lexical Sophistication": 0.9999999085478491,
+      "Helpsteer2 Complexity Judge Terminology Density": 0.9924232428018244,
+      "Helpsteer2 Complexity Judge Syntactic Complexity": 0.7433729904034274,
+      "Helpsteer2 Complexity Judge Assumed Knowledge": 0.711359652047989,
+      "Helpsteer2 Complexity Judge Formalism And References": 0.9434950578235245
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.271460687638844,
+      "train_r2_std": 0.019887046758082633,
+      "val_r2_mean": 0.22177398758949368,
+      "val_r2_std": 0.08672079506292797,
+      "train_mse_mean": 0.34743960736074747,
+      "train_mse_std": 0.004994333283478047,
+      "val_mse_mean": 0.3669281912023636,
+      "val_mse_std": 0.0227608604026182,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.4008881108877373,
+      "mae": 0.5003344558169835,
+      "r2": 0.3139882594434442,
+      "spearman_rho": 0.5027719044247413,
+      "kendall_tau": 0.3985428220848645,
+      "pearson_r": 0.5660006276164133
+    }
+  },
+  {
+    "config": {
+      "n_splines": 8,
+      "lam": 77.47357232424594,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.3511785901015958,
+      "mae": 0.4683444454174359,
+      "r2": 0.2641575316954584,
+      "spearman_rho": 0.44182410648750575,
+      "kendall_tau": 0.3552275893231851,
+      "pearson_r": 0.5141177962524363
+    },
+    "gam_metrics": {
+      "aic": 1749.4158272181699,
+      "edof": 9.436729820809378,
+      "gcv": 0.36523261466818,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Complexity Judge Lexical Sophistication": 0.9999999960283219,
+      "Helpsteer2 Complexity Judge Terminology Density": 0.998443599987663,
+      "Helpsteer2 Complexity Judge Syntactic Complexity": 0.9115453319883455,
+      "Helpsteer2 Complexity Judge Assumed Knowledge": 0.7541371460038793,
+      "Helpsteer2 Complexity Judge Formalism And References": 0.9750880231051783
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.26687738793657056,
+      "train_r2_std": 0.01988426333311626,
+      "val_r2_mean": 0.22101063625365763,
+      "val_r2_std": 0.09019002136260265,
+      "train_mse_mean": 0.34962774796282414,
+      "train_mse_std": 0.005075998956318414,
+      "val_mse_mean": 0.3672190067956046,
+      "val_mse_std": 0.024544518344965603,
+      "best_lam_mean": 77.47357232424594,
+      "best_lam_std": 19.95399660635836
+    },
+    "test_metrics": {
+      "mse": 0.3997959693928597,
+      "mae": 0.5011541342053699,
+      "r2": 0.3158571646753202,
+      "spearman_rho": 0.5074917939339455,
+      "kendall_tau": 0.4034415047092614,
+      "pearson_r": 0.568826115139655
+    }
+  },
+  {
+    "config": {
+      "n_splines": 5,
+      "lam": 4.1412563764879655,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.35192098242653197,
+      "mae": 0.4688543921449351,
+      "r2": 0.2626019590716453,
+      "spearman_rho": 0.4395760176448822,
+      "kendall_tau": 0.3532464106395054,
+      "pearson_r": 0.5125796907815934
+    },
+    "gam_metrics": {
+      "aic": 1749.4147940181474,
+      "edof": 8.741078409244642,
+      "gcv": 0.36493788151741946,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Complexity Judge Lexical Sophistication": 0.999999997602547,
+      "Helpsteer2 Complexity Judge Terminology Density": 0.9974932968897423,
+      "Helpsteer2 Complexity Judge Syntactic Complexity": 0.9762856043223873,
+      "Helpsteer2 Complexity Judge Assumed Knowledge": 0.7143505371640556,
+      "Helpsteer2 Complexity Judge Formalism And References": 0.994654591783467
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.2653887050161092,
+      "train_r2_std": 0.01922230736027779,
+      "val_r2_mean": 0.22075626548720884,
+      "val_r2_std": 0.09185656130359124,
+      "train_mse_mean": 0.35034045603349,
+      "train_mse_std": 0.0046580771873922,
+      "val_mse_mean": 0.36731076941063484,
+      "val_mse_std": 0.02542150508497659,
+      "best_lam_mean": 4.1412563764879655,
+      "best_lam_std": 1.9239362212347848
+    },
+    "test_metrics": {
+      "mse": 0.3988039200033259,
+      "mae": 0.5008878908052933,
+      "r2": 0.3175547892991215,
+      "spearman_rho": 0.5100703917169294,
+      "kendall_tau": 0.40554094011971725,
+      "pearson_r": 0.5706589082375599
+    }
+  },
+  {
+    "config": {
+      "n_splines": 15,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.3452748415433476,
+      "mae": 0.46363150474135606,
+      "r2": 0.276527958121779,
+      "spearman_rho": 0.4597731450469478,
+      "kendall_tau": 0.3703453334833092,
+      "pearson_r": 0.5259493118181535
+    },
+    "gam_metrics": {
+      "aic": 1746.8022450954213,
+      "edof": 16.591424597932416,
+      "gcv": 0.37012932398476045,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Complexity Judge Lexical Sophistication": 0.9999963384832297,
+      "Helpsteer2 Complexity Judge Terminology Density": 0.9602122284740846,
+      "Helpsteer2 Complexity Judge Syntactic Complexity": 0.3224383281931532,
+      "Helpsteer2 Complexity Judge Assumed Knowledge": 0.6355538457280594,
+      "Helpsteer2 Complexity Judge Formalism And References": 0.8497297553995156
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.28167139315740464,
+      "train_r2_std": 0.018836801529425837,
+      "val_r2_mean": 0.21481999053360798,
+      "val_r2_std": 0.08265743084172349,
+      "train_mse_mean": 0.3425759770862248,
+      "train_mse_std": 0.00464020205829546,
+      "val_mse_mean": 0.3703491683532954,
+      "val_mse_std": 0.02120956271252287,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.40778303064540006,
+      "mae": 0.5030765881317951,
+      "r2": 0.30218946627525123,
+      "spearman_rho": 0.48358321624435036,
+      "kendall_tau": 0.3827970565064458,
+      "pearson_r": 0.5525525937242074
+    }
+  },
+  {
+    "config": {
+      "n_splines": 20,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.3418506689464215,
+      "mae": 0.46203223250766495,
+      "r2": 0.28370280216592725,
+      "spearman_rho": 0.46646436932862356,
+      "kendall_tau": 0.37596242531942387,
+      "pearson_r": 0.532758496006682
+    },
+    "gam_metrics": {
+      "aic": 1744.5300315980862,
+      "edof": 21.18637400720424,
+      "gcv": 0.3737442843287895,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Complexity Judge Lexical Sophistication": 0.9999972700317432,
+      "Helpsteer2 Complexity Judge Terminology Density": 0.9350487762340454,
+      "Helpsteer2 Complexity Judge Syntactic Complexity": 0.11109135524330471,
+      "Helpsteer2 Complexity Judge Assumed Knowledge": 0.4372860284432627,
+      "Helpsteer2 Complexity Judge Formalism And References": 0.8879099468781859
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.2899659637955535,
+      "train_r2_std": 0.018579820291315798,
+      "val_r2_mean": 0.21020761690885878,
+      "val_r2_std": 0.08156040795800268,
+      "train_mse_mean": 0.33862132411829704,
+      "train_mse_std": 0.004628564144622752,
+      "val_mse_mean": 0.37257723373626545,
+      "val_mse_std": 0.02083286173317679,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.40913333105838806,
+      "mae": 0.504091943185527,
+      "r2": 0.29987879177174237,
+      "spearman_rho": 0.47501427945966884,
+      "kendall_tau": 0.37579893847159307,
+      "pearson_r": 0.5492507473614253
+    }
+  },
+  {
+    "config": {
+      "n_splines": 25,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.33924619653910726,
+      "mae": 0.4610156996430855,
+      "r2": 0.28916008646186,
+      "spearman_rho": 0.4734409922456764,
+      "kendall_tau": 0.38196224485579483,
+      "pearson_r": 0.5378675038991565
+    },
+    "gam_metrics": {
+      "aic": 1741.9708768672097,
+      "edof": 25.184736618969442,
+      "gcv": 0.37736510544620777,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Helpsteer2 Complexity Judge Lexical Sophistication": 0.9999871167090103,
+      "Helpsteer2 Complexity Judge Terminology Density": 0.9710204834420323,
+      "Helpsteer2 Complexity Judge Syntactic Complexity": 0.07062271304336964,
+      "Helpsteer2 Complexity Judge Assumed Knowledge": 0.4306897805048693,
+      "Helpsteer2 Complexity Judge Formalism And References": 0.9031326520827037
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.29649891627579655,
+      "train_r2_std": 0.018752027240731526,
+      "val_r2_mean": 0.2059735724437389,
+      "val_r2_std": 0.08238765373236151,
+      "train_mse_mean": 0.3355040421122425,
+      "train_mse_std": 0.004769534597666674,
+      "val_mse_mean": 0.37457314783678575,
+      "val_mse_std": 0.0212896362248037,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.40788390639353056,
+      "mae": 0.5036764095578504,
+      "r2": 0.30201684467417234,
+      "spearman_rho": 0.4658195426282399,
+      "kendall_tau": 0.3684509145349976,
+      "pearson_r": 0.550573789246571
+    }
+  }
+]
