@@ -57,17 +57,64 @@ python experiments/track3_automated_selection/llm_judge_decomposer.py \
 #### Configuration
 ```bash
 # Environment variables
-export MARTIAN_API_URL=https://api.withmartian.com
+export MARTIAN_API_URL=https://api.withmartian.com/v1
 export MARTIAN_API_KEY=<your-api-key>
 
 # CLI options
 --max-depth INT           # Maximum recursion depth (default: 1)
---model STR              # Martian model (default: openai/gpt-4.1-nano)
+--model STR              # Martian model (default: openai/gpt-5-nano)
 --temperature FLOAT      # Sampling temperature (default: 0.4)
 --max-tokens INT         # Max tokens per completion (default: 2048)
 --output PATH            # Output directory (default: generated_judges/)
 --judges JUDGE_IDS       # Specific judges (default: all)
+--name STR               # Custom output filename prefix
 ```
+
+### 3.0.1 Judge Hierarchy Visualizer ✅
+- **Status**: COMPLETED
+- **Implementation**: Interactive HTML graph visualization using Pyvis
+- **File**: `visualize_judges.py`
+
+#### Quick Start
+
+```bash
+# Basic visualization (generates HTML file)
+python experiments/track3_automated_selection/visualize_judges.py \
+    experiments/track3_automated_selection/generated_judges/my-judges.yaml
+
+# With text tree output and auto-open in browser
+python experiments/track3_automated_selection/visualize_judges.py \
+    path/to/judges.yaml --tree --open
+
+# Custom output path and title
+python experiments/track3_automated_selection/visualize_judges.py \
+    path/to/judges.yaml \
+    --output my_visualization.html \
+    --title "My Judge Hierarchy"
+```
+
+#### Features
+- 🎨 **Color-coded nodes** by depth level (red=root, orange=depth 1, teal=depth 2, etc.)
+- 🔍 **Hover tooltips** showing judge name, ID, description, and child count
+- 🖱️ **Interactive controls** - drag nodes, zoom, pan, keyboard navigation
+- 📊 **Legend panel** with depth colors and node shapes (● parent, ◆ leaf)
+- 📈 **Statistics panel** showing total/root/leaf judges and max depth
+- 🌳 **Text tree output** (`--tree`) for console visualization
+
+#### CLI Options
+```bash
+--output, -o PATH    # Output HTML file (default: same as input with .html)
+--open               # Open visualization in browser after creation
+--tree               # Print text tree representation to console
+--title STR          # Custom title for the visualization
+```
+
+#### Output
+The visualizer generates a self-contained HTML file with:
+- Hierarchical graph layout (top-down)
+- Physics-based node positioning
+- Dark theme with high contrast colors
+- Embedded legend and statistics
 
 ## Planned Experiments
 
