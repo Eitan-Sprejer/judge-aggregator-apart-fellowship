@@ -17,21 +17,21 @@ import numpy as np
 import pandas as pd
 
 # Add project root to path
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from experiments.track3_automated_selection.judge_set_metrics import (
+from experiments.track3_automated_selection.iterative_selection.judge_set_metrics import (
     JudgeSetMetrics,
     JudgeSetEvaluator,
     compute_quick_redundancy,
 )
-from experiments.track3_automated_selection.gap_analyzer import (
+from experiments.track3_automated_selection.iterative_selection.gap_analyzer import (
     GapAnalyzer,
     GapAnalysisResult,
     identify_least_important_judge,
 )
-from experiments.track3_automated_selection.iterative_selection import (
+from experiments.track3_automated_selection.iterative_selection.iterative_selection import (
     SelectionConfig,
     IterationResult,
     IterativeJudgeSelector,

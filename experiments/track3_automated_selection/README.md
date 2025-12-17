@@ -20,8 +20,8 @@
   - **BrainstormAgent**: Authors detailed 5-level rubrics for each dimension
   - **ValidationAgent**: Validates decomposition coverage and minimal overlap
 - **Files**:
-  - `llm_judge_decomposer.py`: Core recursive decomposition engine
-  - `decompose_all_judges.py`: Batch processor for all judges
+  - `judge_decomposition/llm_judge_decomposer.py`: Core recursive decomposition engine
+  - `judge_decomposition/decompose_all_judges.py`: Batch processor for all judges
 - **Output**: 55 hierarchical judges (10 parents + 45 children) with parent-child relationships
   - Generated file: `generated_judges/all-judges-decomposed-*.yaml`
   - Format: Matches canonical `judges.yaml` format exactly
@@ -32,12 +32,12 @@
 Generate decomposed judges:
 ```bash
 # Decompose all judges (10 parents → 55 total with children)
-python experiments/track3_automated_selection/decompose_all_judges.py \
+python experiments/track3_automated_selection/judge_decomposition/decompose_all_judges.py \
     --max-depth 1 \
     --output experiments/track3_automated_selection/generated_judges
 
 # Decompose single judge
-python experiments/track3_automated_selection/llm_judge_decomposer.py \
+python experiments/track3_automated_selection/judge_decomposition/llm_judge_decomposer.py \
     truthfulness-judge \
     --max-depth 1
 ```
@@ -73,21 +73,21 @@ export MARTIAN_API_KEY=<your-api-key>
 ### 3.0.1 Judge Hierarchy Visualizer ✅
 - **Status**: COMPLETED
 - **Implementation**: Interactive HTML graph visualization using Pyvis
-- **File**: `visualize_judges.py`
+- **File**: `judge_decomposition/visualize_judges.py`
 
 #### Quick Start
 
 ```bash
 # Basic visualization (generates HTML file)
-python experiments/track3_automated_selection/visualize_judges.py \
+python experiments/track3_automated_selection/judge_decomposition/visualize_judges.py \
     experiments/track3_automated_selection/generated_judges/my-judges.yaml
 
 # With text tree output and auto-open in browser
-python experiments/track3_automated_selection/visualize_judges.py \
+python experiments/track3_automated_selection/judge_decomposition/visualize_judges.py \
     path/to/judges.yaml --tree --open
 
 # Custom output path and title
-python experiments/track3_automated_selection/visualize_judges.py \
+python experiments/track3_automated_selection/judge_decomposition/visualize_judges.py \
     path/to/judges.yaml \
     --output my_visualization.html \
     --title "My Judge Hierarchy"
@@ -120,19 +120,19 @@ The visualizer generates a self-contained HTML file with:
 - **Status**: IN PROGRESS
 - **Implementation**: Automated judge set optimization through iterative training and gap analysis
 - **Files**:
-  - `iterative_selection.py`: Main controller orchestrating the selection loop
-  - `gap_analyzer.py`: Analyzes prediction errors to identify missing dimensions
-  - `judge_set_metrics.py`: Composite metrics for evaluating judge sets
+  - `iterative_selection/iterative_selection.py`: Main controller orchestrating the selection loop
+  - `iterative_selection/gap_analyzer.py`: Analyzes prediction errors to identify missing dimensions
+  - `iterative_selection/judge_set_metrics.py`: Composite metrics for evaluating judge sets
 
 #### Quick Start
 
 ```bash
 # Run with config file
-python experiments/track3_automated_selection/iterative_selection.py \
+python experiments/track3_automated_selection/iterative_selection/iterative_selection.py \
     --config config/selection_experiment.yaml
 
 # Run with CLI arguments
-python experiments/track3_automated_selection/iterative_selection.py \
+python experiments/track3_automated_selection/iterative_selection/iterative_selection.py \
     --data results/full_experiments/data_with_judge_scores.pkl \
     --judges judges/helpsteer2/depth_0_parents.yaml \
     --max-iterations 10 \
@@ -158,14 +158,14 @@ python experiments/track3_automated_selection/iterative_selection.py \
 
 #### Components
 
-**JudgeSetEvaluator** (`judge_set_metrics.py`):
+**JudgeSetEvaluator** (`iterative_selection/judge_set_metrics.py`):
 - Predictive power: R², Spearman ρ, Kendall τ
 - Coverage: Variance explained by judges
 - Redundancy: Mean pairwise correlation, highly correlated pairs
 - Diversity: Effective dimensionality via PCA
 - Composite score: Weighted combination of all metrics
 
-**GapAnalyzer** (`gap_analyzer.py`):
+**GapAnalyzer** (`iterative_selection/gap_analyzer.py`):
 - Systematic bias detection (over/under prediction)
 - High variance region identification
 - Cluster-based error pattern analysis

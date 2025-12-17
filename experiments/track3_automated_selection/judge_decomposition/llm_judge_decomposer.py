@@ -54,14 +54,14 @@ def _represent_list_inline(dumper: Any, data: List[Any]) -> Any:
 
 InlineListDumper.add_representer(list, _represent_list_inline)
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 PIPELINE_UTILS = REPO_ROOT / "pipeline" / "utils"
 if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 if str(PIPELINE_UTILS) not in sys.path:
     sys.path.append(str(PIPELINE_UTILS))
 
-import judge_rubrics  # type: ignore  # noqa: E402
+from pipeline.utils import judge_rubrics  # type: ignore  # noqa: E402
 
 load_dotenv()
 
