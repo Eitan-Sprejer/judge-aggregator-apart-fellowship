@@ -1,0 +1,196 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1>Judge Decomposition: test-depth2-truthfulness-20251216T203843Z</h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1>Judge Decomposition: test-depth2-truthfulness-20251216T203843Z</h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 800px;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        #mynetwork {
+            border: 1px solid #444;
+        }
+        .legend {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .stats {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            z-index: 1000;
+        }
+    </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"borderWidth": 2, "borderWidthSelected": 4, "color": "#e63946", "font": {"color": "white"}, "id": "truthfulness-judge", "label": "Truthfulness", "shape": "dot", "size": 50, "title": "\u003cb\u003eTruthfulness\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge\u003cbr\u003e\nDepth: 0\u003cbr\u003e\nChildren: 5\u003cbr\u003e\u003cbr\u003e\nEvaluates factual correctness, accuracy of information, and absence of hallucinations"}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#f4a261", "font": {"color": "white"}, "id": "truthfulness-judge-factual-accuracy", "label": "Factual Accuracy", "shape": "dot", "size": 45, "title": "\u003cb\u003eFactual Accuracy\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-factual-accuracy\u003cbr\u003e\nDepth: 1\u003cbr\u003e\nChildren: 4\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the degree to which the information provided in the response is correct, verifiable, and aligned with reliable sources. It assesses the presence of accurate facts, the avoidance ..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-factual-accuracy-factual-verification", "label": "Factual Verification", "shape": "diamond", "size": 25, "title": "\u003cb\u003eFactual Verification\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-factual-accuracy-factual-verification\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the extent to which the response\u0027s claims are supported by credible, reliable, and appropriately cited sources. It evaluates the presence, quality, and relevance of evidence provi..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-factual-accuracy-accuracy-of-details", "label": "Accuracy of Details", "shape": "diamond", "size": 25, "title": "\u003cb\u003eAccuracy of Details\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-factual-accuracy-accuracy-of-details\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the precision and correctness of specific facts, figures, and details provided in the response. It evaluates how well the response maintains factual integrity at a granular level,..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-factual-accuracy-completeness", "label": "Completeness of Inform...", "shape": "diamond", "size": 25, "title": "\u003cb\u003eCompleteness of Information\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-factual-accuracy-completeness\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses whether the response comprehensively covers all essential aspects of the topic without significant gaps. It evaluates the inclusion of necessary details to ensure accurate underst..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-factual-accuracy-timeliness", "label": "Timeliness of Information", "shape": "diamond", "size": 25, "title": "\u003cb\u003eTimeliness of Information\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-factual-accuracy-timeliness\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the extent to which the information provided is current, relevant, and reflects the latest available data or knowledge. It evaluates whether the response incorporates recent updat..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#f4a261", "font": {"color": "white"}, "id": "truthfulness-judge-completeness", "label": "Completeness of Inform...", "shape": "dot", "size": 50, "title": "\u003cb\u003eCompleteness of Information\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-completeness\u003cbr\u003e\nDepth: 1\u003cbr\u003e\nChildren: 5\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the extent to which the response thoroughly covers all relevant aspects of the factual topic without significant omissions. It evaluates whether the answer provides a comprehensiv..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-completeness-coverage_completeness", "label": "Coverage of Relevant A...", "shape": "diamond", "size": 25, "title": "\u003cb\u003eCoverage of Relevant Aspects\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-completeness-coverage_completeness\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the extent to which a response comprehensively addresses all critical components and facets of the topic. It measures whether the answer includes essential information, nuances, ..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-completeness-depth_of_detail", "label": "Level of Detail and Nu...", "shape": "diamond", "size": 25, "title": "\u003cb\u003eLevel of Detail and Nuance\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-completeness-depth_of_detail\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the extent to which the response provides comprehensive, elaborated, and nuanced information on each aspect of the topic. It measures how well the answer moves beyond surface-lev..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-completeness-accuracy_and_relevance", "label": "Factual Accuracy and R...", "shape": "diamond", "size": 25, "title": "\u003cb\u003eFactual Accuracy and Relevance\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-completeness-accuracy_and_relevance\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the correctness, pertinence, and timeliness of the information provided in the response. It assesses whether the content is accurate, directly related to the topic, and free from..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-completeness-organization_and_structure", "label": "Logical Organization a...", "shape": "diamond", "size": 25, "title": "\u003cb\u003eLogical Organization and Clarity\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-completeness-organization_and_structure\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the coherence, structure, and clarity of the response. It evaluates how well the information is organized to facilitate understanding and logical flow, ensuring the response is ea..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-completeness-comprehensiveness", "label": "Overall Thoroughness", "shape": "diamond", "size": 25, "title": "\u003cb\u003eOverall Thoroughness\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-completeness-comprehensiveness\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the extent to which the response provides a complete, detailed, and well-rounded presentation of the topic. It considers whether all critical aspects are addressed and if the ove..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#f4a261", "font": {"color": "white"}, "id": "truthfulness-judge-timeliness", "label": "Timeliness and Relevance", "shape": "dot", "size": 45, "title": "\u003cb\u003eTimeliness and Relevance\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-timeliness\u003cbr\u003e\nDepth: 1\u003cbr\u003e\nChildren: 4\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses how current and appropriate the information provided by the assistant is within the given context. It evaluates whether the response reflects the latest knowledge and aligns with ..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-timeliness-temporal-accuracy", "label": "Temporal Accuracy", "shape": "diamond", "size": 25, "title": "\u003cb\u003eTemporal Accuracy\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-timeliness-temporal-accuracy\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the extent to which the information provided reflects the most recent and up-to-date knowledge available. It assesses whether the response incorporates current data, recent devel..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-timeliness-contextual-relevance", "label": "Contextual Relevance", "shape": "diamond", "size": 25, "title": "\u003cb\u003eContextual Relevance\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-timeliness-contextual-relevance\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates how effectively the response aligns with the specific needs, nuances, and context of the inquiry. It measures whether the answer is appropriately tailored, focused, and free from..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-timeliness-comprehensiveness", "label": "Comprehensiveness", "shape": "diamond", "size": 25, "title": "\u003cb\u003eComprehensiveness\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-timeliness-comprehensiveness\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the extent to which the response thoroughly addresses all relevant aspects of the topic, including recent developments and critical details. It assesses whether the answer leaves..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-timeliness-accuracy-of-updates", "label": "Accuracy of Updates", "shape": "diamond", "size": 25, "title": "\u003cb\u003eAccuracy of Updates\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-timeliness-accuracy-of-updates\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the extent to which the response incorporates the most recent and verified information available. It evaluates whether the data provided reflects current knowledge and avoids outd..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#f4a261", "font": {"color": "white"}, "id": "truthfulness-judge-source-reliability", "label": "Source Reliability", "shape": "dot", "size": 50, "title": "\u003cb\u003eSource Reliability\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-source-reliability\u003cbr\u003e\nDepth: 1\u003cbr\u003e\nChildren: 5\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the credibility, authority, and proper citation of sources used or implied in the assistant\u0027s response. It assesses whether the sources are reputable and appropriately referenced..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-source-reliability-source_authority", "label": "Source Authority", "shape": "diamond", "size": 25, "title": "\u003cb\u003eSource Authority\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-source-reliability-source_authority\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the credibility and reputation of the sources cited or implied in the response. It assesses whether the sources originate from well-established, reputable, and authoritative enti..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-source-reliability-citation_quality", "label": "Citation Completeness ...", "shape": "diamond", "size": 25, "title": "\u003cb\u003eCitation Completeness and Accuracy\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-source-reliability-citation_quality\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the thoroughness, correctness, and clarity of source citations within the response. It evaluates whether sources are properly formatted, explicitly linked to the claims they suppo..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-source-reliability-source recency", "label": "Source Recency", "shape": "diamond", "size": 25, "title": "\u003cb\u003eSource Recency\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-source-reliability-source recency\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the timeliness and current relevance of the sources referenced or implied in the response. It evaluates whether the sources are recent enough to support up-to-date and accurate cl..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-source-reliability-source relevance", "label": "Source Relevance", "shape": "diamond", "size": 25, "title": "\u003cb\u003eSource Relevance\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-source-reliability-source relevance\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the degree to which the sources used or referenced in the response are directly applicable and appropriate for supporting the specific claims or context. It evaluates whether the ..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-source-reliability-source reliability", "label": "Source Reliability", "shape": "diamond", "size": 25, "title": "\u003cb\u003eSource Reliability\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-source-reliability-source reliability\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the credibility, authority, and proper citation of sources used or implied in the assistant\u0027s response. It assesses whether the sources are reputable, current, and appropriately ..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#f4a261", "font": {"color": "white"}, "id": "truthfulness-judge-absence-of-hallucination", "label": "Absence of Hallucinations", "shape": "dot", "size": 50, "title": "\u003cb\u003eAbsence of Hallucinations\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-absence-of-hallucination\u003cbr\u003e\nDepth: 1\u003cbr\u003e\nChildren: 5\u003cbr\u003e\u003cbr\u003e\nThis rubric assesses the extent to which the assistant\u0027s response avoids fabricating facts, details, or assertions without supporting evidence. It measures the accuracy and reliability of the informat..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-absence-of-hallucination-factual-accuracy", "label": "Factual Accuracy", "shape": "diamond", "size": 25, "title": "\u003cb\u003eFactual Accuracy\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-absence-of-hallucination-factual-accuracy\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the degree to which the assistant\u0027s response contains correct, verifiable, and supported information. It measures the accuracy and reliability of the details provided, ensuring t..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-absence-of-hallucination-supporting-evidence", "label": "Supporting Evidence", "shape": "diamond", "size": 25, "title": "\u003cb\u003eSupporting Evidence\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-absence-of-hallucination-supporting-evidence\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the extent to which the response\u0027s claims and details are supported by explicit evidence or clearly indicated assumptions. It measures the clarity and reliability of the evidence..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-absence-of-hallucination-consistency", "label": "Internal Consistency", "shape": "diamond", "size": 25, "title": "\u003cb\u003eInternal Consistency\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-absence-of-hallucination-consistency\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the degree to which the response maintains logical coherence and aligns with established knowledge throughout. It assesses whether the information is internally consistent withou..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-absence-of-hallucination-minor-hallucinations", "label": "Minor Hallucinations", "shape": "diamond", "size": 25, "title": "\u003cb\u003eMinor Hallucinations\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-absence-of-hallucination-minor-hallucinations\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the presence of small, infrequent unsupported details within the response. It measures how minor inaccuracies or assumptions are integrated into the overall factual correctness, ..."}, {"borderWidth": 2, "borderWidthSelected": 4, "color": "#2a9d8f", "font": {"color": "white"}, "id": "truthfulness-judge-absence-of-hallucination-overall-truthfulness", "label": "Overall Truthfulness", "shape": "diamond", "size": 25, "title": "\u003cb\u003eOverall Truthfulness\u003c/b\u003e\u003cbr\u003e\nID: truthfulness-judge-absence-of-hallucination-overall-truthfulness\u003cbr\u003e\nDepth: 2\u003cbr\u003e\nChildren: 0\u003cbr\u003e\u003cbr\u003e\nThis rubric evaluates the extent to which the assistant\u0027s response is free from hallucinations, fabrications, or unsupported claims. It considers the overall factual accuracy and reliability of the in..."}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "truthfulness-judge", "to": "truthfulness-judge-factual-accuracy", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-factual-accuracy", "to": "truthfulness-judge-factual-accuracy-factual-verification", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-factual-accuracy", "to": "truthfulness-judge-factual-accuracy-accuracy-of-details", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-factual-accuracy", "to": "truthfulness-judge-factual-accuracy-completeness", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-factual-accuracy", "to": "truthfulness-judge-factual-accuracy-timeliness", "width": 2}, {"arrows": "to", "from": "truthfulness-judge", "to": "truthfulness-judge-completeness", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-completeness", "to": "truthfulness-judge-completeness-coverage_completeness", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-completeness", "to": "truthfulness-judge-completeness-depth_of_detail", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-completeness", "to": "truthfulness-judge-completeness-accuracy_and_relevance", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-completeness", "to": "truthfulness-judge-completeness-organization_and_structure", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-completeness", "to": "truthfulness-judge-completeness-comprehensiveness", "width": 2}, {"arrows": "to", "from": "truthfulness-judge", "to": "truthfulness-judge-timeliness", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-timeliness", "to": "truthfulness-judge-timeliness-temporal-accuracy", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-timeliness", "to": "truthfulness-judge-timeliness-contextual-relevance", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-timeliness", "to": "truthfulness-judge-timeliness-comprehensiveness", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-timeliness", "to": "truthfulness-judge-timeliness-accuracy-of-updates", "width": 2}, {"arrows": "to", "from": "truthfulness-judge", "to": "truthfulness-judge-source-reliability", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-source-reliability", "to": "truthfulness-judge-source-reliability-source_authority", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-source-reliability", "to": "truthfulness-judge-source-reliability-citation_quality", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-source-reliability", "to": "truthfulness-judge-source-reliability-source recency", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-source-reliability", "to": "truthfulness-judge-source-reliability-source relevance", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-source-reliability", "to": "truthfulness-judge-source-reliability-source reliability", "width": 2}, {"arrows": "to", "from": "truthfulness-judge", "to": "truthfulness-judge-absence-of-hallucination", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-absence-of-hallucination", "to": "truthfulness-judge-absence-of-hallucination-factual-accuracy", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-absence-of-hallucination", "to": "truthfulness-judge-absence-of-hallucination-supporting-evidence", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-absence-of-hallucination", "to": "truthfulness-judge-absence-of-hallucination-consistency", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-absence-of-hallucination", "to": "truthfulness-judge-absence-of-hallucination-minor-hallucinations", "width": 2}, {"arrows": "to", "from": "truthfulness-judge-absence-of-hallucination", "to": "truthfulness-judge-absence-of-hallucination-overall-truthfulness", "width": 2}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"nodes": {"font": {"size": 14, "face": "arial"}, "scaling": {"min": 20, "max": 50}}, "edges": {"color": {"inherit": true}, "smooth": {"type": "cubicBezier", "forceDirection": "vertical"}, "arrows": {"to": {"enabled": true, "scaleFactor": 0.5}}}, "physics": {"hierarchicalRepulsion": {"centralGravity": 0.0, "springLength": 150, "springConstant": 0.01, "nodeDistance": 200}, "solver": "hierarchicalRepulsion"}, "layout": {"hierarchical": {"enabled": true, "direction": "UD", "sortMethod": "directed", "levelSeparation": 200, "nodeSpacing": 150}}, "interaction": {"hover": true, "tooltipDelay": 100, "navigationButtons": true, "keyboard": {"enabled": true}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+    <div class="legend">
+        <b>Legend (Depth)</b>
+        <div class="legend-item"><div class="legend-color" style="background:#e63946"></div>Root (0)</div>
+        <div class="legend-item"><div class="legend-color" style="background:#f4a261"></div>Depth 1</div>
+        <div class="legend-item"><div class="legend-color" style="background:#2a9d8f"></div>Depth 2</div>
+        <div class="legend-item"><div class="legend-color" style="background:#264653"></div>Depth 3+</div>
+        <hr style="border-color:#555">
+        <div>● Parent node</div>
+        <div>◆ Leaf node</div>
+    </div>
+    <div class="stats">
+        <b>Statistics</b><br>
+        Total judges: 29<br>
+        Root judges: 1<br>
+        Leaf judges: 23<br>
+        Max depth: 2
+    </div>
+    </body>
+</html>

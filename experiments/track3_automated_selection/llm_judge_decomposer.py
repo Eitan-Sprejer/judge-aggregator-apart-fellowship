@@ -28,6 +28,7 @@ import json
 import os
 import re
 import sys
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -72,9 +73,11 @@ MARTIAN_API_URL = os.environ.get("MARTIAN_API_URL")
 class LLMConfig:
     """Configuration for OpenAI chat completions."""
 
-    model: str = "openai/gpt-4.1-nano"
+    model: str = "openai/gpt-5-nano"
     temperature: float = 0.4
-    max_tokens: int = 2048
+    max_tokens: int = 4096
+    max_retries: int = 3
+    use_json_format: bool = False  # gpt-5-nano returns empty with json_object format
 
 
 class ChatCompletionClient:
@@ -117,18 +120,35 @@ class ChatCompletionClient:
             "messages": cast(List[Any], messages),
         }
 
+        # gpt-5 models only support temperature=1 (default), so skip for them
         if not is_gpt5:
             request_params["temperature"] = self._config.temperature
 
-        try:
-            response = self._client.chat.completions.create(**request_params)
-        except OpenAIError as exc:
-            raise RuntimeError(f"OpenAI chat completion failed: {exc}") from exc
+        # Only use json_object format if configured
+        if self._config.use_json_format:
+            request_params["response_format"] = {"type": "json_object"}
 
-        content = response.choices[0].message.content
-        if content is None:
-            raise RuntimeError("OpenAI returned empty content.")
-        return content.strip()
+        last_error: Optional[Exception] = None
+        for attempt in range(self._config.max_retries):
+            try:
+                response = self._client.chat.completions.create(**request_params)
+                content = response.choices[0].message.content
+                if content is not None and content.strip():
+                    return content.strip()
+                # Empty response - retry
+                last_error = RuntimeError(f"Empty response on attempt {attempt + 1}")
+                if attempt < self._config.max_retries - 1:
+                    wait_time = 2 ** attempt  # Exponential backoff: 1, 2, 4 seconds
+                    print(f"  ⚠ Empty response, retrying in {wait_time}s (attempt {attempt + 1}/{self._config.max_retries})...")
+                    time.sleep(wait_time)
+            except OpenAIError as exc:
+                last_error = RuntimeError(f"OpenAI chat completion failed: {exc}")
+                if attempt < self._config.max_retries - 1:
+                    wait_time = 2 ** attempt
+                    print(f"  ⚠ API error, retrying in {wait_time}s (attempt {attempt + 1}/{self._config.max_retries})...")
+                    time.sleep(wait_time)
+
+        raise RuntimeError(f"Failed after {self._config.max_retries} attempts: {last_error}")
 
 
 def _extract_code_block(text: str, language_hint: Optional[str] = None) -> Optional[str]:
@@ -536,17 +556,36 @@ def _merge_dimension_to_rubric(
     criteria = []
     criteria_items = child_rubric.get("criteria", [])
     
-    for idx, item in enumerate(criteria_items):
-        label = item.get("label", "")
+    # Warn if criteria count doesn't match expected 5 levels
+    if len(criteria_items) != 5:
+        print(f"Warning: Expected 5 criteria levels for {dim_id}, got {len(criteria_items)}. "
+              f"Mapping to standard ranges.")
+    
+    # Handle case where we have fewer or more than 5 criteria
+    for idx in range(min(len(criteria_items), len(standard_ranges))):
+        item = criteria_items[idx]
+        label = item.get("label", f"Level {idx}")
         indicators = item.get("indicators", [])
         
-        # Use standard range based on position (capped at 5 levels)
-        range_pair = standard_ranges[min(idx, len(standard_ranges) - 1)]
+        # Ensure indicators is a list
+        if not isinstance(indicators, list):
+            indicators = [str(indicators)] if indicators else []
+        
+        range_pair = standard_ranges[idx]
 
         criteria.append({
             "range": range_pair,
             "label": label,
             "indicators": indicators,
+        })
+    
+    # If we have fewer than 5 criteria, pad with placeholder levels
+    while len(criteria) < 5:
+        idx = len(criteria)
+        criteria.append({
+            "range": standard_ranges[idx],
+            "label": f"Level {idx}",
+            "indicators": [f"Criteria for level {idx} not specified"],
         })
 
     return {
@@ -571,6 +610,10 @@ def decompose_judge_recursively(
     current_depth: int = 0,
     all_judges: Optional[List[Dict[str, Any]]] = None,
     include_parent: bool = True,
+    _generated_judges_registry: Optional[Dict[str, Dict[str, Any]]] = None,
+    _decomposition_agent: Optional[DecompositionAgent] = None,
+    _brainstorm_agent: Optional[BrainstormAgent] = None,
+    _validation_agent: Optional[ValidationAgent] = None,
 ) -> List[Dict[str, Any]]:
     """Recursively decompose a judge into sub-judges up to max_depth.
     
@@ -581,11 +624,26 @@ def decompose_judge_recursively(
         current_depth: Current recursion depth
         all_judges: Accumulator for all judges
         include_parent: If True and at depth 0, include the parent judge
+        _generated_judges_registry: Internal registry for dynamically generated judges
+        _decomposition_agent: Reusable decomposition agent (internal)
+        _brainstorm_agent: Reusable brainstorm agent (internal)
+        _validation_agent: Reusable validation agent (internal)
     """
     if all_judges is None:
         all_judges = []
+    
+    # Initialize registry for dynamically generated judges
+    if _generated_judges_registry is None:
+        _generated_judges_registry = {}
 
-    base_judge = judge_rubrics.get_judge_info(judge_id)
+    # Try to get judge from generated registry first, then fall back to static registry
+    if judge_id in _generated_judges_registry:
+        base_judge = _generated_judges_registry[judge_id]
+    else:
+        try:
+            base_judge = judge_rubrics.get_judge_info(judge_id)
+        except KeyError:
+            raise ValueError(f"Judge '{judge_id}' not found in static or generated registries.")
     
     # Add parent judge at depth 0 if requested
     if current_depth == 0 and include_parent:
@@ -594,9 +652,10 @@ def decompose_judge_recursively(
     if current_depth >= max_depth:
         return all_judges
 
-    decomposition_agent = DecompositionAgent(client)
-    brainstorm_agent = BrainstormAgent(client)
-    validation_agent = ValidationAgent(client)
+    # Reuse agents across recursive calls for efficiency
+    decomposition_agent = _decomposition_agent or DecompositionAgent(client)
+    brainstorm_agent = _brainstorm_agent or BrainstormAgent(client)
+    validation_agent = _validation_agent or ValidationAgent(client)
 
     # Step 1: Identify dimensions
     dimensions = decomposition_agent.decompose(base_judge)
@@ -631,6 +690,9 @@ def decompose_judge_recursively(
         all_judges.append(child_judge)
 
         child_judge_id = child_judge["id"]
+        # Register the generated judge so recursive calls can find it
+        _generated_judges_registry[child_judge_id] = child_judge
+        
         try:
             decompose_judge_recursively(
                 child_judge_id,
@@ -638,6 +700,11 @@ def decompose_judge_recursively(
                 max_depth=max_depth,
                 current_depth=current_depth + 1,
                 all_judges=all_judges,
+                include_parent=False,  # Parent already added
+                _generated_judges_registry=_generated_judges_registry,
+                _decomposition_agent=decomposition_agent,
+                _brainstorm_agent=brainstorm_agent,
+                _validation_agent=validation_agent,
             )
         except Exception as e:
             print(f"Warning: Recursion failed for {child_judge_id}: {e}")
@@ -693,8 +760,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        default="openai/gpt-4.1-nano",
-        help="Martian model name (default: openai/gpt-4.1-nano)",
+        default="openai/gpt-5-nano",
+        help="Martian model name (default: openai/gpt-5-nano)",
     )
     parser.add_argument(
         "--temperature", type=float, default=0.4, help="Sampling temperature"
