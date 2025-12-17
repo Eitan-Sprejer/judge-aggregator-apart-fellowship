@@ -21,17 +21,17 @@ from typing import Any, Dict, List, Optional
 import yaml
 from dotenv import load_dotenv
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 PIPELINE_UTILS = REPO_ROOT / "pipeline" / "utils"
 if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 if str(PIPELINE_UTILS) not in sys.path:
     sys.path.append(str(PIPELINE_UTILS))
 
-import judge_rubrics  # type: ignore  # noqa: E402
+from pipeline.utils import judge_rubrics  # type: ignore  # noqa: E402
 
 # Import the decomposer function
-from llm_judge_decomposer import (  # noqa: E402
+from experiments.track3_automated_selection.judge_decomposition.llm_judge_decomposer import (  # noqa: E402
     ChatCompletionClient,
     InlineListDumper,
     LLMConfig,
