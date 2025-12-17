@@ -40,7 +40,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from pipeline.core.aggregator_training import GAMAggregator, compute_metrics
 from pipeline.core.judge_evaluation import JudgeEvaluator
-from pipeline.utils.judge_rubrics import JudgeLoader
+from pipeline.utils.judge_rubrics import load_judges_from_yaml, JUDGE_RUBRICS
 
 from experiments.track3_automated_selection.judge_set_metrics import (
     JudgeSetMetrics,
@@ -196,12 +196,12 @@ class IterativeJudgeSelector:
     
     def load_initial_judges(self) -> List[Dict[str, Any]]:
         """Load initial judge set from config."""
-        judge_loader = JudgeLoader()
-        
         if self.config.initial_judge_file:
-            judges = judge_loader.load_judges_from_yaml(self.config.initial_judge_file)
+            judges_dict = load_judges_from_yaml(Path(self.config.initial_judge_file))
+            judges = list(judges_dict.values())
         else:
-            judges = judge_loader.get_all_judges()
+            # Use default judges from JUDGE_RUBRICS
+            judges = [{"id": k, **v} for k, v in JUDGE_RUBRICS.items()]
         
         self.current_judges = judges
         logger.info(f"Loaded {len(judges)} initial judges")
@@ -222,8 +222,25 @@ class IterativeJudgeSelector:
         
         # Extract judge scores
         if "judge_scores" in self.df.columns:
-            # Scores stored as list per row
-            X = np.array(self.df["judge_scores"].tolist())
+            # Scores stored as list per row - need to track original judge order
+            all_scores = np.array(self.df["judge_scores"].tolist())
+            
+            # Get indices of judges we want to keep
+            # We need the original full judge list to map indices
+            if not hasattr(self, '_original_judge_names'):
+                # First call - store original judge names
+                self._original_judge_names = judge_names.copy()
+            
+            # Find column indices for the requested judges
+            col_indices = []
+            for name in judge_names:
+                if name in self._original_judge_names:
+                    col_indices.append(self._original_judge_names.index(name))
+            
+            if col_indices:
+                X = all_scores[:, col_indices]
+            else:
+                X = all_scores
         else:
             # Scores in separate columns (judge_name format)
             score_cols = [f"{name}_score" for name in judge_names]
@@ -371,7 +388,6 @@ class IterativeJudgeSelector:
     def _select_judge_to_remove(
         self,
         importance_scores: Dict[str, float],
-        judge_set_metrics: JudgeSetMetrics,
     ) -> Optional[str]:
         """Select which judge to remove."""
         try:
@@ -465,7 +481,6 @@ class IterativeJudgeSelector:
             # Try to remove least important judge
             judge_to_remove = self._select_judge_to_remove(
                 result.importance_scores,
-                JudgeSetMetrics(**result.judge_set_metrics) if isinstance(result.judge_set_metrics, dict) else result.judge_set_metrics,
             )
             
             if judge_to_remove and len(current_judge_names) > self.config.min_judges:
