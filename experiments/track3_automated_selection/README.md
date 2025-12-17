@@ -116,19 +116,83 @@ The visualizer generates a self-contained HTML file with:
 - Dark theme with high contrast colors
 - Embedded legend and statistics
 
-## Planned Experiments
+### 3.1 Iterative Judge Selection Pipeline 🚧
+- **Status**: IN PROGRESS
+- **Implementation**: Automated judge set optimization through iterative training and gap analysis
+- **Files**:
+  - `iterative_selection.py`: Main controller orchestrating the selection loop
+  - `gap_analyzer.py`: Analyzes prediction errors to identify missing dimensions
+  - `judge_set_metrics.py`: Composite metrics for evaluating judge sets
 
-### 3.1 Iterative Judge Selection Pipeline
-- **Status**: Planned
-- **Pipeline**:
-  1. Start with current 10 judges
-  2. Train aggregator, analyze importance (from Track 2.1)
-  3. Identify least important judge
-  4. Propose complementary judge to fill gaps
-  5. Evaluate new judge set
-  6. Repeat
-- **Directory**: `3.1_selection_pipeline/`
-- **Output**: Optimized judge sets for different objectives
+#### Quick Start
+
+```bash
+# Run with config file
+python experiments/track3_automated_selection/iterative_selection.py \
+    --config config/selection_experiment.yaml
+
+# Run with CLI arguments
+python experiments/track3_automated_selection/iterative_selection.py \
+    --data results/full_experiments/data_with_judge_scores.pkl \
+    --judges judges/helpsteer2/depth_0_parents.yaml \
+    --max-iterations 10 \
+    --min-judges 3 \
+    --output results/selection
+```
+
+#### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  Iterative Selection Loop                    │
+├─────────────────────────────────────────────────────────────┤
+│  1. Train GAM aggregator on current judge set               │
+│  2. Compute importance scores (p-values)                    │
+│  3. Evaluate judge set metrics (redundancy, diversity, R²)  │
+│  4. Analyze gaps in predictions                             │
+│  5. Remove least important judge OR                         │
+│  6. Propose complementary judge from gap analysis           │
+│  7. Check stopping criteria → repeat or exit                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Components
+
+**JudgeSetEvaluator** (`judge_set_metrics.py`):
+- Predictive power: R², Spearman ρ, Kendall τ
+- Coverage: Variance explained by judges
+- Redundancy: Mean pairwise correlation, highly correlated pairs
+- Diversity: Effective dimensionality via PCA
+- Composite score: Weighted combination of all metrics
+
+**GapAnalyzer** (`gap_analyzer.py`):
+- Systematic bias detection (over/under prediction)
+- High variance region identification
+- Cluster-based error pattern analysis
+- Judge-error correlation mapping
+- LLM-powered dimension suggestions
+
+**SelectionConfig** (`config/selection_experiment.yaml`):
+- Initial judge set and protected judges
+- Stopping criteria (max iterations, min judges, plateau patience)
+- Redundancy thresholds
+- GAM hyperparameters
+
+#### Stopping Criteria
+- `max_iterations`: Maximum loop iterations (default: 10)
+- `min_judges`: Never reduce below this count (default: 3)
+- `r2_improvement_threshold`: Stop if R² improves < 0.01
+- `plateau_patience`: Stop after N iterations without improvement
+
+#### Output
+Each run creates a timestamped directory with:
+- `config.yaml`: Saved configuration
+- `iteration_XX/`: Per-iteration results
+  - `result.json`: Full metrics and analysis
+  - `judges.txt`: Judge list at this iteration
+- `summary.json`: Final summary with R² progression
+
+## Planned Experiments
 
 ### 3.2 Generalizable Selection Heuristics
 - **Status**: Planned

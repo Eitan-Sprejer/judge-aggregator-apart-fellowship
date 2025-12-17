@@ -1,0 +1,44 @@
+# Iterative Judge Selection Experiment Configuration
+#
+# This config drives the 3.1 Iterative Judge Selection Pipeline.
+# It defines the initial judge set, stopping criteria, and selection parameters.
+
+name: "iterative-selection-helpsteer2"
+description: "Iteratively optimize judge set for HelpSteer2 helpfulness prediction"
+
+# Initial judge set configuration
+initial_judge_file: "judges/helpsteer2/depth_0_parents.yaml"
+
+# Judges that should never be removed (core evaluation dimensions)
+protected_judges:
+  - "helpsteer2-helpfulness-judge"
+  - "helpsteer2-correctness-judge"
+
+# Data configuration
+data_file: "results/full_experiments/data_with_judge_scores.pkl"  # Adjust path
+target_column: "target_helpfulness"  # Column containing ground truth scores
+train_test_split: 0.3   # Fraction for test set
+validation_split: 0.15  # Fraction of train for validation (for early stopping)
+
+# Stopping criteria
+max_iterations: 10
+min_judges: 3           # Never reduce below this
+max_judges: 15          # Don't add beyond this
+r2_improvement_threshold: 0.01  # Stop if R² improves less than this
+plateau_patience: 2     # Stop after N iterations without improvement
+
+# Redundancy control
+max_correlation: 0.9    # Flag/remove judge pairs with correlation above this
+
+# Judge proposal settings
+proposal_mode: "decompose"      # "decompose" = use children, "create" = new parents
+use_llm_suggestions: true       # Use LLM to suggest new dimensions from gap analysis
+llm_model: "openai/gpt-5-nano"  # Model for LLM-based suggestions
+
+# GAM hyperparameters (from Track 2 tuning)
+gam_n_splines: 10
+gam_lam: 0.6
+
+# Output configuration
+output_dir: "results/selection"
+save_intermediate: true  # Save results after each iteration
