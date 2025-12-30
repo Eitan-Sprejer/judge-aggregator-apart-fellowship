@@ -1,0 +1,149 @@
+================================================================================
+TRACK 3: AUTOMATED JUDGE SELECTION - PROGRESS REPORT
+Date: December 17, 2025
+================================================================================
+
+SUMMARY
+-------
+Track 3 focuses on developing systematic pipelines for selecting optimal judge 
+sets. The goal is to programmatically identify redundant judges, propose 
+complementary judges to fill gaps, and create reusable selection heuristics.
+
+================================================================================
+COMPLETED WORK
+================================================================================
+
+3.0 LLM-Driven Judge Decomposition Pipeline ✅
+----------------------------------------------
+Status: COMPLETED
+
+A three-agent LLM pipeline that recursively decomposes parent judges into 
+orthogonal sub-dimensions:
+
+  - DecompositionAgent: Identifies 3-5 orthogonal sub-dimensions
+  - BrainstormAgent: Authors detailed 5-level rubrics for each dimension  
+  - ValidationAgent: Validates coverage and minimal overlap
+
+Files:
+  - judge_decomposition/llm_judge_decomposer.py
+  - judge_decomposition/decompose_all_judges.py
+
+Output: 55 hierarchical judges (10 parents + 45 children) with parent-child
+relationships stored in YAML format.
+
+
+3.0.1 Judge Hierarchy Visualizer ✅
+-----------------------------------
+Status: COMPLETED
+
+Interactive HTML visualization of judge hierarchies using Pyvis:
+  - Color-coded nodes by depth level
+  - Hover tooltips with judge details
+  - Interactive drag/zoom/pan controls
+  - Legend and statistics panels
+  - Text tree output option
+
+File: judge_decomposition/visualize_judges.py
+
+
+3.1 Iterative Judge Selection Pipeline 🚧
+-----------------------------------------
+Status: IN PROGRESS (Core Implementation Complete, Integration Pending)
+
+Automated judge set optimization through iterative training and gap analysis.
+
+Commits:
+  - 29326e6: Initial implementation (Dec 17, 2025)
+  - 9e805fd: Bug fixes and test suite
+  - cde4096: Refactored into submodules
+
+Files:
+  - iterative_selection/iterative_selection.py  - Main controller
+  - iterative_selection/gap_analyzer.py         - Error pattern analysis
+  - iterative_selection/judge_set_metrics.py    - Composite evaluation metrics
+  - iterative_selection/test_iterative_selection.py - Test suite (all passing)
+  - config/selection_experiment.yaml            - Configuration file
+
+Components Implemented:
+  ✅ JudgeSetEvaluator - R², Spearman, redundancy, diversity metrics
+  ✅ GapAnalyzer - Systematic bias detection, cluster analysis
+  ✅ IterativeJudgeSelector - Main loop with stopping criteria
+  ✅ Test suite with synthetic data validation
+
+Directory Structure (after refactoring):
+  experiments/track3_automated_selection/
+  ├── judge_decomposition/      # 3.0 pipeline
+  │   ├── llm_judge_decomposer.py
+  │   ├── decompose_all_judges.py
+  │   └── visualize_judges.py
+  ├── iterative_selection/      # 3.1 pipeline
+  │   ├── iterative_selection.py
+  │   ├── gap_analyzer.py
+  │   ├── judge_set_metrics.py
+  │   └── test_iterative_selection.py
+  └── generated_judges/         # Output from decomposition
+
+================================================================================
+WHAT STILL NEEDS TO BE DONE
+================================================================================
+
+3.1 Iterative Selection - Remaining Tasks
+-----------------------------------------
+
+1. DATA FILE CREATION
+   The config points to a non-existent file:
+     data_file: "results/full_experiments/data_with_judge_scores.pkl"
+   
+   Need to either:
+   - Run a baseline experiment with HelpSteer2 to generate judge scores
+   - Point to an existing experiment result that has judge scores
+
+2. CONFIG FIELD COMPATIBILITY
+   The YAML config has 'name' and 'description' fields that aren't in the
+   SelectionConfig dataclass. Need to add these fields to SelectionConfig.
+
+3. LLM-BASED JUDGE PROPOSAL (TODO in code)
+   The gap analyzer can suggest missing dimensions, but the integration with
+   the judge decomposition pipeline to actually CREATE new judges is not
+   implemented yet. Currently just identifies gaps.
+
+4. END-TO-END VALIDATION
+   Run the full pipeline on real data (not synthetic test data) to validate:
+   - Judge removal decisions are sensible
+   - R² improves or plateaus appropriately
+   - Gap analysis provides actionable suggestions
+
+
+3.2 Generalizable Selection Heuristics
+--------------------------------------
+Status: PLANNED (Not Started)
+
+- Test selection pipeline on JUDGE-BENCH tasks
+- Extract rules that work across task types
+- Document "template judge sets" for common scenarios
+
+
+INTEGRATION WITH OTHER TRACKS
+-----------------------------
+
+- Needs: Track 2 GAM hyperparameters for aggregator training (have defaults)
+- Needs: Track 1 baseline experiment data with judge scores
+- Uses: YAML judge definitions from judges/helpsteer2/
+
+
+================================================================================
+RUNNING THE TESTS
+================================================================================
+
+All unit tests pass:
+
+  python experiments/track3_automated_selection/iterative_selection/test_iterative_selection.py
+
+Tests cover:
+  - JudgeSetEvaluator metrics calculation
+  - Redundancy detection
+  - GapAnalyzer pattern identification
+  - Least important judge selection
+  - Full pipeline with synthetic data
+
+================================================================================
