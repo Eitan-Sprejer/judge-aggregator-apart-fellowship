@@ -16,22 +16,22 @@ import argparse
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import yaml
 from dotenv import load_dotenv
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 PIPELINE_UTILS = REPO_ROOT / "pipeline" / "utils"
 if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 if str(PIPELINE_UTILS) not in sys.path:
     sys.path.append(str(PIPELINE_UTILS))
 
-import judge_rubrics  # type: ignore  # noqa: E402
+from pipeline.utils import judge_rubrics  # type: ignore  # noqa: E402
 
 # Import the decomposer function
-from llm_judge_decomposer import (  # noqa: E402
+from experiments.track3_automated_selection.judge_decomposition.llm_judge_decomposer import (  # noqa: E402
     ChatCompletionClient,
     InlineListDumper,
     LLMConfig,
@@ -49,6 +49,7 @@ def batch_decompose_judges(
     model: str = "openai/gpt-4.1-nano",
     temperature: float = 0.4,
     max_tokens: int = 2048,
+    name: Optional[str] = None,
 ) -> Path:
     """Decompose multiple judges and combine into single output YAML."""
     client = ChatCompletionClient(
@@ -80,7 +81,8 @@ def batch_decompose_judges(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    output_path = output_dir / f"all-judges-decomposed-{timestamp}.yaml"
+    filename = f"{name}-{timestamp}.yaml" if name else f"all-judges-decomposed-{timestamp}.yaml"
+    output_path = output_dir / filename
 
     payload = {"judges": all_judges}
     with output_path.open("w", encoding="utf-8") as handle:
@@ -127,6 +129,11 @@ def main() -> None:
         nargs="+",
         help="Specific judge IDs to decompose (if not provided, decomposes all available judges)",
     )
+    parser.add_argument(
+        "--name",
+        type=str,
+        help="Custom name prefix for output file (default: all-judges-decomposed)",
+    )
 
     args = parser.parse_args()
 
@@ -145,6 +152,7 @@ def main() -> None:
         model=args.model,
         temperature=args.temperature,
         max_tokens=args.max_tokens,
+        name=args.name,
     )
 
     print(f"Ready for aggregation experiments!")
