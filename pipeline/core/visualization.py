@@ -13,7 +13,7 @@ Generates comprehensive visualizations for experiment results including:
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -72,23 +72,92 @@ class ExperimentVisualizer:
         plt.rcParams['savefig.dpi'] = 150
         plt.rcParams['savefig.bbox'] = 'tight'
 
-    def plot_judge_importance(self, dimension: str) -> Path:
+    def plot_judge_importance(self, dimension: str) -> List[Path]:
         """
-        Create horizontal bar chart of judge importance scores.
+        Create two horizontal bar charts of judge importance:
+        1. Mean Absolute Importance - average contribution magnitude
+        2. Variance-based Importance - context-sensitivity
 
         Args:
             dimension: Target dimension name (e.g., 'helpfulness')
 
         Returns:
-            Path to saved plot
+            List of paths to saved plots
         """
         if self.gam_model is None:
-            logger.warning("No GAM model available, skipping judge importance plot")
-            return None
+            logger.warning("No GAM model available, skipping judge importance plots")
+            return []
 
-        # Extract feature importance
-        importance = self.gam_model.get_feature_importance()
+        if self.data is None or 'X_test' not in self.data:
+            logger.warning("No X_test data available, skipping judge importance plots")
+            return []
 
+        from pipeline.core.attribution_analysis import get_gam_feature_importance
+
+        X_test = self.data['X_test']
+        paths = []
+
+        # Get both types of importance
+        importance_mean = get_gam_feature_importance(
+            self.gam_model.model, X_test,
+            feature_names=self.gam_model.feature_names,
+            method='mean_absolute'
+        )
+        importance_variance = get_gam_feature_importance(
+            self.gam_model.model, X_test,
+            feature_names=self.gam_model.feature_names,
+            method='variance'
+        )
+
+        # Plot 1: Mean Absolute Importance (traditional importance)
+        path1 = self._plot_importance_bars(
+            importance_mean,
+            dimension,
+            xlabel='Mean Absolute Attribution',
+            title_suffix='Mean Importance',
+            filename_suffix='mean',
+            color='steelblue'
+        )
+        if path1:
+            paths.append(path1)
+
+        # Plot 2: Variance-based Importance (context-sensitivity)
+        path2 = self._plot_importance_bars(
+            importance_variance,
+            dimension,
+            xlabel='Attribution Variance (Context-Sensitivity)',
+            title_suffix='Context-Sensitivity',
+            filename_suffix='variance',
+            color='darkorange'
+        )
+        if path2:
+            paths.append(path2)
+
+        return paths
+
+    def _plot_importance_bars(
+        self,
+        importance: Dict[str, float],
+        dimension: str,
+        xlabel: str,
+        title_suffix: str,
+        filename_suffix: str,
+        color: str
+    ) -> Path:
+        """
+        Helper to create a horizontal bar chart of importance scores.
+
+        Args:
+            importance: Dict mapping judge names to importance scores
+            dimension: Target dimension name
+            xlabel: X-axis label
+            title_suffix: Suffix for plot title
+            filename_suffix: Suffix for filename
+            color: Bar color
+
+        Returns:
+            Path to saved plot
+        """
         # Sort by importance
         importance_df = pd.DataFrame([
             {'judge': judge, 'importance': score}
@@ -101,51 +170,39 @@ class ExperimentVisualizer:
         bars = ax.barh(
             importance_df['judge'],
             importance_df['importance'],
-            color='steelblue',
-            alpha=0.8
+            color=color,
+            alpha=0.8,
+            edgecolor='black',
+            linewidth=0.8
         )
 
-        # Color code by importance level
-        for i, bar in enumerate(bars):
-            importance_val = importance_df.iloc[i]['importance']
-            if importance_val > 0.8:
-                bar.set_color('#2ecc71')  # Green - high importance
-            elif importance_val > 0.5:
-                bar.set_color('#3498db')  # Blue - medium importance
-            else:
-                bar.set_color('#95a5a6')  # Gray - low importance
-
-        ax.set_xlabel('Importance Score (1 - p-value)', fontsize=12, fontweight='bold')
+        ax.set_xlabel(xlabel, fontsize=12, fontweight='bold')
         ax.set_ylabel('Judge', fontsize=12, fontweight='bold')
-        ax.set_title(f'Judge Importance Analysis - {dimension.title()}',
+        ax.set_title(f'Judge {title_suffix} - {dimension.title()}',
                      fontsize=14, fontweight='bold', pad=20)
-        ax.set_xlim(0, 1.0)
 
         # Add value labels on bars
+        max_val = importance_df['importance'].max()
         for i, (idx, row) in enumerate(importance_df.iterrows()):
             ax.text(
-                row['importance'] + 0.02,
+                row['importance'] + max_val * 0.02,
                 i,
-                f"{row['importance']:.3f}",
+                f"{row['importance']:.4f}",
                 va='center',
                 fontsize=9
             )
 
-        # Add legend
-        high_patch = mpatches.Patch(color='#2ecc71', label='High (>0.8)')
-        med_patch = mpatches.Patch(color='#3498db', label='Medium (0.5-0.8)')
-        low_patch = mpatches.Patch(color='#95a5a6', label='Low (<0.5)')
-        ax.legend(handles=[high_patch, med_patch, low_patch],
-                 loc='lower right', framealpha=0.9)
+        ax.set_xlim(0, max_val * 1.15)
+        ax.grid(True, alpha=0.3, axis='x')
 
         plt.tight_layout()
 
         # Save plot
-        output_path = self.plots_dir / f"judge_importance_{dimension}.png"
+        output_path = self.plots_dir / f"judge_importance_{filename_suffix}_{dimension}.png"
         plt.savefig(output_path)
         plt.close()
 
-        logger.info(f"✓ Judge importance plot saved to {output_path}")
+        logger.info(f"✓ Judge {title_suffix} plot saved to {output_path}")
         return output_path
 
     def plot_performance_table(self, dimension: str) -> Path:
@@ -765,10 +822,9 @@ class ExperimentVisualizer:
         logger.info(f"🎨 Generating visualizations for dimension: {dimension}")
 
         # Core visualizations
-        logger.info("  → Judge importance analysis...")
-        path = self.plot_judge_importance(dimension)
-        if path:
-            plot_paths.append(path)
+        logger.info("  → Judge importance analysis (mean + variance)...")
+        paths = self.plot_judge_importance(dimension)
+        plot_paths.extend(paths)
 
         logger.info("  → Performance comparison table...")
         path = self.plot_performance_table(dimension)
@@ -1012,6 +1068,10 @@ class CrossDimensionVisualizer:
                     judge_groups[parent_dim] = []
                 judge_groups[parent_dim].append(judge)
 
+        if not judge_groups:
+            logger.warning("Could not parse judge groups from names, skipping plot")
+            return None
+
         # Sort dimensions for consistent ordering
         target_dimensions = sorted(importance_data.keys())
         n_dims = len(target_dimensions)
@@ -1060,14 +1120,13 @@ class CrossDimensionVisualizer:
             ax.set_yticks(y_positions)
             # Extract last part of judge name (e.g., "Relevance To Intent" from "Helpsteer2 Helpfulness Judge Relevance To Intent")
             ax.set_yticklabels([' '.join(j.split()[3:]) for j in judges], fontsize=9)
-            ax.set_xlabel('Importance Score (1 - p-value)', fontsize=10, fontweight='bold')
+            ax.set_xlabel('Attribution Variance (Context-Sensitivity)', fontsize=10, fontweight='bold')
             ax.set_title(f'{parent_dim.title()} Judges',
                         fontsize=11, fontweight='bold', pad=10)
-            ax.set_xlim(0, 1.0)
             ax.grid(True, alpha=0.3, axis='x')
             ax.legend(loc='lower right', fontsize=8, ncol=n_dims, framealpha=0.9)
 
-        fig.suptitle('Judge Importance Across Target Dimensions',
+        fig.suptitle('Judge Context-Sensitivity Across Target Dimensions',
                      fontsize=14, fontweight='bold', y=0.995)
         plt.tight_layout()
 
@@ -1077,6 +1136,511 @@ class CrossDimensionVisualizer:
         plt.close()
 
         logger.info(f"✓ Judge importance grouped bar plot saved to {output_path}")
+        return output_path
+
+    def plot_attribution_importance_by_dimension(self) -> Path:
+        """
+        Create a 2x3 grid showing mean absolute importance for each dimension's judges.
+
+        This shows the "traditional" importance - which judges contribute most on average.
+
+        Returns:
+            Path to saved plot
+        """
+        if not self.dimension_results:
+            logger.warning("No dimension results available")
+            return None
+
+        import pickle
+        import joblib
+        from sklearn.model_selection import train_test_split
+        from pipeline.core.attribution_analysis import get_gam_feature_importance
+
+        # Load data
+        data_path = self.run_dir / "data" / "data_with_judge_scores.pkl"
+        if not data_path.exists():
+            logger.warning(f"Data file not found: {data_path}")
+            return None
+
+        with open(data_path, 'rb') as f:
+            df = pickle.load(f)
+
+        X_all = np.array([row for row in df['judge_scores']])
+
+        # Dimension indices - assumes standard HelpSteer2 layout
+        # This should be made more robust in future
+        dimension_configs = {
+            'helpfulness': list(range(5, 10)),
+            'correctness': list(range(10, 15)),
+            'coherence': list(range(15, 20)),
+            'complexity': list(range(20, 25)),
+            'verbosity': list(range(25, 30))
+        }
+
+        # Get available dimensions
+        available_dims = [d for d in dimension_configs.keys() if d in self.dimension_results]
+
+        if not available_dims:
+            logger.warning("No matching dimensions found")
+            return None
+
+        # Create figure
+        n_dims = len(available_dims)
+        ncols = 3
+        nrows = (n_dims + ncols - 1) // ncols
+        fig, axes = plt.subplots(nrows, ncols, figsize=(15, nrows * 4))
+        axes = axes.flatten()
+
+        for idx, dim_name in enumerate(available_dims):
+            ax = axes[idx]
+
+            # Get dimension-specific data
+            indices = dimension_configs.get(dim_name)
+            if indices is None:
+                continue
+
+            X_dim = X_all[:, indices]
+            y = np.array([row[dim_name] for row in df['target_human_aggregated']])
+
+            # Train/test split (same seed as experiment)
+            X_trainval, X_test, y_trainval, y_test = train_test_split(
+                X_dim, y, test_size=0.2, random_state=42
+            )
+
+            # Load GAM model
+            model_path = self.dimensions_dir / dim_name / "models" / "gam_model.pkl"
+            if not model_path.exists():
+                ax.text(0.5, 0.5, 'Model not found', ha='center', va='center',
+                       transform=ax.transAxes, fontsize=12, color='gray')
+                ax.set_title(dim_name.capitalize(), fontsize=12, fontweight='bold')
+                continue
+
+            gam_aggregator = joblib.load(model_path)
+            gam_model = gam_aggregator.model
+            feature_names = gam_aggregator.feature_names
+
+            # Get mean absolute importance
+            importance = get_gam_feature_importance(
+                gam_model, X_test, feature_names, method='mean_absolute'
+            )
+
+            # Prepare for plotting
+            short_names = [fn.split()[-1] for fn in feature_names]
+            values = [importance[fn] for fn in feature_names]
+
+            # Sort by importance
+            sorted_pairs = sorted(zip(short_names, values), key=lambda x: x[1], reverse=True)
+            names_sorted, values_sorted = zip(*sorted_pairs)
+
+            # Bar plot
+            ax.barh(names_sorted[::-1], values_sorted[::-1], color='steelblue', alpha=0.8)
+            ax.set_xlabel('Mean Absolute Attribution')
+            ax.set_title(dim_name.capitalize(), fontsize=12, fontweight='bold')
+            ax.tick_params(axis='y', labelsize=9)
+            ax.grid(True, alpha=0.3, axis='x')
+
+        # Hide unused subplots
+        for idx in range(len(available_dims), len(axes)):
+            axes[idx].axis('off')
+
+        fig.suptitle('Mean Absolute Importance by Dimension', fontsize=14, fontweight='bold')
+        plt.tight_layout()
+
+        output_path = self.plots_dir / "attribution_importance_by_dimension.png"
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        logger.info(f"✓ Attribution importance by dimension plot saved to {output_path}")
+        return output_path
+
+    def plot_top_judges_by_variance(self, top_n: int = 15) -> Path:
+        """
+        Create a bar chart showing the top N judges ranked by attribution variance.
+
+        This shows which judges are most context-dependent across all dimensions.
+
+        Args:
+            top_n: Number of top judges to show
+
+        Returns:
+            Path to saved plot
+        """
+        if not self.dimension_results:
+            logger.warning("No dimension results available")
+            return None
+
+        import pickle
+        import joblib
+        from sklearn.model_selection import train_test_split
+        from pipeline.core.attribution_analysis import get_gam_feature_importance
+
+        # Load data
+        data_path = self.run_dir / "data" / "data_with_judge_scores.pkl"
+        if not data_path.exists():
+            logger.warning(f"Data file not found: {data_path}")
+            return None
+
+        with open(data_path, 'rb') as f:
+            df = pickle.load(f)
+
+        X_all = np.array([row for row in df['judge_scores']])
+
+        # Dimension indices
+        dimension_configs = {
+            'helpfulness': list(range(5, 10)),
+            'correctness': list(range(10, 15)),
+            'coherence': list(range(15, 20)),
+            'complexity': list(range(20, 25)),
+            'verbosity': list(range(25, 30))
+        }
+
+        # Color map for dimensions
+        color_map = {
+            'helpfulness': '#1f77b4',
+            'correctness': '#ff7f0e',
+            'coherence': '#2ca02c',
+            'complexity': '#d62728',
+            'verbosity': '#9467bd'
+        }
+
+        # Collect all variance scores
+        all_variances = []
+        all_labels = []
+        colors = []
+
+        for dim_name in dimension_configs.keys():
+            if dim_name not in self.dimension_results:
+                continue
+
+            indices = dimension_configs[dim_name]
+            X_dim = X_all[:, indices]
+            y = np.array([row[dim_name] for row in df['target_human_aggregated']])
+
+            X_trainval, X_test, y_trainval, y_test = train_test_split(
+                X_dim, y, test_size=0.2, random_state=42
+            )
+
+            model_path = self.dimensions_dir / dim_name / "models" / "gam_model.pkl"
+            if not model_path.exists():
+                continue
+
+            gam_aggregator = joblib.load(model_path)
+            gam_model = gam_aggregator.model
+            feature_names = gam_aggregator.feature_names
+
+            importance_var = get_gam_feature_importance(
+                gam_model, X_test, feature_names, method='variance'
+            )
+
+            for fn in feature_names:
+                short_name = fn.split()[-1]
+                all_variances.append(importance_var[fn])
+                all_labels.append(f"{dim_name[:3].upper()}: {short_name}")
+                colors.append(color_map[dim_name])
+
+        if not all_variances:
+            logger.warning("No variance data collected")
+            return None
+
+        # Sort by variance
+        sorted_data = sorted(zip(all_labels, all_variances, colors),
+                            key=lambda x: x[1], reverse=True)
+        labels_sorted, vars_sorted, colors_sorted = zip(*sorted_data)
+
+        # Create figure
+        fig, ax = plt.subplots(figsize=(12, 8))
+
+        # Top N only
+        n_show = min(top_n, len(labels_sorted))
+        bars = ax.barh(
+            labels_sorted[:n_show][::-1],
+            vars_sorted[:n_show][::-1],
+            color=colors_sorted[:n_show][::-1],
+            alpha=0.8,
+            edgecolor='black',
+            linewidth=0.8
+        )
+
+        ax.set_xlabel('Attribution Variance (Context-Sensitivity)', fontsize=11)
+        ax.set_title(f'Top {n_show} Judges by Context-Sensitivity\n(Higher = More Context-Dependent)',
+                    fontsize=12, fontweight='bold')
+        ax.grid(True, alpha=0.3, axis='x')
+
+        # Legend
+        patches = [mpatches.Patch(color=color_map[d], label=d.capitalize())
+                  for d in dimension_configs.keys() if d in self.dimension_results]
+        ax.legend(handles=patches, loc='lower right', fontsize=9)
+
+        plt.tight_layout()
+
+        output_path = self.plots_dir / "top_judges_by_attribution_variance.png"
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        logger.info(f"✓ Top judges by variance plot saved to {output_path}")
+        return output_path
+
+    def plot_attribution_correlation_heatmaps(self) -> Path:
+        """
+        Create a combined grid of correlation heatmaps for all dimensions.
+
+        High correlation between judges suggests redundancy - they contribute
+        similarly across samples. This helps identify which judges provide
+        unique information.
+
+        Returns:
+            Path to saved plot
+        """
+        if not self.dimension_results:
+            logger.warning("No dimension results available")
+            return None
+
+        import pickle
+        import joblib
+        from sklearn.model_selection import train_test_split
+        from pipeline.core.attribution_analysis import attribution_correlation_matrix
+
+        # Load data
+        data_path = self.run_dir / "data" / "data_with_judge_scores.pkl"
+        if not data_path.exists():
+            logger.warning(f"Data file not found: {data_path}")
+            return None
+
+        with open(data_path, 'rb') as f:
+            df = pickle.load(f)
+
+        X_all = np.array([row for row in df['judge_scores']])
+
+        # Dimension indices
+        dimension_configs = {
+            'helpfulness': list(range(5, 10)),
+            'correctness': list(range(10, 15)),
+            'coherence': list(range(15, 20)),
+            'complexity': list(range(20, 25)),
+            'verbosity': list(range(25, 30))
+        }
+
+        # Get available dimensions
+        available_dims = [d for d in dimension_configs.keys() if d in self.dimension_results]
+
+        if not available_dims:
+            logger.warning("No matching dimensions found")
+            return None
+
+        # Create figure with subplots (2x3 grid for 5 dimensions)
+        n_dims = len(available_dims)
+        ncols = 3
+        nrows = 2
+        fig, axes = plt.subplots(nrows, ncols, figsize=(15, 10))
+        axes = axes.flatten()
+
+        all_redundant_pairs = {}
+
+        for idx, dim_name in enumerate(available_dims):
+            ax = axes[idx]
+
+            indices = dimension_configs[dim_name]
+            X_dim = X_all[:, indices]
+            y = np.array([row[dim_name] for row in df['target_human_aggregated']])
+
+            X_trainval, X_test, y_trainval, y_test = train_test_split(
+                X_dim, y, test_size=0.2, random_state=42
+            )
+
+            model_path = self.dimensions_dir / dim_name / "models" / "gam_model.pkl"
+            if not model_path.exists():
+                ax.text(0.5, 0.5, 'Model not found', ha='center', va='center',
+                       transform=ax.transAxes, fontsize=12, color='gray')
+                ax.set_title(dim_name.capitalize(), fontsize=11, fontweight='bold')
+                continue
+
+            gam_aggregator = joblib.load(model_path)
+            gam_model = gam_aggregator.model
+            feature_names = gam_aggregator.feature_names
+
+            # Get correlation data
+            corr_data = attribution_correlation_matrix(gam_model, X_test, feature_names)
+            corr_matrix = corr_data['correlation_matrix']
+            redundant_pairs = corr_data['redundant_pairs']
+
+            all_redundant_pairs[dim_name] = redundant_pairs
+
+            # Use short names for display
+            short_names = [fn.split()[-1] for fn in feature_names]
+
+            # Create heatmap
+            im = ax.imshow(corr_matrix, cmap='RdBu_r', vmin=-1, vmax=1, aspect='auto')
+
+            # Set ticks
+            ax.set_xticks(np.arange(len(short_names)))
+            ax.set_yticks(np.arange(len(short_names)))
+            ax.set_xticklabels(short_names, rotation=45, ha='right', fontsize=7)
+            ax.set_yticklabels(short_names, fontsize=7)
+
+            # Add correlation values as text
+            for i in range(len(short_names)):
+                for j in range(len(short_names)):
+                    val = corr_matrix[i, j]
+                    color = 'white' if abs(val) > 0.5 else 'black'
+                    ax.text(j, i, f'{val:.2f}', ha='center', va='center',
+                           color=color, fontsize=6)
+
+            ax.set_title(dim_name.capitalize(), fontsize=11, fontweight='bold')
+
+        # Hide unused subplots
+        for idx in range(len(available_dims), len(axes)):
+            axes[idx].axis('off')
+
+        # Add a single colorbar for all subplots
+        fig.subplots_adjust(right=0.88)
+        cbar_ax = fig.add_axes([0.90, 0.15, 0.02, 0.7])
+        cbar = fig.colorbar(im, cax=cbar_ax)
+        cbar.set_label('Attribution Correlation', fontsize=10)
+
+        fig.suptitle('Judge Attribution Correlations by Dimension\n(High |corr| = redundant judges)',
+                    fontsize=14, fontweight='bold')
+        plt.tight_layout(rect=[0, 0, 0.88, 0.95])
+
+        output_path = self.plots_dir / "attribution_correlation_all_dimensions.png"
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        # Log redundant pairs summary
+        for dim_name, pairs in all_redundant_pairs.items():
+            if pairs:
+                logger.info(f"  {dim_name}: {len(pairs)} redundant pairs (|corr| > 0.7)")
+                for p in pairs[:3]:  # Show top 3
+                    short1 = p[0].split()[-1]
+                    short2 = p[1].split()[-1]
+                    logger.info(f"    - {short1} <-> {short2}: {p[2]:.3f}")
+
+        logger.info(f"✓ Attribution correlation heatmaps saved to {output_path}")
+        return output_path
+
+    def plot_importance_with_confidence_intervals(self, n_bootstrap: int = 100) -> Path:
+        """
+        Create bar plot of importance scores with bootstrap confidence intervals.
+
+        Shows mean absolute importance with error bars representing 95% CI.
+
+        Args:
+            n_bootstrap: Number of bootstrap samples for CI estimation
+
+        Returns:
+            Path to saved plot
+        """
+        if not self.dimension_results:
+            logger.warning("No dimension results available")
+            return None
+
+        import pickle
+        import joblib
+        from sklearn.model_selection import train_test_split
+        from pipeline.core.attribution_analysis import get_importance_with_confidence
+
+        # Load data
+        data_path = self.run_dir / "data" / "data_with_judge_scores.pkl"
+        if not data_path.exists():
+            logger.warning(f"Data file not found: {data_path}")
+            return None
+
+        with open(data_path, 'rb') as f:
+            df = pickle.load(f)
+
+        X_all = np.array([row for row in df['judge_scores']])
+
+        # Dimension indices
+        dimension_configs = {
+            'helpfulness': list(range(5, 10)),
+            'correctness': list(range(10, 15)),
+            'coherence': list(range(15, 20)),
+            'complexity': list(range(20, 25)),
+            'verbosity': list(range(25, 30))
+        }
+
+        # Get available dimensions
+        available_dims = [d for d in dimension_configs.keys() if d in self.dimension_results]
+
+        if not available_dims:
+            logger.warning("No matching dimensions found")
+            return None
+
+        # Create figure with subplots
+        n_dims = len(available_dims)
+        ncols = 3
+        nrows = (n_dims + ncols - 1) // ncols
+        fig, axes = plt.subplots(nrows, ncols, figsize=(15, nrows * 4))
+        axes = axes.flatten()
+
+        for idx, dim_name in enumerate(available_dims):
+            ax = axes[idx]
+
+            indices = dimension_configs.get(dim_name)
+            if indices is None:
+                continue
+
+            X_dim = X_all[:, indices]
+            y = np.array([row[dim_name] for row in df['target_human_aggregated']])
+
+            X_trainval, X_test, y_trainval, y_test = train_test_split(
+                X_dim, y, test_size=0.2, random_state=42
+            )
+
+            model_path = self.dimensions_dir / dim_name / "models" / "gam_model.pkl"
+            if not model_path.exists():
+                ax.text(0.5, 0.5, 'Model not found', ha='center', va='center',
+                       transform=ax.transAxes, fontsize=12, color='gray')
+                ax.set_title(dim_name.capitalize(), fontsize=12, fontweight='bold')
+                continue
+
+            gam_aggregator = joblib.load(model_path)
+            gam_model = gam_aggregator.model
+            feature_names = gam_aggregator.feature_names
+
+            # Get importance with confidence intervals
+            importance_ci = get_importance_with_confidence(
+                gam_model, X_test, feature_names,
+                method='mean_absolute', n_bootstrap=n_bootstrap
+            )
+
+            # Prepare data for plotting
+            short_names = [fn.split()[-1] for fn in feature_names]
+            means = [importance_ci[fn]['mean'] for fn in feature_names]
+            ci_lowers = [importance_ci[fn]['ci_lower'] for fn in feature_names]
+            ci_uppers = [importance_ci[fn]['ci_upper'] for fn in feature_names]
+
+            # Sort by mean importance
+            sorted_data = sorted(zip(short_names, means, ci_lowers, ci_uppers),
+                                key=lambda x: x[1], reverse=True)
+            names_sorted, means_sorted, lowers_sorted, uppers_sorted = zip(*sorted_data)
+
+            # Calculate error bars (asymmetric)
+            errors_lower = [m - l for m, l in zip(means_sorted, lowers_sorted)]
+            errors_upper = [u - m for m, u in zip(means_sorted, uppers_sorted)]
+
+            # Plot horizontal bars with error bars
+            y_pos = np.arange(len(names_sorted))
+            ax.barh(y_pos, means_sorted[::-1], xerr=[errors_lower[::-1], errors_upper[::-1]],
+                   color='steelblue', alpha=0.8, capsize=3, ecolor='gray')
+            ax.set_yticks(y_pos)
+            ax.set_yticklabels(names_sorted[::-1], fontsize=9)
+            ax.set_xlabel('Mean Absolute Attribution (95% CI)')
+            ax.set_title(dim_name.capitalize(), fontsize=12, fontweight='bold')
+            ax.grid(True, alpha=0.3, axis='x')
+
+        # Hide unused subplots
+        for idx in range(len(available_dims), len(axes)):
+            axes[idx].axis('off')
+
+        fig.suptitle(f'Importance with Bootstrap Confidence Intervals (n={n_bootstrap})',
+                    fontsize=14, fontweight='bold')
+        plt.tight_layout()
+
+        output_path = self.plots_dir / "importance_with_confidence_intervals.png"
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        logger.info(f"✓ Importance with confidence intervals plot saved to {output_path}")
         return output_path
 
     def generate_all_global_plots(self) -> List[Path]:
@@ -1101,9 +1665,32 @@ class CrossDimensionVisualizer:
             if path:
                 plot_paths.append(path)
 
-        # Judge importance grouped bar plot
-        logger.info("  → Judge importance grouped bars...")
+        # Judge importance grouped bar plot (uses variance from tuning results)
+        logger.info("  → Judge context-sensitivity grouped bars...")
         path = self.plot_judge_importance_grouped_bars()
+        if path:
+            plot_paths.append(path)
+
+        # Attribution-based importance plots (computed fresh from models)
+        logger.info("  → Attribution importance by dimension (mean absolute)...")
+        path = self.plot_attribution_importance_by_dimension()
+        if path:
+            plot_paths.append(path)
+
+        logger.info("  → Top judges by variance (context-sensitivity)...")
+        path = self.plot_top_judges_by_variance()
+        if path:
+            plot_paths.append(path)
+
+        # Attribution correlation heatmaps (redundancy detection)
+        logger.info("  → Attribution correlation heatmaps...")
+        path = self.plot_attribution_correlation_heatmaps()
+        if path:
+            plot_paths.append(path)
+
+        # Importance with bootstrap confidence intervals
+        logger.info("  → Importance with confidence intervals...")
+        path = self.plot_importance_with_confidence_intervals(n_bootstrap=100)
         if path:
             plot_paths.append(path)
 
