@@ -141,18 +141,28 @@ class GAMAggregator:
             raise ValueError("Model must be fitted before scoring")
         return self.model.score(X, y)
     
-    def get_feature_importance(self) -> Dict[str, float]:
-        """Get feature importance scores for each judge/feature."""
+    def get_feature_importance(self, X_data: np.ndarray) -> Dict[str, float]:
+        """Get feature importance scores using attribution-based analysis.
+
+        Computes per-sample attributions from GAM spline basis functions,
+        then uses variance across samples as the importance score.
+
+        Args:
+            X_data: Input data for computing per-sample attributions
+
+        Returns:
+            Dictionary mapping feature names to importance scores
+        """
         if self.model is None:
             raise ValueError("Model must be fitted first")
 
-        importance = {}
-        for i, label in enumerate(self.feature_names):
-            # Use p-value as inverse importance (lower p-value = more important)
-            p_value = self.model.statistics_['p_values'][i] if i < len(self.model.statistics_['p_values']) else 1.0
-            importance[label] = 1.0 - p_value
-
-        return importance
+        from pipeline.core.attribution_analysis import get_gam_feature_importance
+        return get_gam_feature_importance(
+            self.model,
+            X_data,
+            feature_names=self.feature_names,
+            method='variance'
+        )
 
     def save_model(self, path: Union[str, Path]):
         """Save GAM model to disk using joblib (sklearn-recommended).
