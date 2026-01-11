@@ -90,57 +90,87 @@ helpsteer2:
   response_format: "json"
 
 summeval:
+  # EXACT annotation guidelines from SummEval (Fabbri et al., 2021)
+  # These are the verbatim instructions given to human annotators
   rubric: |
-    You are evaluating the quality of a text summary. Please rate the summary across 4 dimensions:
+    In this task you will evaluate the quality of a summary written for a news article.
+    Rate the summary on a scale from 1 (worst) to 5 (best) by its relevance, consistency, fluency, and coherence.
 
-    **Dimensions to evaluate:**
+    ## Definitions
 
-    1. **Coherence (1-5)**: How well-structured and organized is the summary?
-       - 1: Completely incoherent
-       - 2: Mostly incoherent with some structure
-       - 3: Somewhat coherent
-       - 4: Coherent with minor issues
-       - 5: Perfectly coherent
+    **Relevance:**
+    The rating measures how well the summary captures the key points of the article.
+    Consider whether all and only the important aspects are contained in the summary.
 
-    2. **Consistency (1-5)**: Is the summary factually consistent with the source document?
-       - 1: Highly inconsistent, major contradictions
-       - 2: Mostly inconsistent
-       - 3: Somewhat consistent
-       - 4: Mostly consistent with minor issues
-       - 5: Completely consistent
+    **Consistency:**
+    The rating measures whether the facts in the summary are consistent with the facts in the original article.
+    Consider whether the summary does reproduce all facts accurately and does not make up untrue information.
 
-    3. **Fluency (1-5)**: Is the summary well-written and grammatically correct?
-       - 1: Very poor fluency, many errors
-       - 2: Poor fluency
-       - 3: Acceptable fluency
-       - 4: Good fluency with minor errors
-       - 5: Excellent fluency
+    **Fluency:**
+    This rating measures the quality of individual sentences, are they well-written and grammatically correct.
+    Consider the quality of individual sentences.
 
-    4. **Relevance (1-5)**: Does the summary capture the most important information?
-       - 1: Not relevant at all
-       - 2: Mostly irrelevant
-       - 3: Somewhat relevant
-       - 4: Mostly relevant
-       - 5: Highly relevant
+    **Coherence:**
+    The rating measures the quality of all sentences collectively, to the fit together and sound naturally.
+    Consider the quality of the summary as a whole.
 
-    **Instructions:**
-    - Read both the source document and the summary
+    ## Instructions
+    - Carefully read the news article, be aware of the information it contains
+    - Read the proposed summary
+    - Rate the summary on a scale from 1 (worst) to 5 (best) by its relevance, consistency, fluency, and coherence
     - For each dimension, provide a brief explanation (1-2 sentences) and then a score (1-5)
-    - Return in JSON format: {"coherence": {"explanation": "...", "score": X}, "consistency": {"explanation": "...", "score": X}, "fluency": {"explanation": "...", "score": X}, "relevance": {"explanation": "...", "score": X}}
+    - Return in JSON format: {"relevance": {"explanation": "...", "score": X}, "consistency": {"explanation": "...", "score": X}, "fluency": {"explanation": "...", "score": X}, "coherence": {"explanation": "...", "score": X}}
 
   dimensions:
-    - name: "coherence"
-      scale: [1, 5]
-      description: "Structure and organization quality"
-    - name: "consistency"
-      scale: [1, 5]
-      description: "Factual consistency with source"
-    - name: "fluency"
-      scale: [1, 5]
-      description: "Writing quality and grammar"
     - name: "relevance"
       scale: [1, 5]
-      description: "Importance of captured information"
+      description: "How well the summary captures the key points of the article"
+    - name: "consistency"
+      scale: [1, 5]
+      description: "Factual consistency with the original article"
+    - name: "fluency"
+      scale: [1, 5]
+      description: "Quality of individual sentences - well-written and grammatically correct"
+    - name: "coherence"
+      scale: [1, 5]
+      description: "Quality of all sentences collectively - fit together and sound natural"
+
+  response_format: "json"
+
+wmt_en_de:
+  # Annotation guidelines for WMT-20 English→German translation quality
+  # Based on Scalar Quality Metric (SQM) from Freitag et al., TACL 2021
+  # Professional translators (native German speakers) rated translations
+  rubric: |
+    You are evaluating translation quality. Given a source text (English) and its translation (German), rate the translation on a scale from 0 to 6 based on how well it preserves the meaning of the source and how natural it reads in the target language.
+
+    ## Quality Scale (0-6)
+
+    **0 - Nonsense**: The translation is completely unrelated to the source, incomprehensible, or no meaning is preserved whatsoever.
+
+    **1 - Very low quality**: Only fragments of meaning are preserved. The translation is largely incomprehensible or misleading.
+
+    **2 - Low quality**: Some meaning is preserved, but the translation is difficult to understand due to major accuracy or fluency errors.
+
+    **3 - Medium quality**: The core meaning is preserved and the translation is understandable, but there are significant errors in accuracy, fluency, or both.
+
+    **4 - Good quality**: Most of the meaning is preserved accurately. There are some minor errors in accuracy or fluency, but they do not significantly impede understanding.
+
+    **5 - Very good quality**: The meaning is fully preserved with only minor fluency issues (e.g., slightly unnatural phrasing, minor stylistic issues). No accuracy errors.
+
+    **6 - Perfect**: The translation accurately conveys all meaning from the source with natural, fluent target language. No errors.
+
+    ## Instructions
+    - Read the source text (English)
+    - Read the translation (German)
+    - Rate overall translation quality on a 0-6 scale considering both meaning preservation and fluency
+    - Provide a brief explanation (1-2 sentences) and then a score (0-6)
+    - Return in JSON format: {"quality": {"explanation": "...", "score": X}}
+
+  dimensions:
+    - name: "quality"
+      scale: [0, 6]
+      description: "Overall translation quality - meaning preservation and target language fluency"
 
   response_format: "json"
 
