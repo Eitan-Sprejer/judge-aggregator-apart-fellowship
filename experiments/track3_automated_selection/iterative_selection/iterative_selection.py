@@ -52,6 +52,15 @@ from experiments.track3_automated_selection.iterative_selection.gap_analyzer imp
     GapAnalysisResult,
     identify_least_important_judge,
 )
+from experiments.track3_automated_selection.judge_decomposition.llm_judge_decomposer import (
+    ChatCompletionClient,
+    LLMConfig,
+)
+
+from experiments.track2_judge_interpretability.explainability.fetch_attributions import (
+    gam_interp,
+    contribution_based_importance,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +68,10 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SelectionConfig:
     """Configuration for iterative judge selection."""
+    
+    # Metadata
+    name: str = "iterative-selection"
+    description: str = ""
     
     # Initial judge set
     initial_judge_file: str = "judges/helpsteer2/depth_0_parents.yaml"
@@ -73,9 +86,12 @@ class SelectionConfig:
     # Stopping criteria
     max_iterations: int = 10
     min_judges: int = 3
+    target_judges: Optional[int] = None
     max_judges: int = 15
     r2_improvement_threshold: float = 0.01  # Stop if R² improves less than this
+    r2_degradation_threshold: Optional[float] = None  # Stop if R² drops more than this
     plateau_patience: int = 2  # Stop after this many iterations without improvement
+    selection_mode: str = "backward"  # "backward" or "forward"
     
     # Redundancy thresholds
     max_correlation: float = 0.9  # Remove if pair exceeds this
@@ -158,8 +174,23 @@ class IterativeJudgeSelector:
         self.judge_set_evaluator = JudgeSetEvaluator(
             correlation_threshold=config.max_correlation
         )
+        
+        # Initialize LLM client for gap analysis if needed
+        llm_client = None
+        if config.use_llm_suggestions:
+            try:
+                llm_config = LLMConfig(
+                    model=config.llm_model,
+                    temperature=0.4,
+                    max_tokens=2048,
+                )
+                llm_client = ChatCompletionClient(llm_config)
+            except RuntimeError as exc:
+                logger.warning("LLM client unavailable, continuing without suggestions: %s", exc)
+        
         self.gap_analyzer = GapAnalyzer(
-            use_llm_suggestions=config.use_llm_suggestions
+            use_llm_suggestions=config.use_llm_suggestions,
+            llm_client=llm_client,
         )
         
         # State tracking
@@ -191,6 +222,16 @@ class IterativeJudgeSelector:
                 self.df = pickle.load(f)
         else:
             raise ValueError("Must provide df or config.data_file")
+        
+        # Extract target values if needed (for workshop data with human_feedback dict)
+        if self.config.target_column not in self.df.columns:
+            if "human_feedback" in self.df.columns:
+                logger.info("Extracting target from human_feedback column")
+                self.df[self.config.target_column] = self.df["human_feedback"].apply(
+                    lambda x: x.get("score", x.get("average_score", 0)) if isinstance(x, dict) else 0
+                )
+            else:
+                raise ValueError(f"Target column '{self.config.target_column}' not found in data")
         
         logger.info(f"Loaded data with {len(self.df)} samples")
     
@@ -306,7 +347,48 @@ class IterativeJudgeSelector:
         test_metrics = compute_metrics(y_test, test_predictions)
         
         # Get importance scores
-        importance = gam.get_feature_importance()
+        importance = gam.get_feature_importance(X_test)
+        
+        # Enhanced importance calculation using Track 2 methods
+        try:
+            # Prepare data for attribution analysis
+            interp_df = pd.DataFrame({"judge_scores": list(X_test)})
+            
+            attributions = gam_interp(
+                gam.model,
+                interp_df,
+                {"n_splines": self.config.gam_n_splines},
+            )
+            contrib_importance_list = contribution_based_importance(attributions)
+            
+            # Map back to judge names
+            contrib_importance = {
+                name: score
+                for name, score in zip(judge_names, contrib_importance_list)
+            }
+            
+            # Combine with attribution-based importance
+            base_vals = np.array([importance.get(name, 0.0) for name in judge_names], dtype=float)
+            contrib_vals = np.array([contrib_importance.get(name, 0.0) for name in judge_names], dtype=float)
+            
+            def normalize(vals: np.ndarray) -> np.ndarray:
+                if vals.max() > vals.min():
+                    return (vals - vals.min()) / (vals.max() - vals.min())
+                return vals
+            
+            base_norm = normalize(base_vals)
+            contrib_norm = normalize(contrib_vals)
+            
+            combined_importance = {}
+            for i, name in enumerate(judge_names):
+                combined_importance[name] = 0.5 * base_norm[i] + 0.5 * contrib_norm[i]
+            
+            logger.info("Combined importance scores calculated (Attribution + Contribution)")
+            importance = combined_importance
+            
+        except Exception as e:
+            logger.warning(f"Failed to calculate contribution-based importance: {e}")
+            # Fallback to attribution-based importance (already in 'importance' variable)
         
         # Evaluate judge set
         judge_set_metrics = self.judge_set_evaluator.evaluate(
@@ -337,12 +419,19 @@ class IterativeJudgeSelector:
             improvement=improvement,
         )
         
-        # Update best R² if improved
-        if improvement > self.config.r2_improvement_threshold:
-            self.best_r2 = current_r2
-            self.plateau_count = 0
+        # Update best R² and plateau counter
+        if self.config.r2_degradation_threshold is not None:
+            if current_r2 > self.best_r2:
+                self.best_r2 = current_r2
+                self.plateau_count = 0
+            else:
+                self.plateau_count += 1
         else:
-            self.plateau_count += 1
+            if improvement > self.config.r2_improvement_threshold:
+                self.best_r2 = current_r2
+                self.plateau_count = 0
+            else:
+                self.plateau_count += 1
         
         result = IterationResult(
             iteration=iteration,
@@ -375,9 +464,20 @@ class IterativeJudgeSelector:
         if iteration >= self.config.max_iterations:
             return True, "max_iterations_reached"
         
+        # Target number of judges reached
+        if self.config.target_judges is not None and n_judges <= self.config.target_judges:
+            return True, f"target_judges_reached_{self.config.target_judges}"
+        
         # Minimum judges reached
         if n_judges <= self.config.min_judges:
             return True, "min_judges_reached"
+        
+        # Performance degradation too severe
+        if (
+            self.config.r2_degradation_threshold is not None
+            and improvement < -self.config.r2_degradation_threshold
+        ):
+            return True, f"performance_degraded_by_{abs(improvement):.4f}"
         
         # Plateau detected
         if self.plateau_count >= self.config.plateau_patience:
@@ -483,11 +583,26 @@ class IterativeJudgeSelector:
                 result.importance_scores,
             )
             
-            if judge_to_remove and len(current_judge_names) > self.config.min_judges:
-                logger.info(f"Removing judge: {judge_to_remove}")
+            removal_floor = (
+                self.config.target_judges
+                if self.config.target_judges is not None
+                else self.config.min_judges
+            )
+            
+            if judge_to_remove and len(current_judge_names) > removal_floor:
+                logger.info(
+                    "Removing judge: %s (importance: %.4f)",
+                    judge_to_remove,
+                    result.importance_scores.get(judge_to_remove, 0.0),
+                )
                 current_judge_names = [j for j in current_judge_names if j != judge_to_remove]
                 self.current_judges = [j for j in self.current_judges if j["id"] != judge_to_remove]
                 removed = judge_to_remove
+            elif self.config.target_judges is not None and len(current_judge_names) <= self.config.target_judges:
+                logger.info(
+                    "Reached target of %s judges. Stopping removal.",
+                    self.config.target_judges,
+                )
             
             # TODO: Propose new judge based on gap analysis
             # new_judge = self._propose_new_judge(...)

@@ -15,8 +15,8 @@ protected_judges:
   - "helpsteer2-correctness-judge"
 
 # Data configuration
-data_file: "results/full_experiments/data_with_judge_scores.pkl"  # Adjust path
-target_column: "target_helpfulness"  # Column containing ground truth scores
+data_file: "datasets/data_with_judge_scores.pkl"  # Workshop dataset (2000 samples)
+target_column: "target"  # Column containing ground truth scores (generic target for workshop data)
 train_test_split: 0.3   # Fraction for test set
 validation_split: 0.15  # Fraction of train for validation (for early stopping)
 
