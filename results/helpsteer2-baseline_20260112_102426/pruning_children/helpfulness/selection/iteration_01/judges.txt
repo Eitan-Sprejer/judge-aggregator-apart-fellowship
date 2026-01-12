@@ -1,0 +1,4 @@
+helpsteer2-helpfulness-judge-relevance-to-intent
+helpsteer2-helpfulness-judge-actionability-and-specificity
+helpsteer2-helpfulness-judge-completeness-of-solution
+helpsteer2-helpfulness-judge-context-tailoring-and-assumptions

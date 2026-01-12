@@ -1,0 +1,24 @@
+data_file: results/helpsteer2-baseline_20260112_102426/pruning_children/complexity/data_with_judge_scores.pkl
+description: Prune child judges to half (rounded up)
+gam_lam: 0.6
+gam_n_splines: 10
+initial_judge_file: results/helpsteer2-baseline_20260112_102426/pruning_children/complexity/child_judges.yaml
+llm_model: openai/gpt-5-nano
+max_correlation: 0.9
+max_iterations: 10
+max_judges: 15
+min_judges: 2
+name: helpsteer2-complexity-prune-children
+output_dir: results/helpsteer2-baseline_20260112_102426/pruning_children/complexity/selection
+plateau_patience: 10
+proposal_mode: decompose
+protected_judges: []
+r2_degradation_threshold: null
+r2_improvement_threshold: 0.0
+save_intermediate: true
+selection_mode: backward
+target_column: target
+target_judges: 3
+train_test_split: 0.2
+use_llm_suggestions: false
+validation_split: 0.15

@@ -1,0 +1,99 @@
+{
+  "iteration": 2,
+  "judge_names": [
+    "helpsteer2-verbosity-judge-structural-expansion",
+    "helpsteer2-verbosity-judge-extras-density",
+    "helpsteer2-verbosity-judge-redundancy"
+  ],
+  "n_judges": 3,
+  "train_metrics": {
+    "mse": 0.3979114766269071,
+    "mae": 0.46348091025825483,
+    "r2": 0.39313708916182577,
+    "spearman_rho": 0.5478958171500864,
+    "kendall_tau": 0.4444360593438556,
+    "pearson_r": 0.6270106221918975
+  },
+  "test_metrics": {
+    "mse": 0.44658472957801104,
+    "mae": 0.48433821847072006,
+    "r2": 0.22882968472109988,
+    "spearman_rho": 0.4767242310087962,
+    "kendall_tau": 0.3861077432893277,
+    "pearson_r": 0.4995703204346946
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.22882968472109988,
+      "mse": 0.44658472957801104,
+      "mae": 0.48433821847072006,
+      "spearman_rho": 0.4767242310087962,
+      "kendall_tau": 0.3861077432893277,
+      "pearson_r": 0.4995703204346946
+    },
+    "coverage": {
+      "variance_explained": 0.2736674850327454,
+      "coverage_score": 0.2736674850327454
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.30824928039183436,
+      "max_pairwise_correlation": 0.46844784744534085,
+      "redundancy_score": 0.6917507196081656,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 2.441517093735863,
+      "diversity_index": 0.8138390312452876
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.5177239134468721,
+      "entropy": 0.4835147751127407
+    },
+    "composite_score": 0.4473833210656797
+  },
+  "importance_scores": {
+    "helpsteer2-verbosity-judge-structural-expansion": 0.0,
+    "helpsteer2-verbosity-judge-extras-density": 0.28768760568322,
+    "helpsteer2-verbosity-judge-redundancy": 1.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-verbosity-judge-extras-density' scores are low",
+        "severity": 0.5035509457884829,
+        "affected_samples": 98,
+        "characteristics": {
+          "judge": "helpsteer2-verbosity-judge-extras-density",
+          "low_score_error_var": 0.6059544467279658,
+          "high_score_error_var": 0.2908406854340899
+        },
+        "suggested_dimension": "helpsteer2-verbosity-judge-extras-density-specificity"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": -0.0015326052263273304,
+      "std_error": 0.6682681951875544,
+      "mean_abs_error": 0.48433821847072006,
+      "median_abs_error": 0.33961408664226256,
+      "max_abs_error": 3.1899834557929685,
+      "pct_high_error": 38.5,
+      "skewness": 0.6985327265454948,
+      "kurtosis": 2.8833475235382835
+    },
+    "judge_error_correlations": {
+      "helpsteer2-verbosity-judge-structural-expansion": -0.030942091242389218,
+      "helpsteer2-verbosity-judge-extras-density": -0.03915698935377684,
+      "helpsteer2-verbosity-judge-redundancy": -0.2021048364589178
+    },
+    "suggested_dimensions": [
+      "helpsteer2-verbosity-judge-extras-density-specificity"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 38.5% samples with error > 0.5\nMean absolute error: 0.484\nError skewness: 0.699\n\nIdentified 1 gap patterns:\n  1. [high_variance] High error variance when 'helpsteer2-verbosity-judge-extras-density' scores are low\n     Severity: 0.50, Affected: 98 samples\n\nSuggested new dimensions: helpsteer2-verbosity-judge-extras-density-specificity"
+  },
+  "improvement": -0.022355615775422333,
+  "should_stop": true,
+  "stop_reason": "target_judges_reached_3"
+}

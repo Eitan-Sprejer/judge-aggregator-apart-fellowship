@@ -46,7 +46,7 @@ TRACK3_DIR = REPO_ROOT / "experiments" / "track3_automated_selection"
 if str(TRACK3_DIR) not in sys.path:
     sys.path.append(str(TRACK3_DIR))
 
-from experiments.track3_automated_selection.llm_judge_decomposer import (
+from experiments.track3_automated_selection.judge_decomposition.llm_judge_decomposer import (
     ChatCompletionClient,
     DecompositionAgent,
     BrainstormAgent,
