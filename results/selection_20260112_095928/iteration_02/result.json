@@ -1,0 +1,166 @@
+{
+  "iteration": 2,
+  "judge_names": [
+    "truthfulness-judge",
+    "harmlessness-judge",
+    "helpfulness-judge",
+    "instruction-following-judge",
+    "clarity-judge",
+    "conciseness-judge",
+    "logical-consistency-judge",
+    "creativity-judge"
+  ],
+  "n_judges": 8,
+  "train_metrics": {
+    "mse": 2.306252172914577,
+    "mae": 1.0736146423726771,
+    "r2": 0.6679972206947962,
+    "spearman_rho": 0.7500413715053283,
+    "kendall_tau": 0.5795880692682656,
+    "pearson_r": 0.8173150812145986
+  },
+  "test_metrics": {
+    "mse": 2.1250272035825257,
+    "mae": 1.052560711207774,
+    "r2": 0.695766917287449,
+    "spearman_rho": 0.7392442488264603,
+    "kendall_tau": 0.5673676536753931,
+    "pearson_r": 0.8369529396889974
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.695766917287449,
+      "mse": 2.1250272035825257,
+      "mae": 1.052560711207774,
+      "spearman_rho": 0.7392442488264603,
+      "kendall_tau": 0.5673676536753931,
+      "pearson_r": 0.8369529396889974
+    },
+    "coverage": {
+      "variance_explained": 0.7072363514900222,
+      "coverage_score": 0.7072363514900222
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.6111616200718467,
+      "max_pairwise_correlation": 0.8314420082598868,
+      "redundancy_score": 0.3888383799281533,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 1.8988129187629172,
+      "diversity_index": 0.23735161484536466
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.5359725027602169,
+      "entropy": 0.7436126340387317
+    },
+    "composite_score": 0.5449920361676877
+  },
+  "importance_scores": {
+    "truthfulness-judge": 1.0,
+    "harmlessness-judge": 0.18758499027852643,
+    "helpfulness-judge": 0.22305588241015112,
+    "instruction-following-judge": 0.8328194335802692,
+    "clarity-judge": 0.1881413217584203,
+    "conciseness-judge": 0.0,
+    "logical-consistency-judge": 0.082007858177057,
+    "creativity-judge": 0.08863842103856456
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpfulness-judge' scores are low",
+        "severity": 0.5421984345348676,
+        "affected_samples": 291,
+        "characteristics": {
+          "judge": "helpfulness-judge",
+          "low_score_error_var": 2.9308612858877683,
+          "high_score_error_var": 1.3413785263886127
+        },
+        "suggested_dimension": "helpfulness-judge-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'instruction-following-judge' scores are low",
+        "severity": 0.5653891552163581,
+        "affected_samples": 180,
+        "characteristics": {
+          "judge": "instruction-following-judge",
+          "low_score_error_var": 3.4221455051249614,
+          "high_score_error_var": 1.503181440407804
+        },
+        "suggested_dimension": "instruction-following-judge-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'clarity-judge' scores are low",
+        "severity": 0.5112947958280756,
+        "affected_samples": 262,
+        "characteristics": {
+          "judge": "clarity-judge",
+          "low_score_error_var": 2.9543098239137984,
+          "high_score_error_var": 1.4345237111836329
+        },
+        "suggested_dimension": "clarity-judge-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'logical-consistency-judge' scores are low",
+        "severity": 0.5371170822407051,
+        "affected_samples": 265,
+        "characteristics": {
+          "judge": "logical-consistency-judge",
+          "low_score_error_var": 2.978664063224524,
+          "high_score_error_var": 1.3764128333055219
+        },
+        "suggested_dimension": "logical-consistency-judge-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'creativity-judge' scores are low",
+        "severity": 0.5728533007187271,
+        "affected_samples": 291,
+        "characteristics": {
+          "judge": "creativity-judge",
+          "low_score_error_var": 2.997368770459265,
+          "high_score_error_var": 1.29808741378405
+        },
+        "suggested_dimension": "creativity-judge-specificity"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": -0.0036127900180772995,
+      "std_error": 1.4577428275696682,
+      "mean_abs_error": 1.052560711207774,
+      "median_abs_error": 0.768196482409878,
+      "max_abs_error": 5.975706320547221,
+      "pct_high_error": 63.0,
+      "skewness": -0.16136582491939747,
+      "kurtosis": 1.814120103738924
+    },
+    "judge_error_correlations": {
+      "truthfulness-judge": 0.11286954430118307,
+      "harmlessness-judge": 0.035593859546127336,
+      "helpfulness-judge": 0.12263169902312533,
+      "instruction-following-judge": 0.16319748597917264,
+      "clarity-judge": 0.11922124275713006,
+      "conciseness-judge": 0.12161879323315546,
+      "logical-consistency-judge": 0.1656489262647927,
+      "creativity-judge": 0.03304052025192574
+    },
+    "suggested_dimensions": [
+      "helpfulness-judge-specificity",
+      "instruction-following-judge-specificity",
+      "clarity-judge-specificity",
+      "logical-consistency-judge-specificity",
+      "creativity-judge-specificity"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 63.0% samples with error > 0.5\nMean absolute error: 1.053\nError skewness: -0.161\n\nIdentified 5 gap patterns:\n  1. [high_variance] High error variance when 'helpfulness-judge' scores are low\n     Severity: 0.54, Affected: 291 samples\n  2. [high_variance] High error variance when 'instruction-following-judge' scores are low\n     Severity: 0.57, Affected: 180 samples\n  3. [high_variance] High error variance when 'clarity-judge' scores are low\n     Severity: 0.51, Affected: 262 samples\n  4. [high_variance] High error variance when 'logical-consistency-judge' scores are low\n     Severity: 0.54, Affected: 265 samples\n  5. [high_variance] High error variance when 'creativity-judge' scores are low\n     Severity: 0.57, Affected: 291 samples\n\nSuggested new dimensions: helpfulness-judge-specificity, instruction-following-judge-specificity, clarity-judge-specificity, logical-consistency-judge-specificity, creativity-judge-specificity"
+  },
+  "improvement": 0.0006112863715270755,
+  "should_stop": false,
+  "stop_reason": null
+}

@@ -1,0 +1,7 @@
+iteration	n_judges	removed	added
+0	10	explanatory-depth-judge	None
+1	9	honesty-judge	None
+2	8	conciseness-judge	None
+3	7	logical-consistency-judge	None
+4	6	creativity-judge	None
+5	5	None	None
