@@ -1,0 +1,357 @@
+judges:
+- id: helpsteer2-verbosity-judge-minimal-overage
+  name: Minimal Sufficiency Overage
+  version: '1.0'
+  description: "Measures how far a response\u2019s length exceeds the minimally sufficient\
+    \ amount for its prompt type. Establish a minimal baseline (e.g., one sentence\
+    \ for fact lookup, one command for shell tasks, a minimal patch for short fixes),\
+    \ then compute the overage ratio r = actual length \xF7 baseline length using\
+    \ words for prose-heavy responses and code lines for code-first responses. Under-length\
+    \ or exactly minimal responses are treated as zero overage."
+  scoring_description: Score how well the response demonstrates minimal sufficiency
+    overage
+  definition: "Measures how far a response\u2019s length exceeds the minimally sufficient\
+    \ amount for its prompt type. Establish a minimal baseline (e.g., one sentence\
+    \ for fact lookup, one command for shell tasks, a minimal patch for short fixes),\
+    \ then compute the overage ratio r = actual length \xF7 baseline length using\
+    \ words for prose-heavy responses and code lines for code-first responses. Under-length\
+    \ or exactly minimal responses are treated as zero overage."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: No Overage
+    indicators:
+    - "Overage ratio r \u2264 1.05 relative to the defined minimal baseline (use words\
+      \ for prose-heavy, lines for code-first)."
+    - Contains only the direct output with no added examples, options, or structural
+      expansion (lists/sections).
+  - range:
+    - 1.0
+    - 1.9
+    label: Slight Overage
+    indicators:
+    - "1.05 < r \u2264 1.20 above the minimal baseline."
+    - "At most one brief extra clause or note in prose, or \u22642 extra code lines;\
+      \ no lists, headings, or multi-step expansions."
+  - range:
+    - 2.0
+    - 2.9
+    label: Moderate Overage
+    indicators:
+    - "1.20 < r \u2264 1.60 above the minimal baseline."
+    - "One short supporting sentence or a compact list (\u22643 bullets), or small\
+      \ code additions/wrappers (e.g., minor boilerplate) without extended narrative."
+  - range:
+    - 3.0
+    - 3.9
+    label: Large Overage
+    indicators:
+    - "1.60 < r \u2264 2.50 above the minimal baseline."
+    - Multiple sentences/paragraphs or multi-step list; code accompanied by notable
+      commentary, options, or examples that expand length substantially.
+  - range:
+    - 4.0
+    - 4.0
+    label: Extreme Overage
+    indicators:
+    - r > 2.50 above the minimal baseline.
+    - 'Extensive expansion: multiple sections/examples, long lists, or large code
+      blocks with substantial narrative well beyond what the prompt minimally requires.'
+  guidelines:
+  - "Word/line count ratio to estimated minimum (e.g., >2\xD7 indicates overage)."
+  - Code lines exceed the minimal functional snippet by a large margin.
+  - Includes additional sentences where a single direct line would suffice.
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-structural-expansion
+  name: Structural Expansion
+  version: '1.0'
+  description: "Measures how much organizational structure (headings, sections, lists,\
+    \ sub-bullets, tables/callouts) is added beyond a direct, linear answer. Scoring\
+    \ reflects the volume and complexity of structure relative to a minimally structured\
+    \ response for the task type. It does not judge content quality or correctness\u2014\
+    only the extent of structural buildup."
+  scoring_description: Score how well the response demonstrates structural expansion
+  definition: "Measures how much organizational structure (headings, sections, lists,\
+    \ sub-bullets, tables/callouts) is added beyond a direct, linear answer. Scoring\
+    \ reflects the volume and complexity of structure relative to a minimally structured\
+    \ response for the task type. It does not judge content quality or correctness\u2014\
+    only the extent of structural buildup."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Minimal
+    indicators:
+    - 'No explicit structure: a single sentence or compact paragraph; or a single
+      short code block with no headings.'
+    - No lists, steps, sections, tables, callouts, or nesting.
+    - Structure matches a direct answer only (no organizational scaffolding).
+  - range:
+    - 1.0
+    - 1.9
+    label: Low
+    indicators:
+    - "One light structural element: a short list (up to 3 items) or a brief 2\u2013\
+      3 step sequence; no headings or sections."
+    - No nesting or sub-bullets; no tables/callouts; mostly linear text.
+    - "May include a simple label (e.g., \u201CAnswer:\u201D) but no additional partitioning."
+  - range:
+    - 2.0
+    - 2.9
+    label: Moderate
+    indicators:
+    - "One primary list of about 3\u20136 items or a single section with a heading\
+      \ plus one list."
+    - "At most 1 level of sub-bullets for 1\u20132 items; no more than one section\
+      \ heading overall."
+    - No tables/callouts; minimal intro/outro beyond the single structured block.
+  - range:
+    - 3.0
+    - 3.9
+    label: High
+    indicators:
+    - "Multiple structured parts: 2\u20133 sections with headings or a multi-step\
+      \ procedure of 6+ steps."
+    - Some nesting (sub-bullets up to depth 2) and/or inclusion of one auxiliary element
+      (e.g., a single table or callout).
+    - Clear scaffolding with intro plus sections and lists, but limited to a small
+      set of sections.
+  - range:
+    - 4.0
+    - 4.0
+    label: Extensive
+    indicators:
+    - "Several sections (4+), or a long step-by-step broken into subsections; multiple\
+      \ lists with nested bullets (depth \u22652) in multiple places."
+    - Use of multiple structural elements across the response (headings/subheadings,
+      numbered and bulleted lists, tables/callouts, labeled tips/FAQs).
+    - Heavy organizational scaffolding well beyond a direct answer (overview, prerequisites,
+      steps, alternatives, conclusions, etc.).
+  guidelines:
+  - Presence and count of headings/sections beyond none.
+  - List length and depth (e.g., number of bullets/steps, sub-bullets).
+  - Multi-paragraph layout instead of a single sentence or snippet.
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-extras-density
+  name: Extra Details Density
+  version: '1.0'
+  description: "Measures how much optional content is added beyond the core answer.\
+    \ Identify the minimal direct answer, then count discrete extras such as examples,\
+    \ caveats, background points, alternatives/options, tips, references, or edge\
+    \ cases. Do not judge correctness\u2014only the volume of add-ons."
+  scoring_description: Score how well the response demonstrates extra details density
+  definition: "Measures how much optional content is added beyond the core answer.\
+    \ Identify the minimal direct answer, then count discrete extras such as examples,\
+    \ caveats, background points, alternatives/options, tips, references, or edge\
+    \ cases. Do not judge correctness\u2014only the volume of add-ons."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: None
+    indicators:
+    - Adds 0 extras; only the direct answer with no examples, caveats, background,
+      options, tips, or references.
+    - No side notes or expansions; strictly the minimal response.
+  - range:
+    - 1.0
+    - 1.9
+    label: Few
+    indicators:
+    - "Adds 1\u20132 extras total (e.g., one brief example or a single caveat/background\
+      \ note)."
+    - Extras are concise and occupy a small fraction of the response; the core answer
+      clearly dominates.
+  - range:
+    - 2.0
+    - 2.9
+    label: Several (Low)
+    indicators:
+    - "Adds about 3 extras total, or 2\u20133 with modest elaboration."
+    - Extras provide limited breadth (e.g., a couple of examples and one caveat) without
+      separate sections or extensive detail.
+  - range:
+    - 3.0
+    - 3.9
+    label: Several (High)
+    indicators:
+    - "Adds 4\u20135 extras total, spanning multiple types (examples, caveats, background,\
+      \ options, tips, references)."
+    - Extras are prominent and comparable in space to the core answer but do not dominate
+      the entire response.
+  - range:
+    - 4.0
+    - 4.0
+    label: Many
+    indicators:
+    - Adds more than 5 extras (6+), often including multiple examples plus caveats,
+      background sections, options/variations, tips, or references.
+    - Extras dominate the response length or structure, with noticeable expansion
+      (e.g., dedicated sections or extended lists of add-ons).
+  guidelines:
+  - Number of examples or variations provided.
+  - Count of caveats, tips, or background explanations included.
+  - Alternative approaches/options presented beyond the primary answer.
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-redundancy
+  name: Redundancy and Repetition
+  version: '1.0'
+  description: "Measures how much a response repeats the same information or ideas\
+    \ without adding new value. Counts both explicit repeats and paraphrased restatements\
+    \ that inflate length, while excluding legitimate cross-references (e.g., \u201C\
+    see step 2\u201D). Emphasis is on unique information density versus duplicated\
+    \ content."
+  scoring_description: Score how well the response demonstrates redundancy and repetition
+  definition: "Measures how much a response repeats the same information or ideas\
+    \ without adding new value. Counts both explicit repeats and paraphrased restatements\
+    \ that inflate length, while excluding legitimate cross-references (e.g., \u201C\
+    see step 2\u201D). Emphasis is on unique information density versus duplicated\
+    \ content."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: None
+    indicators:
+    - No repeated statements or paraphrased restatements (0 repeats).
+    - Each sentence/bullet introduces new information; no echoing of prior points.
+    - No duplicated headings, recap sentences, or redundant disclaimers.
+  - range:
+    - 1.0
+    - 1.9
+    label: Minor
+    indicators:
+    - Exactly 1 repeated point (one repeat or brief paraphrase of the same idea).
+    - Redundancy limited to a short clause or single sentence; otherwise unique content.
+    - "Estimated duplicated content \u226410% and not beyond legitimate step references."
+  - range:
+    - 2.0
+    - 2.9
+    label: Moderate
+    indicators:
+    - "2\u20133 repeated points or paraphrased restatements of the same idea."
+    - "Some recap phrasing (e.g., re-stating the request or repeating a caveat) across\
+      \ 1\u20132 places."
+    - "Estimated duplicated content ~10\u201320%; repetition is noticeable but not\
+      \ pervasive."
+  - range:
+    - 3.0
+    - 3.9
+    label: Heavy
+    indicators:
+    - "4\u20135 repeated points or paraphrased restatements across multiple sentences/sections."
+    - Multiple bullets or paragraphs restate the same guidance or caveats without
+      new detail.
+    - "Estimated duplicated content ~20\u201335%; redundancy materially inflates length."
+  - range:
+    - 4.0
+    - 4.0
+    label: Severe
+    indicators:
+    - "\u22656 repeats or entire sentences/paragraphs that restate prior content,\
+      \ including duplicated headings or summaries."
+    - Redundancy is pervasive across the response, with circular restatement of key
+      points.
+    - Estimated duplicated content >35%; clear padding or verbosity driven by repetition.
+  guidelines:
+  - Restates the same point in multiple sentences.
+  - Duplicated disclaimers or instructions.
+  - Paraphrased repetition across sections or bullets.
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity
+- id: helpsteer2-verbosity-judge-framing-padding
+  name: Framing and Padding
+  version: '1.0'
+  description: Measures the amount of non-essential preambles, meta-commentary, and
+    sign-offs that wrap the core answer. Isolates opening and closing material and
+    evaluates its length and necessity relative to the task. Brief, essential context
+    may be acceptable; otherwise it counts as padding.
+  scoring_description: Score how well the response demonstrates framing and padding
+  definition: Measures the amount of non-essential preambles, meta-commentary, and
+    sign-offs that wrap the core answer. Isolates opening and closing material and
+    evaluates its length and necessity relative to the task. Brief, essential context
+    may be acceptable; otherwise it counts as padding.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: None
+    indicators:
+    - "No greeting, apology, sign-off, or meta-statements (e.g., \u201CAs an AI\u2026\
+      \u201D); begins directly with core content."
+    - Zero standalone framing sentences; any context is embedded and clearly necessary
+      for understanding.
+    - No closing filler or calls-to-action beyond the answer itself.
+  - range:
+    - 1.0
+    - 1.9
+    label: Brief
+    indicators:
+    - At most one short framing sentence (opening or closing) that is clearly task-relevant
+      or necessary.
+    - No greeting/sign-off; no generic disclaimers or apologies.
+    - "Framing \u226410% of total response length."
+  - range:
+    - 2.0
+    - 2.9
+    label: Moderate
+    indicators:
+    - "Noticeable framing: 2\u20133 sentences or a short paragraph across opening/closing."
+    - "May include a brief greeting, apology, or generic caveat (e.g., \u201CI can\
+      \ help with\u2026\u201D); limited redundancy."
+    - "Framing occupies roughly 10\u201325% of the total response."
+  - range:
+    - 3.0
+    - 3.9
+    label: Long
+    indicators:
+    - "Heavy framing: \u22651 full paragraph combined across preamble/closing, or\
+      \ multiple sentences at both start and end."
+    - Includes generic disclaimers, restatements, and/or greeting plus sign-off; noticeable
+      template language.
+    - "Framing occupies roughly 25\u201340% of the total response."
+  - range:
+    - 4.0
+    - 4.0
+    label: Excessive
+    indicators:
+    - Multiple paragraphs or extended sections of preamble/closing; often longer than
+      the core answer.
+    - Extensive boilerplate, policy/legal disclaimers, repeated apologies or greetings/sign-offs,
+      or meta-context that overwhelms content.
+    - Framing >40% of total length; core content is buried within or after padding.
+  guidelines:
+  - Lengthy introductions, apologies, or context-setting not required by the prompt.
+  - Extended sign-offs or postambles.
+  - Boilerplate safety/format notes unrelated to user constraints.
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-verbosity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: verbosity

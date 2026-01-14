@@ -1,0 +1,143 @@
+{
+  "iteration": 2,
+  "judge_names": [
+    "helpsteer2-coherence-judge-referential-clarity-and-terminology",
+    "helpsteer2-coherence-judge-concision-and-non-redundancy",
+    "helpsteer2-coherence-judge-structure-and-formatting-support"
+  ],
+  "n_judges": 3,
+  "train_metrics": {
+    "mse": 0.3984260410877797,
+    "mae": 0.4689201881993925,
+    "r2": 0.15218355156807672,
+    "spearman_rho": 0.28295795515290956,
+    "kendall_tau": 0.2284209890438634,
+    "pearson_r": 0.39017425843699854
+  },
+  "test_metrics": {
+    "mse": 0.5026954398821697,
+    "mae": 0.5192690983563906,
+    "r2": 0.07076031261672033,
+    "spearman_rho": 0.19302344779475997,
+    "kendall_tau": 0.1545494114823757,
+    "pearson_r": 0.2826815282957131
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.07076031261672033,
+      "mse": 0.5026954398821697,
+      "mae": 0.5192690983563906,
+      "spearman_rho": 0.19302344779475994,
+      "kendall_tau": 0.1545494114823757,
+      "pearson_r": 0.28268152829571314
+    },
+    "coverage": {
+      "variance_explained": 0.12240155162588151,
+      "coverage_score": 0.12240155162588151
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.4602861006223196,
+      "max_pairwise_correlation": 0.5241254636770751,
+      "redundancy_score": 0.5397138993776804,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 2.09914906472187,
+      "diversity_index": 0.6997163549072899
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.5013831254324763,
+      "entropy": 0.509774352963374
+    },
+    "composite_score": 0.3006704862288585
+  },
+  "importance_scores": {
+    "helpsteer2-coherence-judge-referential-clarity-and-terminology": 1.0,
+    "helpsteer2-coherence-judge-concision-and-non-redundancy": 0.3296551732593861,
+    "helpsteer2-coherence-judge-structure-and-formatting-support": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-coherence-judge-referential-clarity-and-terminology' scores are low",
+        "severity": 0.6170528528637192,
+        "affected_samples": 90,
+        "characteristics": {
+          "judge": "helpsteer2-coherence-judge-referential-clarity-and-terminology",
+          "low_score_error_var": 0.7547906371577653,
+          "high_score_error_var": 0.2958046947092174
+        },
+        "suggested_dimension": "helpsteer2-coherence-judge-referential-clarity-and-terminology-specificity"
+      },
+      {
+        "type": "cluster",
+        "description": "Cluster 1: Model underpredicts for samples with distinctive judge score patterns",
+        "severity": 0.7860190602314275,
+        "affected_samples": 26,
+        "characteristics": {
+          "cluster_id": 1,
+          "mean_error": 0.11924287712036383,
+          "mean_abs_error": 0.8163108173946216,
+          "notable_judges": [
+            [
+              "helpsteer2-coherence-judge-structure-and-formatting-support",
+              -0.938230769230769
+            ],
+            [
+              "helpsteer2-coherence-judge-concision-and-non-redundancy",
+              -0.954653846153847
+            ],
+            [
+              "helpsteer2-coherence-judge-referential-clarity-and-terminology",
+              -0.9915000000000003
+            ]
+          ]
+        },
+        "suggested_dimension": "cross-dimension-interaction"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": 0.003809223160211228,
+      "std_error": 0.7089999504238949,
+      "mean_abs_error": 0.5192690983563906,
+      "median_abs_error": 0.34734236374506455,
+      "max_abs_error": 3.4144986189990583,
+      "pct_high_error": 33.0,
+      "skewness": -1.7801588250439964,
+      "kurtosis": 4.532361515652055
+    },
+    "judge_error_correlations": {
+      "helpsteer2-coherence-judge-referential-clarity-and-terminology": 0.0006981877253967456,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": -0.02826378945070645,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": 0.06998820217583923
+    },
+    "suggested_dimensions": [
+      "helpsteer2-coherence-judge-referential-clarity-and-terminology-specificity",
+      "cross-dimension-interaction"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 33.0% samples with error > 0.5\nMean absolute error: 0.519\nError skewness: -1.780\n\nIdentified 2 gap patterns:\n  1. [high_variance] High error variance when 'helpsteer2-coherence-judge-referential-clarity-and-terminology' scores are low\n     Severity: 0.62, Affected: 90 samples\n  2. [cluster] Cluster 1: Model underpredicts for samples with distinctive judge score patterns\n     Severity: 0.79, Affected: 26 samples\n\nSuggested new dimensions: helpsteer2-coherence-judge-referential-clarity-and-terminology-specificity, cross-dimension-interaction"
+  },
+  "attribution_correlations": {
+    "helpsteer2-coherence-judge-referential-clarity-and-terminology": {
+      "helpsteer2-coherence-judge-referential-clarity-and-terminology": 1.0,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": 0.40497448542336206,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": 0.1401224875465754
+    },
+    "helpsteer2-coherence-judge-concision-and-non-redundancy": {
+      "helpsteer2-coherence-judge-referential-clarity-and-terminology": 0.40497448542336206,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": 1.0,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": 0.007197639390057477
+    },
+    "helpsteer2-coherence-judge-structure-and-formatting-support": {
+      "helpsteer2-coherence-judge-referential-clarity-and-terminology": 0.1401224875465754,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": 0.007197639390057477,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": 1.0
+    }
+  },
+  "improvement": 0.08344652385504181,
+  "should_stop": true,
+  "stop_reason": "target_judges_reached_3"
+}

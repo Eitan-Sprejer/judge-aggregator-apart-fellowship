@@ -1,0 +1,385 @@
+judges:
+- id: helpsteer2-correctness-judge-requirement-coverage
+  name: Requirement Coverage & Constraint Compliance
+  version: '1.0'
+  description: Assesses whether the response fulfills every explicit task, detail,
+    and constraint stated in the prompt by enumerating requirements and mapping each
+    to the output. Verifies presence, format, sequencing, limits, and prohibitions,
+    marking any missing, incorrect, or non-compliant elements. Partial fulfillment
+    is treated as incomplete; any missing or violated requirement reduces the score.
+  scoring_description: Score how well the response demonstrates requirement coverage
+    & constraint compliance
+  definition: Assesses whether the response fulfills every explicit task, detail,
+    and constraint stated in the prompt by enumerating requirements and mapping each
+    to the output. Verifies presence, format, sequencing, limits, and prohibitions,
+    marking any missing, incorrect, or non-compliant elements. Partial fulfillment
+    is treated as incomplete; any missing or violated requirement reduces the score.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: No Coverage
+    indicators:
+    - Addresses fewer than 10% of explicit requirements; core task not attempted or
+      off-topic.
+    - Multiple critical constraints violated (e.g., banned tools/languages used, wrong
+      output type) or responds to a different task.
+    - Most required outputs/sections absent.
+  - range:
+    - 1.0
+    - 1.9
+    label: Minimal Coverage
+    indicators:
+    - Addresses about 10-39% of explicit requirements; most core tasks missing or
+      delivered in the wrong form.
+    - At least one major constraint breach (e.g., format/length/step-order/tool restrictions)
+      that makes the response unusable as-is.
+    - Several required elements or steps omitted.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partial Coverage
+    indicators:
+    - Addresses about 40-69% of explicit requirements; at least one major required
+      component/output is missing.
+    - Some constraints met, but notable lapses remain (e.g., incorrect format/units,
+      exceeds limits, missing mandatory sections).
+    - Delivers only a subset of required outputs or misorders mandatory steps.
+  - range:
+    - 3.0
+    - 3.9
+    label: Substantial Coverage
+    indicators:
+    - Addresses about 70-99% of explicit requirements; only minor elements are missing
+      or slightly off-spec.
+    - All major constraints satisfied; any deviations are minor and do not impede
+      use (e.g., small formatting variance or slight length drift).
+    - All primary outputs present in the requested form; edge-case or ancillary details
+      may be incomplete.
+  - range:
+    - 4.0
+    - 4.0
+    label: Complete Coverage
+    indicators:
+    - Satisfies 100% of explicit requirements with no omissions or substitutions.
+    - Fully compliant with all stated constraints (formats, steps, limits, tools/APIs,
+      language/safety rules).
+    - Outputs are complete, correctly structured, and aligned to every specified detail,
+      including conditional branches and edge cases.
+  guidelines:
+  - All requested outputs/steps are present and complete
+  - Specified constraints (formats, limits, data fields) are followed
+  - No required element is omitted or replaced with an unrelated item
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-factual-accuracy
+  name: Factual Claim Accuracy & Precision
+  version: '1.0'
+  description: Measures whether all factual claims, values, and conclusions are true,
+    precise, and non-misleading relative to the prompt and widely accepted knowledge.
+    Checks correctness of numbers, definitions, entities, and causal implications,
+    and whether uncertainty is properly acknowledged when applicable.
+  scoring_description: Score how well the response demonstrates factual claim accuracy
+    & precision
+  definition: Measures whether all factual claims, values, and conclusions are true,
+    precise, and non-misleading relative to the prompt and widely accepted knowledge.
+    Checks correctness of numbers, definitions, entities, and causal implications,
+    and whether uncertainty is properly acknowledged when applicable.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Completely Incorrect
+    indicators:
+    - Most claims contradict the prompt or authoritative knowledge, or are irrelevant
+      to the task.
+    - Core conclusions rely on impossible or non-existent facts, entities, tools,
+      or relationships.
+    - Precision is grossly wrong (e.g., wrong units/dates/identities) with no acknowledgment
+      of uncertainty, making the response unusable.
+  - range:
+    - 1.0
+    - 1.9
+    label: Mostly Inaccurate
+    indicators:
+    - Multiple major factual errors or contradictions; only isolated elements are
+      correct.
+    - Several hallucinated or fabricated specifics (e.g., invented data/APIs) presented
+      as fact.
+    - Missing qualifiers/units or imprecise wording materially distorts meaning or
+      outcomes.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partially Accurate
+    indicators:
+    - Mix of correct and incorrect claims; at least one material inaccuracy or several
+      minor ones that could mislead.
+    - Relies on unsupported assumptions or vague assertions where specific facts are
+      needed.
+    - Numbers/definitions partly right but with notable errors in magnitude, scope,
+      or qualifiers affecting some interpretations.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Accurate
+    indicators:
+    - All core claims are correct; only minor imprecision (e.g., small rounding or
+      generic naming) that does not affect conclusions.
+    - No material hallucinations; any assumptions are reasonable and consistent with
+      the prompt.
+    - Minor omissions in precision (units/qualifiers) but context keeps statements
+      non-misleading.
+  - range:
+    - 4.0
+    - 4.0
+    label: Fully Accurate
+    indicators:
+    - Every factual claim, number, definition, and reference is correct and verifiable
+      from the prompt or authoritative sources.
+    - No unsupported assumptions or hallucinated specifics; uncertainty is explicitly
+      and appropriately stated when relevant.
+    - Statements are precise (correct units, dates, names, scopes, API behavior) and
+      non-misleading throughout.
+  guidelines:
+  - Claims align with verifiable facts or given context
+  - Numerical results and derived outputs are correct
+  - No misleading implications, conflations, or overgeneralizations
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-grounding-and-non-hallucination
+  name: "Grounding & Non\u2011Hallucination"
+  version: '1.0'
+  description: Assesses whether the response anchors its claims to the provided context
+    or to widely accepted general knowledge, avoiding invented specifics. Rewards
+    explicit acknowledgment of uncertainty and cautious generalization, while penalizing
+    ungrounded details, fabricated citations, or overconfident speculation. Focuses
+    on support versus invention (grounding), not on factual accuracy alone.
+  scoring_description: "Score how well the response demonstrates grounding & non\u2011\
+    hallucination"
+  definition: Assesses whether the response anchors its claims to the provided context
+    or to widely accepted general knowledge, avoiding invented specifics. Rewards
+    explicit acknowledgment of uncertainty and cautious generalization, while penalizing
+    ungrounded details, fabricated citations, or overconfident speculation. Focuses
+    on support versus invention (grounding), not on factual accuracy alone.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Unfounded
+    indicators:
+    - 'Predominantly hallucinated: key claims lack support or contradict the provided
+      context.'
+    - Relies on non-existent entities, sources, data, or APIs as central elements.
+    - Shows no use of or alignment with the given context; content is essentially
+      made up.
+  - range:
+    - 1.0
+    - 1.9
+    label: Mostly Ungrounded
+    indicators:
+    - Frequent unsupported specifics (names, numbers, dates) not in the context or
+      common knowledge.
+    - Speculation is presented as certain; includes fabricated references/examples.
+    - Materially diverges from or ignores relevant context when making claims.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partially Grounded
+    indicators:
+    - Mix of grounded and ungrounded content; some specific details are added without
+      support.
+    - Speculative inferences appear with weak or missing hedging.
+    - Occasionally overlooks or loosely interprets the provided context.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Grounded
+    indicators:
+    - Core claims are supported by the context or common knowledge; only minor unstated
+      generalities.
+    - No fabricated entities or sources; small extrapolations are clearly hedged.
+    - Avoids introducing specific unsupported numbers/names; background knowledge
+      use is appropriate.
+  - range:
+    - 4.0
+    - 4.0
+    label: Fully Grounded
+    indicators:
+    - All concrete details are supported by the prompt/context or widely accepted
+      knowledge; no new specific facts invented.
+    - Uncertainties and gaps are explicitly acknowledged; no speculation presented
+      as fact.
+    - No fabricated sources, quotes, statistics, APIs, or entities.
+  guidelines:
+  - No fabricated entities, data points, APIs, or citations
+  - Assumptions are explicitly labeled and not presented as facts
+  - References to context are faithful and not extrapolated beyond evidence
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-procedural-correctness
+  name: Procedural/Computational Correctness
+  version: '1.0'
+  description: Evaluates whether methods, algorithms, calculations, and code are technically
+    valid and produce correct results for the stated task. Checks logical soundness
+    of steps, correct use of APIs/libraries (names, signatures, parameter semantics),
+    and accuracy across typical and edge cases. Minor syntactic nits are acceptable;
+    logical, feasibility, or semantic errors are not.
+  scoring_description: Score how well the response demonstrates procedural/computational
+    correctness
+  definition: Evaluates whether methods, algorithms, calculations, and code are technically
+    valid and produce correct results for the stated task. Checks logical soundness
+    of steps, correct use of APIs/libraries (names, signatures, parameter semantics),
+    and accuracy across typical and edge cases. Minor syntactic nits are acceptable;
+    logical, feasibility, or semantic errors are not.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Completely Incorrect
+    indicators:
+    - Procedure is irrelevant or incoherent; cannot produce the requested outcome.
+    - Relies on fabricated/non-existent entities or impossible math/operations.
+    - No valid API/function usage; outputs (if any) are demonstrably wrong.
+  - range:
+    - 1.0
+    - 1.9
+    label: Mostly Incorrect
+    indicators:
+    - Core method is unsuitable or misapplied; key steps are invalid or infeasible.
+    - Uses wrong or non-existent APIs/signatures as central steps; code would not
+      run or compile.
+    - Results are largely incorrect or missing; violates stated constraints.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partially Correct
+    indicators:
+    - General approach aligns with the task but contains a major logical error or
+      multiple nontrivial mistakes.
+    - API/function usage shows misunderstandings (e.g., wrong signature/types or parameter
+      semantics), though some calls are valid.
+    - Produces incomplete or partly correct results; fails on typical edge cases or
+      provided tests.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Correct
+    indicators:
+    - Core logic/algorithm is correct; only minor, easily fixed issues (e.g., trivial
+      syntax, off-by-one, formatting).
+    - "APIs/libraries are appropriate with at most minor parameter/name imprecision\
+      \ that\u2019s trivially correctable."
+    - Correct for main cases; may miss a rare edge case or minor rounding/format detail
+      without altering the method.
+  - range:
+    - 4.0
+    - 4.0
+    label: Fully Correct
+    indicators:
+    - Algorithm/procedure is logically sound end-to-end and matches problem requirements
+      and constraints.
+    - Uses valid APIs/libraries with correct names, signatures, types, and parameter
+      semantics; feasible and reproducible.
+    - Produces correct results (including stated edge cases) with numerically accurate
+      outputs within declared tolerances; code is ready-to-run in a standard environment.
+  guidelines:
+  - Code uses valid functions/APIs and would run with trivial or no fixes
+  - Mathematical steps and algorithmic logic yield correct results
+  - Outputs are consistent with the described method and inputs
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness
+- id: helpsteer2-correctness-judge-uncertainty-handling
+  name: Uncertainty & Unknowns Handling
+  version: '1.0'
+  description: This rubric measures how well a response handles uncertainty, missing
+    data, and probabilistic or future-dependent claims. It rewards clear qualification,
+    appropriate confidence calibration, and explicit assumptions, and penalizes unwarranted
+    certainty or invented specifics. It focuses on whether unknowns are acknowledged
+    and bounded rather than ignored.
+  scoring_description: Score how well the response demonstrates uncertainty & unknowns
+    handling
+  definition: This rubric measures how well a response handles uncertainty, missing
+    data, and probabilistic or future-dependent claims. It rewards clear qualification,
+    appropriate confidence calibration, and explicit assumptions, and penalizes unwarranted
+    certainty or invented specifics. It focuses on whether unknowns are acknowledged
+    and bounded rather than ignored.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Poor
+    indicators:
+    - States speculative or future outcomes as facts and provides precise figures/dates
+      without support.
+    - Ignores missing data or known uncertainty; fabricates details to fill gaps.
+    - Offers no caveats, assumptions, or limitations where they are necessary.
+  - range:
+    - 1.0
+    - 1.9
+    label: Weak
+    indicators:
+    - "Uses vague hedges (e.g., \u201Cprobably\u201D) but makes key claims with unwarranted\
+      \ certainty."
+    - Gives single-point estimates with no context, basis, or error bounds.
+    - Omits major assumptions or known unknowns relevant to the answer.
+  - range:
+    - 2.0
+    - 2.9
+    label: Fair
+    indicators:
+    - Acknowledges some uncertainty but misses one or more critical caveats or limitations.
+    - Mixes qualified language with occasional unsupported specifics (e.g., overly
+      narrow ranges or confident tone).
+    - Partially separates facts from speculation but blurs the boundary in places.
+  - range:
+    - 3.0
+    - 3.9
+    label: Good
+    indicators:
+    - Clearly identifies unknowns and conditions key claims on stated assumptions.
+    - Provides ranges, scenarios, or probability qualifiers appropriate to the evidence;
+      avoids invented specifics.
+    - Only minor lapses in calibration or missing caveats that do not materially mislead.
+  - range:
+    - 4.0
+    - 4.0
+    label: Excellent
+    indicators:
+    - Consistently distinguishes facts, estimates, and unknowns; explicitly states
+      relevant assumptions and data limits.
+    - Calibrates confidence with appropriate ranges/probabilities and briefly explains
+      the basis or evidence.
+    - Avoids asserting beyond available evidence and, when useful, suggests ways to
+      obtain missing information.
+  guidelines:
+  - Acknowledges when data is unavailable or inherently uncertain
+  - States assumptions and limits clearly for predictions/estimates
+  - Uses ranges or conditional phrasing where exact facts are unknown
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-correctness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: correctness

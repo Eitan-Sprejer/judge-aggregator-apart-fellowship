@@ -1,0 +1,3 @@
+helpsteer2-coherence-judge-internal-consistency
+helpsteer2-coherence-judge-concision-and-non-redundancy
+helpsteer2-coherence-judge-structure-and-formatting-support

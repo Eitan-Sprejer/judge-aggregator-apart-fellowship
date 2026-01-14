@@ -1,0 +1,142 @@
+{
+  "iteration": 1,
+  "judge_names": [
+    "helpsteer2-correctness-judge-requirement-coverage",
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination",
+    "helpsteer2-correctness-judge-procedural-correctness",
+    "helpsteer2-correctness-judge-uncertainty-handling"
+  ],
+  "n_judges": 4,
+  "train_metrics": {
+    "mse": 1.227609103776024,
+    "mae": 0.8686766857354918,
+    "r2": 0.26043189121270915,
+    "spearman_rho": 0.4106247927094576,
+    "kendall_tau": 0.3202858903134638,
+    "pearson_r": 0.5103602083232206
+  },
+  "test_metrics": {
+    "mse": 1.3808221884474436,
+    "mae": 0.9418958184774349,
+    "r2": 0.28731758015615794,
+    "spearman_rho": 0.4793910713689971,
+    "kendall_tau": 0.3723636876290341,
+    "pearson_r": 0.5361194903503232
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.28731758015615794,
+      "mse": 1.3808221884474436,
+      "mae": 0.9418958184774349,
+      "spearman_rho": 0.4793910713689971,
+      "kendall_tau": 0.3723636876290341,
+      "pearson_r": 0.5361194903503234
+    },
+    "coverage": {
+      "variance_explained": 0.29781954257350607,
+      "coverage_score": 0.29781954257350607
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.4781517485429862,
+      "max_pairwise_correlation": 0.6870026059739336,
+      "redundancy_score": 0.5218482514570137,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 2.1825933781666653,
+      "diversity_index": 0.5456483445416663
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.30609066028166954,
+      "entropy": 0.7851112599242117
+    },
+    "composite_score": 0.38799025977690044
+  },
+  "importance_scores": {
+    "helpsteer2-correctness-judge-requirement-coverage": 0.7800412346861343,
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination": 1.0,
+    "helpsteer2-correctness-judge-procedural-correctness": 0.7195882619081101,
+    "helpsteer2-correctness-judge-uncertainty-handling": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "cluster",
+        "description": "Cluster 2: Model overpredicts for samples with distinctive judge score patterns",
+        "severity": 0.7549942225504744,
+        "affected_samples": 37,
+        "characteristics": {
+          "cluster_id": 2,
+          "mean_error": -0.2503517575129931,
+          "mean_abs_error": 1.4222518023898274,
+          "notable_judges": [
+            [
+              "helpsteer2-correctness-judge-grounding-and-non-hallucination",
+              -0.9017297297297298
+            ],
+            [
+              "helpsteer2-correctness-judge-procedural-correctness",
+              -1.2638648648648645
+            ],
+            [
+              "helpsteer2-correctness-judge-requirement-coverage",
+              -1.3791081081081071
+            ]
+          ]
+        },
+        "suggested_dimension": "cross-dimension-interaction"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": 0.008815380818747234,
+      "std_error": 1.175050840393072,
+      "mean_abs_error": 0.9418958184774349,
+      "median_abs_error": 0.7808967263411923,
+      "max_abs_error": 3.1643543190816357,
+      "pct_high_error": 69.5,
+      "skewness": -0.3914150201157114,
+      "kurtosis": 0.2007186977833153
+    },
+    "judge_error_correlations": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.0687617803582111,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": -0.0470108634785813,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.03771976308560383,
+      "helpsteer2-correctness-judge-uncertainty-handling": 0.06693598150733729
+    },
+    "suggested_dimensions": [
+      "cross-dimension-interaction"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 69.5% samples with error > 0.5\nMean absolute error: 0.942\nError skewness: -0.391\n\nIdentified 1 gap patterns:\n  1. [cluster] Cluster 2: Model overpredicts for samples with distinctive judge score patterns\n     Severity: 0.75, Affected: 37 samples\n\nSuggested new dimensions: cross-dimension-interaction"
+  },
+  "attribution_correlations": {
+    "helpsteer2-correctness-judge-requirement-coverage": {
+      "helpsteer2-correctness-judge-requirement-coverage": 1.0,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 0.4925536531521812,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.6262777425543519,
+      "helpsteer2-correctness-judge-uncertainty-handling": 0.16658271857860116
+    },
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.4925536531521812,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 1.0,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.5442622238323204,
+      "helpsteer2-correctness-judge-uncertainty-handling": 0.19728240930482255
+    },
+    "helpsteer2-correctness-judge-procedural-correctness": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.6262777425543519,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 0.5442622238323204,
+      "helpsteer2-correctness-judge-procedural-correctness": 1.0,
+      "helpsteer2-correctness-judge-uncertainty-handling": 0.17260037004811535
+    },
+    "helpsteer2-correctness-judge-uncertainty-handling": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.16658271857860116,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 0.19728240930482255,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.17260037004811535,
+      "helpsteer2-correctness-judge-uncertainty-handling": 1.0
+    }
+  },
+  "improvement": 0.01733208294713895,
+  "should_stop": false,
+  "stop_reason": null
+}

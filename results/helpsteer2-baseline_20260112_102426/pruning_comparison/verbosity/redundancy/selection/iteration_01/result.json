@@ -1,0 +1,113 @@
+{
+  "iteration": 1,
+  "judge_names": [
+    "helpsteer2-verbosity-judge-minimal-overage",
+    "helpsteer2-verbosity-judge-structural-expansion",
+    "helpsteer2-verbosity-judge-redundancy",
+    "helpsteer2-verbosity-judge-framing-padding"
+  ],
+  "n_judges": 4,
+  "train_metrics": {
+    "mse": 0.3808080019572444,
+    "mae": 0.458358079588667,
+    "r2": 0.41922194731033946,
+    "spearman_rho": 0.5570348955517656,
+    "kendall_tau": 0.4504008100089755,
+    "pearson_r": 0.6474807385868755
+  },
+  "test_metrics": {
+    "mse": 0.4519768687604331,
+    "mae": 0.4860426626938337,
+    "r2": 0.219518444551143,
+    "spearman_rho": 0.4909792629425958,
+    "kendall_tau": 0.40155395444180153,
+    "pearson_r": 0.49390317480111584
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.219518444551143,
+      "mse": 0.4519768687604331,
+      "mae": 0.4860426626938337,
+      "spearman_rho": 0.4909792629425958,
+      "kendall_tau": 0.4015539544418015,
+      "pearson_r": 0.49390317480111584
+    },
+    "coverage": {
+      "variance_explained": 0.2613854330765396,
+      "coverage_score": 0.2613854330765396
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.21650499693827038,
+      "max_pairwise_correlation": 0.3249822623943419,
+      "redundancy_score": 0.7834950030617296,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 3.283653739636838,
+      "diversity_index": 0.8209134349092095
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.34739817494104175,
+      "entropy": 0.7673821599973583
+    },
+    "composite_score": 0.46096615202995295
+  },
+  "importance_scores": {
+    "helpsteer2-verbosity-judge-minimal-overage": 0.5245349146077999,
+    "helpsteer2-verbosity-judge-structural-expansion": 0.9162966790134084,
+    "helpsteer2-verbosity-judge-redundancy": 1.0,
+    "helpsteer2-verbosity-judge-framing-padding": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [],
+    "overall_error_stats": {
+      "mean_error": 0.025365679021337746,
+      "std_error": 0.6718135538140173,
+      "mean_abs_error": 0.4860426626938337,
+      "median_abs_error": 0.3336102744148126,
+      "max_abs_error": 3.0651571985887913,
+      "pct_high_error": 39.0,
+      "skewness": 0.5860690772044646,
+      "kurtosis": 2.703514157333676
+    },
+    "judge_error_correlations": {
+      "helpsteer2-verbosity-judge-minimal-overage": 0.015549017405189713,
+      "helpsteer2-verbosity-judge-structural-expansion": -0.013684754798135836,
+      "helpsteer2-verbosity-judge-redundancy": -0.17985504530372842,
+      "helpsteer2-verbosity-judge-framing-padding": -0.13325321878709806
+    },
+    "suggested_dimensions": [],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 39.0% samples with error > 0.5\nMean absolute error: 0.486\nError skewness: 0.586\n\nIdentified 0 gap patterns:"
+  },
+  "attribution_correlations": {
+    "helpsteer2-verbosity-judge-minimal-overage": {
+      "helpsteer2-verbosity-judge-minimal-overage": 1.0,
+      "helpsteer2-verbosity-judge-structural-expansion": 0.12745327896859762,
+      "helpsteer2-verbosity-judge-redundancy": 0.326551522458878,
+      "helpsteer2-verbosity-judge-framing-padding": 0.2436137827116558
+    },
+    "helpsteer2-verbosity-judge-structural-expansion": {
+      "helpsteer2-verbosity-judge-minimal-overage": 0.12745327896859762,
+      "helpsteer2-verbosity-judge-structural-expansion": 1.0,
+      "helpsteer2-verbosity-judge-redundancy": 0.19434078546316533,
+      "helpsteer2-verbosity-judge-framing-padding": 0.15777611223357968
+    },
+    "helpsteer2-verbosity-judge-redundancy": {
+      "helpsteer2-verbosity-judge-minimal-overage": 0.326551522458878,
+      "helpsteer2-verbosity-judge-structural-expansion": 0.19434078546316533,
+      "helpsteer2-verbosity-judge-redundancy": 1.0,
+      "helpsteer2-verbosity-judge-framing-padding": 0.2719614612193989
+    },
+    "helpsteer2-verbosity-judge-framing-padding": {
+      "helpsteer2-verbosity-judge-minimal-overage": 0.2436137827116558,
+      "helpsteer2-verbosity-judge-structural-expansion": 0.15777611223357968,
+      "helpsteer2-verbosity-judge-redundancy": 0.2719614612193989,
+      "helpsteer2-verbosity-judge-framing-padding": 1.0
+    }
+  },
+  "improvement": -0.03166685594537921,
+  "should_stop": false,
+  "stop_reason": null
+}

@@ -1,0 +1,194 @@
+{
+  "iteration": 1,
+  "judge_names": [
+    "helpsteer2-coherence-judge-logical-flow-and-sequencing",
+    "helpsteer2-coherence-judge-internal-consistency",
+    "helpsteer2-coherence-judge-concision-and-non-redundancy",
+    "helpsteer2-coherence-judge-structure-and-formatting-support"
+  ],
+  "n_judges": 4,
+  "train_metrics": {
+    "mse": 0.37955899164252516,
+    "mae": 0.4621946034404016,
+    "r2": 0.1923310148448083,
+    "spearman_rho": 0.28790898279981725,
+    "kendall_tau": 0.23314254283495905,
+    "pearson_r": 0.43902491508881125
+  },
+  "test_metrics": {
+    "mse": 0.552669617947709,
+    "mae": 0.5375130388074486,
+    "r2": -0.021617668002604562,
+    "spearman_rho": 0.158449641097888,
+    "kendall_tau": 0.12548638236371182,
+    "pearson_r": 0.21318205877881968
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": -0.021617668002604562,
+      "mse": 0.552669617947709,
+      "mae": 0.5375130388074486,
+      "spearman_rho": 0.15844964109788803,
+      "kendall_tau": 0.12548638236371182,
+      "pearson_r": 0.21318205877881968
+    },
+    "coverage": {
+      "variance_explained": 0.1608329966886024,
+      "coverage_score": 0.1608329966886024
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.43122510394597785,
+      "max_pairwise_correlation": 0.5471688927107716,
+      "redundancy_score": 0.5687748960540222,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 2.51244765839282,
+      "diversity_index": 0.628111914598205
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.4824417771789431,
+      "entropy": 0.6698818044961327
+    },
+    "composite_score": 0.27154396146816595
+  },
+  "importance_scores": {
+    "helpsteer2-coherence-judge-logical-flow-and-sequencing": 1.0,
+    "helpsteer2-coherence-judge-internal-consistency": 0.0,
+    "helpsteer2-coherence-judge-concision-and-non-redundancy": 0.4964483072945547,
+    "helpsteer2-coherence-judge-structure-and-formatting-support": 0.20774742859305928
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-coherence-judge-logical-flow-and-sequencing' scores are low",
+        "severity": 1.0,
+        "affected_samples": 98,
+        "characteristics": {
+          "judge": "helpsteer2-coherence-judge-logical-flow-and-sequencing",
+          "low_score_error_var": 0.9413293901145627,
+          "high_score_error_var": 0.17694514032480527
+        },
+        "suggested_dimension": "helpsteer2-coherence-judge-logical-flow-and-sequencing-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-coherence-judge-internal-consistency' scores are low",
+        "severity": 0.5224405461788646,
+        "affected_samples": 68,
+        "characteristics": {
+          "judge": "helpsteer2-coherence-judge-internal-consistency",
+          "low_score_error_var": 0.8438338866880811,
+          "high_score_error_var": 0.393794217763098
+        },
+        "suggested_dimension": "helpsteer2-coherence-judge-internal-consistency-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-coherence-judge-concision-and-non-redundancy' scores are low",
+        "severity": 0.5327311090265177,
+        "affected_samples": 97,
+        "characteristics": {
+          "judge": "helpsteer2-coherence-judge-concision-and-non-redundancy",
+          "low_score_error_var": 0.7652089074251841,
+          "high_score_error_var": 0.34909715729924384
+        },
+        "suggested_dimension": "helpsteer2-coherence-judge-concision-and-non-redundancy-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-coherence-judge-structure-and-formatting-support' scores are low",
+        "severity": 0.5360266443294504,
+        "affected_samples": 75,
+        "characteristics": {
+          "judge": "helpsteer2-coherence-judge-structure-and-formatting-support",
+          "low_score_error_var": 0.8378591108505634,
+          "high_score_error_var": 0.38077307057128396
+        },
+        "suggested_dimension": "helpsteer2-coherence-judge-structure-and-formatting-support-specificity"
+      },
+      {
+        "type": "cluster",
+        "description": "Cluster 2: Model underpredicts for samples with distinctive judge score patterns",
+        "severity": 0.9218518792942882,
+        "affected_samples": 35,
+        "characteristics": {
+          "cluster_id": 2,
+          "mean_error": 0.012540786020898193,
+          "mean_abs_error": 0.9910148099396604,
+          "notable_judges": [
+            [
+              "helpsteer2-coherence-judge-structure-and-formatting-support",
+              -0.781857142857143
+            ],
+            [
+              "helpsteer2-coherence-judge-internal-consistency",
+              -0.8469285714285704
+            ],
+            [
+              "helpsteer2-coherence-judge-logical-flow-and-sequencing",
+              -1.1135000000000004
+            ]
+          ]
+        },
+        "suggested_dimension": "cross-dimension-interaction"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": 0.013684585929466813,
+      "std_error": 0.743291564633723,
+      "mean_abs_error": 0.5375130388074486,
+      "median_abs_error": 0.3663059318315127,
+      "max_abs_error": 3.3749485450884196,
+      "pct_high_error": 38.0,
+      "skewness": -1.0577151931412851,
+      "kurtosis": 4.6920714542445605
+    },
+    "judge_error_correlations": {
+      "helpsteer2-coherence-judge-logical-flow-and-sequencing": 0.034711715876785405,
+      "helpsteer2-coherence-judge-internal-consistency": -0.09331165101912994,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": -0.04803029591397677,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": 0.1041250357669743
+    },
+    "suggested_dimensions": [
+      "helpsteer2-coherence-judge-logical-flow-and-sequencing-specificity",
+      "helpsteer2-coherence-judge-internal-consistency-specificity",
+      "helpsteer2-coherence-judge-concision-and-non-redundancy-specificity",
+      "helpsteer2-coherence-judge-structure-and-formatting-support-specificity",
+      "cross-dimension-interaction"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 38.0% samples with error > 0.5\nMean absolute error: 0.538\nError skewness: -1.058\n\nIdentified 5 gap patterns:\n  1. [high_variance] High error variance when 'helpsteer2-coherence-judge-logical-flow-and-sequencing' scores are low\n     Severity: 1.00, Affected: 98 samples\n  2. [high_variance] High error variance when 'helpsteer2-coherence-judge-internal-consistency' scores are low\n     Severity: 0.52, Affected: 68 samples\n  3. [high_variance] High error variance when 'helpsteer2-coherence-judge-concision-and-non-redundancy' scores are low\n     Severity: 0.53, Affected: 97 samples\n  4. [high_variance] High error variance when 'helpsteer2-coherence-judge-structure-and-formatting-support' scores are low\n     Severity: 0.54, Affected: 75 samples\n  5. [cluster] Cluster 2: Model underpredicts for samples with distinctive judge score patterns\n     Severity: 0.92, Affected: 35 samples\n\nSuggested new dimensions: helpsteer2-coherence-judge-logical-flow-and-sequencing-specificity, helpsteer2-coherence-judge-internal-consistency-specificity, helpsteer2-coherence-judge-concision-and-non-redundancy-specificity, helpsteer2-coherence-judge-structure-and-formatting-support-specificity, cross-dimension-interaction"
+  },
+  "attribution_correlations": {
+    "helpsteer2-coherence-judge-logical-flow-and-sequencing": {
+      "helpsteer2-coherence-judge-logical-flow-and-sequencing": 1.0,
+      "helpsteer2-coherence-judge-internal-consistency": 0.32404366103649634,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": 0.4061618635535005,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": -0.33523270602461924
+    },
+    "helpsteer2-coherence-judge-internal-consistency": {
+      "helpsteer2-coherence-judge-logical-flow-and-sequencing": 0.32404366103649634,
+      "helpsteer2-coherence-judge-internal-consistency": 1.0,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": 0.3076301946991048,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": 0.07747573199144005
+    },
+    "helpsteer2-coherence-judge-concision-and-non-redundancy": {
+      "helpsteer2-coherence-judge-logical-flow-and-sequencing": 0.4061618635535005,
+      "helpsteer2-coherence-judge-internal-consistency": 0.3076301946991048,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": 1.0,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": -0.23068075063198817
+    },
+    "helpsteer2-coherence-judge-structure-and-formatting-support": {
+      "helpsteer2-coherence-judge-logical-flow-and-sequencing": -0.33523270602461924,
+      "helpsteer2-coherence-judge-internal-consistency": 0.07747573199144005,
+      "helpsteer2-coherence-judge-concision-and-non-redundancy": -0.23068075063198817,
+      "helpsteer2-coherence-judge-structure-and-formatting-support": 1.0
+    }
+  },
+  "improvement": -0.008931456764283086,
+  "should_stop": false,
+  "stop_reason": null
+}

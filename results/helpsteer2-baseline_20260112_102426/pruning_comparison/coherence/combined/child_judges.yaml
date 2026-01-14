@@ -1,0 +1,377 @@
+judges:
+- id: helpsteer2-coherence-judge-logical-flow-and-sequencing
+  name: Logical Flow & Sequencing
+  version: '1.0'
+  description: Measures how clearly and logically ideas progress from start to finish,
+    with attention to ordered sequencing and smooth transitions. Evaluates whether
+    the response presents a clear beginning, middle, and end without disjoint jumps
+    that force the reader to backtrack.
+  scoring_description: Score how well the response demonstrates logical flow & sequencing
+  definition: Measures how clearly and logically ideas progress from start to finish,
+    with attention to ordered sequencing and smooth transitions. Evaluates whether
+    the response presents a clear beginning, middle, and end without disjoint jumps
+    that force the reader to backtrack.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Chaotic
+    indicators:
+    - No discernible beginning, middle, and end; content feels unordered.
+    - Ideas or steps appear out of sequence with abrupt, unexplained jumps.
+    - Reader must repeatedly backtrack to connect points.
+  - range:
+    - 1.0
+    - 1.9
+    label: Disjointed
+    indicators:
+    - Weak or inconsistent structure; sections are misgrouped or partially shuffled.
+    - Transitions are missing or misleading, causing confusion about how points relate.
+    - Frequent sequencing errors force the reader to re-interpret earlier parts.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partial Order
+    indicators:
+    - Basic opening/body/closing exists but ordering is suboptimal with occasional
+      jumps.
+    - Some transitions or signposts are present, yet gaps require the reader to fill
+      in links.
+    - A few instances of mild backtracking or re-reading to follow the progression.
+  - range:
+    - 3.0
+    - 3.9
+    label: Well-Ordered
+    indicators:
+    - Clear overall progression where most ideas build on prior points in a sensible
+      order.
+    - Transitions generally guide the reader; only minor rough spots or brief tangents.
+    - Beginning, middle, and end are evident with little to no backtracking needed.
+  - range:
+    - 4.0
+    - 4.0
+    label: Seamless
+    indicators:
+    - Strong opening frames the path; body proceeds in a clean, logical sequence;
+      closing consolidates the message.
+    - Smooth, purposeful transitions make relationships explicit and eliminate ambiguity.
+    - No disjoint jumps or reordering; the reader moves forward without needing to
+      backtrack.
+  guidelines:
+  - Each sentence/point follows logically from the previous one
+  - Uses signposting or transitions to connect steps or sections
+  - Avoids abrupt topic shifts or unexplained jumps
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-internal-consistency
+  name: Internal Consistency
+  version: '1.0'
+  description: "Assesses whether the response maintains a stable stance without contradicting\
+    \ itself. It checks for mutually incompatible statements, reversals, or conflicting\
+    \ details (e.g., terms, numbers, conditions). Contradictions are weighed heavily\
+    \ regardless of the response\u2019s correctness or usefulness."
+  scoring_description: Score how well the response demonstrates internal consistency
+  definition: "Assesses whether the response maintains a stable stance without contradicting\
+    \ itself. It checks for mutually incompatible statements, reversals, or conflicting\
+    \ details (e.g., terms, numbers, conditions). Contradictions are weighed heavily\
+    \ regardless of the response\u2019s correctness or usefulness."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Completely Inconsistent
+    indicators:
+    - Multiple direct contradictions or mutually incompatible claims on core points.
+    - Later statements explicitly reverse or negate earlier statements without acknowledgement.
+    - Conflicting figures/conditions (e.g., different numbers, definitions, or constraints)
+      appear for the same item.
+  - range:
+    - 1.0
+    - 1.9
+    label: Mostly Inconsistent
+    indicators:
+    - At least one clear contradiction on a major point that undermines the overall
+      message.
+    - Key terms, variables, or criteria shift meaning mid-response without explanation.
+    - Important numbers, assumptions, or rules change inconsistently across sections.
+  - range:
+    - 2.0
+    - 2.9
+    label: Some Inconsistencies
+    indicators:
+    - Main stance is identifiable but contains minor conflicting statements or unresolved
+      qualifiers.
+    - Small numerical/detail mismatches (e.g., counts, thresholds) that create localized
+      inconsistency.
+    - "Occasional conditional claims that don\u2019t align perfectly with later statements."
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Consistent
+    indicators:
+    - No substantive contradictions; overall stance and conclusions align.
+    - Terminology, variables, and figures are largely consistent; only minor wording
+      could be read ambiguously.
+    - Caveats and conditions remain compatible with subsequent statements.
+  - range:
+    - 4.0
+    - 4.0
+    label: Perfectly Consistent
+    indicators:
+    - All statements reinforce a single, stable stance with zero contradictions or
+      reversals.
+    - Terminology, variables, and quantitative details remain uniform throughout.
+    - Qualifiers and conditions are applied consistently, and later parts build on
+      earlier points without conflict.
+  guidelines:
+  - No claims that conflict with earlier assertions or conditions
+  - Stable stance and recommendations throughout
+  - No mixed directives (e.g., advising both to do and not do something)
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-referential-clarity-and-terminology
+  name: Referential Clarity & Terminology
+  version: '1.0'
+  description: Assesses how clearly and consistently an answer refers to entities,
+    variables, acronyms, and terms so that references are unambiguous. Evaluates whether
+    pronouns have clear antecedents, terms and symbols are defined and used consistently,
+    and wording changes do not shift meaning. Minor stylistic variation is acceptable
+    when the intended referent remains unmistakable.
+  scoring_description: Score how well the response demonstrates referential clarity
+    & terminology
+  definition: Assesses how clearly and consistently an answer refers to entities,
+    variables, acronyms, and terms so that references are unambiguous. Evaluates whether
+    pronouns have clear antecedents, terms and symbols are defined and used consistently,
+    and wording changes do not shift meaning. Minor stylistic variation is acceptable
+    when the intended referent remains unmistakable.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Completely Unclear
+    indicators:
+    - Pronouns or references lack antecedents or have multiple unresolved candidates,
+      making mapping impossible.
+    - Terms/symbols change meaning mid-response or contradict earlier usage.
+    - Inconsistent or incorrect naming (e.g., variables, acronyms) prevents understanding
+      of what refers to what.
+  - range:
+    - 1.0
+    - 1.9
+    label: Mostly Unclear
+    indicators:
+    - Frequent ambiguous pronouns/references; readers must guess the intended entity.
+    - Terminology or symbols switch labels or meanings in ways that cause sustained
+      confusion.
+    - Key acronyms/variables introduced without definition and used inconsistently.
+  - range:
+    - 2.0
+    - 2.9
+    label: Somewhat Clear
+    indicators:
+    - Several ambiguous or weakly specified references that require effort or backtracking
+      to resolve.
+    - At least one instance of inconsistent terminology or symbol reuse that creates
+      momentary uncertainty.
+    - Some terms/acronyms are undefined or renamed later, though the intended meaning
+      can usually be inferred.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Clear
+    indicators:
+    - Pronouns and variables have clear antecedents with only minor, easily resolvable
+      ambiguities.
+    - Terminology, acronyms, and symbols are largely consistent; any variation (e.g.,
+      synonyms) does not shift meaning.
+    - Nonstandard terms are defined or evident from context; disambiguation is used
+      when similar entities appear.
+  - range:
+    - 4.0
+    - 4.0
+    label: Excellent
+    indicators:
+    - All pronouns, variables, and cross-references have unambiguous antecedents;
+      no competing candidates.
+    - Terms, acronyms, and symbols are defined when needed and used consistently with
+      no unexplained switches.
+    - Multiple similar entities are clearly distinguished with precise labels or qualifiers
+      throughout.
+  guidelines:
+  - Pronouns have clear antecedents; variables/symbols are used consistently
+  - Terminology remains stable or changes are explicitly signaled
+  - Avoids vague deictics (this/that/it) when multiple candidates exist
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-concision-and-non-redundancy
+  name: Concision & Non-Redundancy
+  version: '1.0'
+  description: "Measures how efficiently the response communicates without unnecessary\
+    \ repetition or filler. Assesses whether each sentence adds new value, avoids\
+    \ duplicating prior content, and omits tangents or boilerplate that do not advance\
+    \ the point. Correctness is not judged\u2014only brevity, lack of duplication,\
+    \ and whether redundancy impairs flow."
+  scoring_description: Score how well the response demonstrates concision & non-redundancy
+  definition: "Measures how efficiently the response communicates without unnecessary\
+    \ repetition or filler. Assesses whether each sentence adds new value, avoids\
+    \ duplicating prior content, and omits tangents or boilerplate that do not advance\
+    \ the point. Correctness is not judged\u2014only brevity, lack of duplication,\
+    \ and whether redundancy impairs flow."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Severely Redundant
+    indicators:
+    - Verbatim or near-verbatim sentences/paragraphs are duplicated, or the text loops
+      back to the same point repeatedly.
+    - Large portions are filler (e.g., long prefaces, disclaimers, tangents) that
+      do not advance the task.
+    - Redundancy overwhelms the message; core content is hard to locate or follow.
+  - range:
+    - 1.0
+    - 1.9
+    label: Mostly Redundant
+    indicators:
+    - Same ideas or instructions are restated multiple times with minor rephrasing.
+    - Noticeable nonessential content (e.g., extended meta-commentary, unnecessary
+      examples) inflates length.
+    - Redundancy disrupts flow, causing the reader to skim past repeated material.
+  - range:
+    - 2.0
+    - 2.9
+    label: Some Redundancy
+    indicators:
+    - Occasional repetition or recap reiterates earlier points instead of synthesizing
+      them.
+    - Some filler words/phrases or verbose constructions that could be tightened without
+      loss of meaning.
+    - Slightly longer than necessary; redundancy mildly affects pacing but main points
+      remain clear.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Concise
+    indicators:
+    - Minimal repetition; any brief recap is purposeful and adds clarity (e.g., short
+      summary without restating details).
+    - Little to no filler or tangents; wording is generally tight and focused on the
+      task.
+    - Length is appropriate; minor verbosity does not impede flow.
+  - range:
+    - 4.0
+    - 4.0
+    label: Optimal Concision
+    indicators:
+    - No unnecessary repetition; each sentence contributes new, relevant information.
+    - Zero filler or irrelevant meta-commentary; phrasing is compact without sacrificing
+      clarity.
+    - If present, summaries are succinct and non-duplicative, clearly enhancing comprehension.
+  guidelines:
+  - No repeated points or steps without added value
+  - Each sentence advances the message; minimal filler or looping text
+  - No verbose restatements that obscure the main idea
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence
+- id: helpsteer2-coherence-judge-structure-and-formatting-support
+  name: Structure & Formatting Support
+  version: '1.0'
+  description: "Assesses how well the response\u2019s structure and formatting (headings,\
+    \ lists, tables, code blocks) make the content easier to read and follow. Rewards\
+    \ clear, consistent organization that supports comprehension and task execution,\
+    \ and penalizes broken, inconsistent, or misleading formatting. Stylistic choices\
+    \ are not penalized if the structure remains functionally clear and coherent."
+  scoring_description: Score how well the response demonstrates structure & formatting
+    support
+  definition: "Assesses how well the response\u2019s structure and formatting (headings,\
+    \ lists, tables, code blocks) make the content easier to read and follow. Rewards\
+    \ clear, consistent organization that supports comprehension and task execution,\
+    \ and penalizes broken, inconsistent, or misleading formatting. Stylistic choices\
+    \ are not penalized if the structure remains functionally clear and coherent."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Completely Broken
+    indicators:
+    - Formatting errors render content hard to parse (e.g., mangled or nested lists,
+      unclosed code fences, misaligned tables).
+    - Structure misleads or contradicts content (e.g., mislabeled sections/steps,
+      headings that do not match the text).
+    - Intrusive or chaotic layout (random line breaks, repeated blocks) fragments
+      the message and obscures flow.
+  - range:
+    - 1.0
+    - 1.9
+    label: Mostly Deficient
+    indicators:
+    - Disorganized or inconsistent structure (abrupt list level changes, missing or
+      illogical headings).
+    - Frequent formatting inaccuracies that impede reading (misnumbered steps, mixed
+      bullet styles, uneven indentation).
+    - Misuse of structural elements (e.g., code blocks for prose or tables for simple
+      lists) that creates confusion.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partially Effective
+    indicators:
+    - Basic structure present (some headings/lists), but ordering or grouping is suboptimal
+      and requires reader effort.
+    - Occasional inconsistencies or minor errors (e.g., a mislabeled step or uneven
+      spacing) that mildly hinder clarity.
+    - Some helpful formatting coexists with unnecessary or distracting elements (e.g.,
+      redundant sections or overly long blocks).
+  - range:
+    - 3.0
+    - 3.9
+    label: Effective
+    indicators:
+    - Clear, logical organization with consistent headings and correctly formatted
+      lists/code that support the message.
+    - Formatting aids skimming and execution (concise sections, sensible step order)
+      with minimal distraction.
+    - No substantive structural errors; stylistic variations are consistent and do
+      not impede understanding.
+  - range:
+    - 4.0
+    - 4.0
+    label: Exemplary
+    indicators:
+    - Purposeful, well-scoped structure (descriptive headings, well-ordered steps,
+      correctly scoped code/examples) that enhances comprehension.
+    - Consistent, unambiguous conventions (numbering, bullets, labels, references)
+      with precise alignment between structure and content.
+    - Formatting anticipates reader needs (e.g., brief summaries, callouts, or tables
+      where appropriate) without redundancy or clutter.
+  guidelines:
+  - Lists/steps are complete, parallel, and properly ordered
+  - Headings and grouping align with the logical structure
+  - No broken or mangled formatting that hinders readability
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-coherence-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: coherence

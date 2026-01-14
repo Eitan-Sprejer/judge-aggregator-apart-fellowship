@@ -1,0 +1,128 @@
+{
+  "iteration": 1,
+  "judge_names": [
+    "helpsteer2-correctness-judge-requirement-coverage",
+    "helpsteer2-correctness-judge-factual-accuracy",
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination",
+    "helpsteer2-correctness-judge-procedural-correctness"
+  ],
+  "n_judges": 4,
+  "train_metrics": {
+    "mse": 1.227955995918222,
+    "mae": 0.8695428096759165,
+    "r2": 0.2602229074533272,
+    "spearman_rho": 0.4130684577359299,
+    "kendall_tau": 0.3222730744186111,
+    "pearson_r": 0.5102023108383682
+  },
+  "test_metrics": {
+    "mse": 1.4099614587596097,
+    "mae": 0.9638278192077863,
+    "r2": 0.2722779567692336,
+    "spearman_rho": 0.45364746449628074,
+    "kendall_tau": 0.3509194744709553,
+    "pearson_r": 0.522138750727129
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.2722779567692336,
+      "mse": 1.4099614587596097,
+      "mae": 0.9638278192077863,
+      "spearman_rho": 0.45364746449628074,
+      "kendall_tau": 0.3509194744709553,
+      "pearson_r": 0.5221387507271291
+    },
+    "coverage": {
+      "variance_explained": 0.2972205109101381,
+      "coverage_score": 0.2972205109101381
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.6028483406806103,
+      "max_pairwise_correlation": 0.768518788920842,
+      "redundancy_score": 0.39715165931938967,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 1.8822170548374668,
+      "diversity_index": 0.4705542637093667
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.32781534291933134,
+      "entropy": 0.7771469403004398
+    },
+    "composite_score": 0.34189646949547237
+  },
+  "importance_scores": {
+    "helpsteer2-correctness-judge-requirement-coverage": 0.9181883258348491,
+    "helpsteer2-correctness-judge-factual-accuracy": 0.0,
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination": 1.0,
+    "helpsteer2-correctness-judge-procedural-correctness": 0.607002776593184
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-correctness-judge-factual-accuracy' scores are low",
+        "severity": 0.5016153335429036,
+        "affected_samples": 93,
+        "characteristics": {
+          "judge": "helpsteer2-correctness-judge-factual-accuracy",
+          "low_score_error_var": 1.895362438823177,
+          "high_score_error_var": 0.9346294361838248
+        },
+        "suggested_dimension": "helpsteer2-correctness-judge-factual-accuracy-specificity"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": 0.023671028174191488,
+      "std_error": 1.1871820168722176,
+      "mean_abs_error": 0.9638278192077863,
+      "median_abs_error": 0.7913088888424982,
+      "max_abs_error": 3.4272783548673083,
+      "pct_high_error": 69.5,
+      "skewness": -0.42895576607525177,
+      "kurtosis": 0.19825335875624894
+    },
+    "judge_error_correlations": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.06112642637591564,
+      "helpsteer2-correctness-judge-factual-accuracy": -0.07732594767785297,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": -0.051015833640130445,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.03597972490667548
+    },
+    "suggested_dimensions": [
+      "helpsteer2-correctness-judge-factual-accuracy-specificity"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 69.5% samples with error > 0.5\nMean absolute error: 0.964\nError skewness: -0.429\n\nIdentified 1 gap patterns:\n  1. [high_variance] High error variance when 'helpsteer2-correctness-judge-factual-accuracy' scores are low\n     Severity: 0.50, Affected: 93 samples\n\nSuggested new dimensions: helpsteer2-correctness-judge-factual-accuracy-specificity"
+  },
+  "attribution_correlations": {
+    "helpsteer2-correctness-judge-requirement-coverage": {
+      "helpsteer2-correctness-judge-requirement-coverage": 1.0,
+      "helpsteer2-correctness-judge-factual-accuracy": -0.13244416559580036,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 0.4954107536414531,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.6187879371880416
+    },
+    "helpsteer2-correctness-judge-factual-accuracy": {
+      "helpsteer2-correctness-judge-requirement-coverage": -0.13244416559580036,
+      "helpsteer2-correctness-judge-factual-accuracy": 1.0,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": -0.21662012277225898,
+      "helpsteer2-correctness-judge-procedural-correctness": -0.353487551721164
+    },
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.4954107536414531,
+      "helpsteer2-correctness-judge-factual-accuracy": -0.21662012277225898,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 1.0,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.5410470445124896
+    },
+    "helpsteer2-correctness-judge-procedural-correctness": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.6187879371880416,
+      "helpsteer2-correctness-judge-factual-accuracy": -0.353487551721164,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 0.5410470445124896,
+      "helpsteer2-correctness-judge-procedural-correctness": 1.0
+    }
+  },
+  "improvement": 0.0022924595602146214,
+  "should_stop": false,
+  "stop_reason": null
+}
