@@ -22,6 +22,7 @@ import argparse
 import json
 import logging
 import pickle
+import random
 import sys
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
@@ -96,6 +97,9 @@ class SelectionConfig:
     # Redundancy thresholds
     max_correlation: float = 0.9  # Remove if pair exceeds this
     
+    # Pruning strategy
+    pruning_strategy: str = "importance"  # "importance", "redundancy", "attribution_correlation", "human_correlation", "combined", "random"
+    
     # Judge proposal settings
     proposal_mode: str = "decompose"  # "decompose" (children) or "create" (new parents)
     use_llm_suggestions: bool = True
@@ -146,6 +150,9 @@ class IterationResult:
     
     # Gap analysis
     gap_analysis: Optional[Dict[str, Any]] = None
+    
+    # Attribution correlations (for redundancy-based pruning)
+    attribution_correlations: Optional[Dict[str, Dict[str, float]]] = None
     
     # Stopping info
     improvement: float = 0.0
@@ -350,6 +357,7 @@ class IterativeJudgeSelector:
         importance = gam.get_feature_importance(X_test)
         
         # Enhanced importance calculation using Track 2 methods
+        attribution_correlations = None
         try:
             # Prepare data for attribution analysis
             interp_df = pd.DataFrame({"judge_scores": list(X_test)})
@@ -360,6 +368,13 @@ class IterativeJudgeSelector:
                 {"n_splines": self.config.gam_n_splines},
             )
             contrib_importance_list = contribution_based_importance(attributions)
+            
+            # Compute attribution correlation matrix for redundancy-based pruning
+            attr_matrix = np.array(attributions)
+            if attr_matrix.shape[1] > 1:
+                attr_df = pd.DataFrame(attr_matrix, columns=judge_names)
+                corr_matrix = attr_df.corr().fillna(0)
+                attribution_correlations = corr_matrix.to_dict()
             
             # Map back to judge names
             contrib_importance = {
@@ -444,6 +459,7 @@ class IterativeJudgeSelector:
             removed_judge=removed_judge,
             added_judge=added_judge,
             gap_analysis=gap_result.to_dict(),
+            attribution_correlations=attribution_correlations,
             improvement=improvement,
             should_stop=should_stop,
             stop_reason=stop_reason,
@@ -488,16 +504,247 @@ class IterativeJudgeSelector:
     def _select_judge_to_remove(
         self,
         importance_scores: Dict[str, float],
+        judge_scores: Optional[np.ndarray] = None,
+        judge_names: Optional[List[str]] = None,
+        targets: Optional[np.ndarray] = None,
+        attribution_correlations: Optional[Dict[str, Dict[str, float]]] = None,
     ) -> Optional[str]:
-        """Select which judge to remove."""
+        """
+        Select which judge to remove based on configured pruning strategy.
+        
+        Args:
+            importance_scores: Dict mapping judge names to importance scores
+            judge_scores: Judge score matrix (n_samples, n_judges) for redundancy strategies
+            judge_names: List of judge names corresponding to columns in judge_scores
+            targets: Target values for human correlation strategy
+            attribution_correlations: Dict of attribution correlation matrix for attribution strategy
+            
+        Returns:
+            Name of judge to remove, or None if no candidate found
+        """
+        strategy = self.config.pruning_strategy
+        
+        if strategy == "importance":
+            return self._remove_by_importance(importance_scores)
+        elif strategy == "redundancy":
+            return self._remove_by_redundancy(judge_scores, judge_names, importance_scores)
+        elif strategy == "attribution_correlation":
+            return self._remove_by_attribution_correlation(
+                attribution_correlations, importance_scores, judge_names
+            )
+        elif strategy == "human_correlation":
+            return self._remove_by_human_correlation(judge_scores, judge_names, targets)
+        elif strategy == "combined":
+            return self._remove_by_combined(importance_scores, judge_scores, judge_names)
+        elif strategy == "random":
+            return self._remove_random(judge_names)
+        else:
+            logger.warning(f"Unknown pruning strategy '{strategy}', falling back to importance")
+            return self._remove_by_importance(importance_scores)
+    
+    def _remove_by_importance(self, importance_scores: Dict[str, float]) -> Optional[str]:
+        """Remove judge with lowest importance score (original strategy)."""
         try:
             judge_name, score = identify_least_important_judge(
                 importance_scores,
                 protected_judges=self.config.protected_judges,
             )
+            logger.info(f"[importance] Selecting {judge_name} (score={score:.4f})")
             return judge_name
         except ValueError:
             return None
+    
+    def _remove_by_redundancy(
+        self,
+        judge_scores: Optional[np.ndarray],
+        judge_names: Optional[List[str]],
+        importance_scores: Dict[str, float],
+    ) -> Optional[str]:
+        """Remove judge with highest mean pairwise score correlation."""
+        if judge_scores is None or judge_names is None:
+            logger.warning("[redundancy] Missing judge_scores or judge_names, falling back to importance")
+            return self._remove_by_importance(importance_scores)
+        
+        protected = set(self.config.protected_judges)
+        n_judges = len(judge_names)
+        
+        if n_judges < 2:
+            return None
+        
+        # Compute correlation matrix of judge scores
+        corr_matrix = np.corrcoef(judge_scores.T)
+        
+        # Calculate mean absolute correlation for each judge (excluding self)
+        redundancy_scores = {}
+        for i, name in enumerate(judge_names):
+            if name in protected:
+                continue
+            other_corrs = []
+            for j in range(n_judges):
+                if i != j and not np.isnan(corr_matrix[i, j]):
+                    other_corrs.append(abs(corr_matrix[i, j]))
+            if other_corrs:
+                redundancy_scores[name] = np.mean(other_corrs)
+        
+        if not redundancy_scores:
+            return self._remove_by_importance(importance_scores)
+        
+        # Remove judge with highest redundancy (most correlated with others)
+        most_redundant = max(redundancy_scores.items(), key=lambda x: x[1])
+        logger.info(f"[redundancy] Selecting {most_redundant[0]} (mean_corr={most_redundant[1]:.4f})")
+        return most_redundant[0]
+    
+    def _remove_by_attribution_correlation(
+        self,
+        attribution_correlations: Optional[Dict[str, Dict[str, float]]],
+        importance_scores: Dict[str, float],
+        judge_names: Optional[List[str]],
+    ) -> Optional[str]:
+        """Remove judge from most-correlated attribution pair (lower importance one)."""
+        if attribution_correlations is None or not judge_names:
+            logger.warning("[attribution_correlation] Missing data, falling back to importance")
+            return self._remove_by_importance(importance_scores)
+        
+        protected = set(self.config.protected_judges)
+        threshold = self.config.max_correlation
+        
+        # Find all pairs exceeding correlation threshold
+        correlated_pairs = []
+        judges = list(attribution_correlations.keys())
+        for i, j1 in enumerate(judges):
+            if j1 not in importance_scores:
+                continue
+            for j2 in judges[i + 1:]:
+                if j2 not in importance_scores:
+                    continue
+                corr = attribution_correlations.get(j1, {}).get(j2, 0)
+                if abs(corr) > threshold:
+                    correlated_pairs.append((abs(corr), j1, j2))
+        
+        # Sort by highest correlation
+        correlated_pairs.sort(key=lambda x: x[0], reverse=True)
+        
+        for corr, j1, j2 in correlated_pairs:
+            # Find candidate to remove (not protected, lower importance)
+            candidates = []
+            if j1 not in protected:
+                candidates.append((j1, importance_scores.get(j1, 0)))
+            if j2 not in protected:
+                candidates.append((j2, importance_scores.get(j2, 0)))
+            
+            if not candidates:
+                continue
+            
+            # Remove the one with lower importance
+            to_remove = min(candidates, key=lambda x: x[1])[0]
+            logger.info(
+                f"[attribution_correlation] Selecting {to_remove} "
+                f"(corr={corr:.4f} with {j2 if to_remove == j1 else j1})"
+            )
+            return to_remove
+        
+        # No highly correlated pairs found, fall back to importance
+        logger.info("[attribution_correlation] No pairs above threshold, falling back to importance")
+        return self._remove_by_importance(importance_scores)
+    
+    def _remove_by_human_correlation(
+        self,
+        judge_scores: Optional[np.ndarray],
+        judge_names: Optional[List[str]],
+        targets: Optional[np.ndarray],
+    ) -> Optional[str]:
+        """Remove judge with lowest correlation to human targets."""
+        if judge_scores is None or judge_names is None or targets is None:
+            logger.warning("[human_correlation] Missing data, cannot compute correlations")
+            return None
+        
+        protected = set(self.config.protected_judges)
+        from scipy import stats
+        
+        correlations = {}
+        for i, name in enumerate(judge_names):
+            if name in protected:
+                continue
+            judge_col = judge_scores[:, i]
+            # Filter NaN values
+            mask = ~(np.isnan(judge_col) | np.isnan(targets))
+            if mask.sum() < 3:
+                correlations[name] = 0.0
+                continue
+            r, _ = stats.pearsonr(judge_col[mask], targets[mask])
+            correlations[name] = r if not np.isnan(r) else 0.0
+        
+        if not correlations:
+            return None
+        
+        # Remove judge with lowest correlation to human labels
+        lowest = min(correlations.items(), key=lambda x: x[1])
+        logger.info(f"[human_correlation] Selecting {lowest[0]} (pearson_r={lowest[1]:.4f})")
+        return lowest[0]
+    
+    def _remove_by_combined(
+        self,
+        importance_scores: Dict[str, float],
+        judge_scores: Optional[np.ndarray],
+        judge_names: Optional[List[str]],
+    ) -> Optional[str]:
+        """Remove judge with lowest combined score: importance × (1 - redundancy)."""
+        if judge_scores is None or judge_names is None:
+            logger.warning("[combined] Missing judge_scores, falling back to importance")
+            return self._remove_by_importance(importance_scores)
+        
+        protected = set(self.config.protected_judges)
+        n_judges = len(judge_names)
+        
+        if n_judges < 2:
+            return self._remove_by_importance(importance_scores)
+        
+        # Compute correlation matrix
+        corr_matrix = np.corrcoef(judge_scores.T)
+        
+        # Calculate combined scores
+        combined_scores = {}
+        for i, name in enumerate(judge_names):
+            if name in protected:
+                continue
+            
+            imp = importance_scores.get(name, 0.0)
+            
+            # Mean correlation with other judges
+            other_corrs = []
+            for j in range(n_judges):
+                if i != j and not np.isnan(corr_matrix[i, j]):
+                    other_corrs.append(abs(corr_matrix[i, j]))
+            
+            redundancy = np.mean(other_corrs) if other_corrs else 0.0
+            
+            # Combined score: high importance + low redundancy = high value (keep)
+            # We want to remove low combined scores
+            combined = imp * (1.0 - redundancy)
+            combined_scores[name] = combined
+        
+        if not combined_scores:
+            return self._remove_by_importance(importance_scores)
+        
+        # Remove judge with lowest combined score
+        lowest = min(combined_scores.items(), key=lambda x: x[1])
+        logger.info(f"[combined] Selecting {lowest[0]} (combined_score={lowest[1]:.4f})")
+        return lowest[0]
+    
+    def _remove_random(self, judge_names: Optional[List[str]]) -> Optional[str]:
+        """Remove a random non-protected judge (baseline strategy)."""
+        if not judge_names:
+            return None
+        
+        protected = set(self.config.protected_judges)
+        candidates = [j for j in judge_names if j not in protected]
+        
+        if not candidates:
+            return None
+        
+        selected = random.choice(candidates)
+        logger.info(f"[random] Selecting {selected}")
+        return selected
     
     def _propose_new_judge(
         self,
@@ -578,9 +825,13 @@ class IterativeJudgeSelector:
             removed = None
             added = None
             
-            # Try to remove least important judge
+            # Select judge to remove based on configured pruning strategy
             judge_to_remove = self._select_judge_to_remove(
-                result.importance_scores,
+                importance_scores=result.importance_scores,
+                judge_scores=X_test,
+                judge_names=current_judge_names,
+                targets=y_test,
+                attribution_correlations=result.attribution_correlations,
             )
             
             removal_floor = (
