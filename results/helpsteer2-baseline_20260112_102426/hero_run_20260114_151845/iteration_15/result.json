@@ -1,0 +1,177 @@
+{
+  "iteration": 15,
+  "n_judges": 15,
+  "judges": [
+    "helpsteer2-helpfulness-judge",
+    "helpsteer2-correctness-judge",
+    "helpsteer2-coherence-judge",
+    "helpsteer2-complexity-judge",
+    "helpsteer2-verbosity-judge",
+    "helpsteer2-helpfulness-judge-relevance-to-intent",
+    "helpsteer2-helpfulness-judge-completeness-of-solution",
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions",
+    "helpsteer2-helpfulness-judge-organization-for-immediate-application",
+    "helpsteer2-correctness-judge-requirement-coverage",
+    "helpsteer2-correctness-judge-procedural-correctness",
+    "helpsteer2-coherence-judge-logical-flow-and-sequencing",
+    "helpsteer2-coherence-judge-structure-and-formatting-support",
+    "helpsteer2-complexity-judge-lexical-sophistication",
+    "helpsteer2-verbosity-judge-extras-density"
+  ],
+  "removed_judge": null,
+  "removal_reason": "",
+  "dimension_metrics": {
+    "helpfulness": {
+      "r2": 0.32188873388325756,
+      "mae": 0.9250322059310317,
+      "pearson_r": 0.5676852786062018
+    },
+    "correctness": {
+      "r2": 0.321148495501949,
+      "mae": 0.8986213113103179,
+      "pearson_r": 0.5685537974146082
+    },
+    "coherence": {
+      "r2": 0.06774126597269048,
+      "mae": 0.5431706871259023,
+      "pearson_r": 0.3371377376398545
+    },
+    "complexity": {
+      "r2": 0.1631788526510657,
+      "mae": 0.4664840710223426,
+      "pearson_r": 0.4400637050702788
+    },
+    "verbosity": {
+      "r2": 0.18727795044396955,
+      "mae": 0.5047836956731377,
+      "pearson_r": 0.48546309183665354
+    }
+  },
+  "avg_r2": 0.21224705969058646,
+  "avg_mae": 0.6676183942125464,
+  "avg_pearson_r": 0.47978072211351935,
+  "importance_scores": {
+    "helpsteer2-helpfulness-judge": 0.24745941223284887,
+    "helpsteer2-correctness-judge": 0.2530104412108398,
+    "helpsteer2-coherence-judge": 0.1386072359554279,
+    "helpsteer2-complexity-judge": 1.0,
+    "helpsteer2-verbosity-judge": 0.7709046486581609,
+    "helpsteer2-helpfulness-judge-relevance-to-intent": 0.34430394830390376,
+    "helpsteer2-helpfulness-judge-completeness-of-solution": 0.07151452624324607,
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.17455059079018936,
+    "helpsteer2-helpfulness-judge-organization-for-immediate-application": 0.0,
+    "helpsteer2-correctness-judge-requirement-coverage": 0.09331700339049719,
+    "helpsteer2-correctness-judge-procedural-correctness": 0.21347750768992832,
+    "helpsteer2-coherence-judge-logical-flow-and-sequencing": 0.34981519678028833,
+    "helpsteer2-coherence-judge-structure-and-formatting-support": 0.34618892305406485,
+    "helpsteer2-complexity-judge-lexical-sophistication": 0.23183837866687024,
+    "helpsteer2-verbosity-judge-extras-density": 0.07534083974248165
+  },
+  "human_correlations": {
+    "helpsteer2-helpfulness-judge": {
+      "helpfulness": 0.47576020462916513,
+      "correctness": 0.49232560637264344,
+      "coherence": 0.311268387015252,
+      "complexity": 0.1300216345485503,
+      "verbosity": 0.04437135884889459
+    },
+    "helpsteer2-correctness-judge": {
+      "helpfulness": 0.5030826908687174,
+      "correctness": 0.5072654728823293,
+      "coherence": 0.32596773904856635,
+      "complexity": 0.019930156060197008,
+      "verbosity": -0.05619321152040475
+    },
+    "helpsteer2-coherence-judge": {
+      "helpfulness": 0.3871153305603464,
+      "correctness": 0.387684154751311,
+      "coherence": 0.43205229258087674,
+      "complexity": 0.033887226087061545,
+      "verbosity": 0.10872681533541581
+    },
+    "helpsteer2-complexity-judge": {
+      "helpfulness": 0.3071361430217212,
+      "correctness": 0.3017103619782193,
+      "coherence": 0.1527657231518526,
+      "complexity": 0.4255011672350697,
+      "verbosity": 0.38819587997713517
+    },
+    "helpsteer2-verbosity-judge": {
+      "helpfulness": 0.31317400968073716,
+      "correctness": 0.3124593662686145,
+      "coherence": 0.10057917479675896,
+      "complexity": 0.3559421745712268,
+      "verbosity": 0.5186413464695577
+    },
+    "helpsteer2-helpfulness-judge-relevance-to-intent": {
+      "helpfulness": 0.5330102738456315,
+      "correctness": 0.5427391641930348,
+      "coherence": 0.32998193302217055,
+      "complexity": 0.10033194362626947,
+      "verbosity": 0.04483531915219442
+    },
+    "helpsteer2-helpfulness-judge-completeness-of-solution": {
+      "helpfulness": 0.4947329493519452,
+      "correctness": 0.5033911688020092,
+      "coherence": 0.2102163990011081,
+      "complexity": 0.19915402583246566,
+      "verbosity": 0.13589370820872151
+    },
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": {
+      "helpfulness": 0.5248091455573685,
+      "correctness": 0.5332217905756481,
+      "coherence": 0.3159878414661238,
+      "complexity": 0.10037159156590386,
+      "verbosity": 0.10256941709246764
+    },
+    "helpsteer2-helpfulness-judge-organization-for-immediate-application": {
+      "helpfulness": 0.45050091551994487,
+      "correctness": 0.4295008467882236,
+      "coherence": 0.2620839021083454,
+      "complexity": 0.23593801541590778,
+      "verbosity": 0.24340500729197587
+    },
+    "helpsteer2-correctness-judge-requirement-coverage": {
+      "helpfulness": 0.47485961669826254,
+      "correctness": 0.48003329085584917,
+      "coherence": 0.24946288952652235,
+      "complexity": 0.13641065370902145,
+      "verbosity": 0.10084850275156448
+    },
+    "helpsteer2-correctness-judge-procedural-correctness": {
+      "helpfulness": 0.5049809653257671,
+      "correctness": 0.5006316696019459,
+      "coherence": 0.2744818001426929,
+      "complexity": 0.12290625634565915,
+      "verbosity": 0.020628098432090312
+    },
+    "helpsteer2-coherence-judge-logical-flow-and-sequencing": {
+      "helpfulness": 0.4674983171545712,
+      "correctness": 0.4479907891451388,
+      "coherence": 0.3839194827442925,
+      "complexity": 0.1836219734386183,
+      "verbosity": 0.1178966532508216
+    },
+    "helpsteer2-coherence-judge-structure-and-formatting-support": {
+      "helpfulness": 0.505783748503555,
+      "correctness": 0.48128960739027205,
+      "coherence": 0.2576302981843455,
+      "complexity": 0.16678888885566515,
+      "verbosity": 0.2497542353671257
+    },
+    "helpsteer2-complexity-judge-lexical-sophistication": {
+      "helpfulness": 0.3209139138779298,
+      "correctness": 0.33844166114184443,
+      "coherence": 0.12359515704003181,
+      "complexity": 0.39507811817285,
+      "verbosity": 0.29951993023332446
+    },
+    "helpsteer2-verbosity-judge-extras-density": {
+      "helpfulness": 0.3333515659632966,
+      "correctness": 0.3277142325015538,
+      "coherence": 0.11826467062452259,
+      "complexity": 0.364196823138329,
+      "verbosity": 0.4656436700540093
+    }
+  }
+}

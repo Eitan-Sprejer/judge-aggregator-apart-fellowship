@@ -1,0 +1,289 @@
+{
+  "total_iterations": 20,
+  "initial_judges": 30,
+  "final_judges": 11,
+  "best_iteration": 15,
+  "best_n_judges": 15,
+  "best_avg_r2": 0.21224705969058646,
+  "best_judges": [
+    "helpsteer2-helpfulness-judge",
+    "helpsteer2-correctness-judge",
+    "helpsteer2-coherence-judge",
+    "helpsteer2-complexity-judge",
+    "helpsteer2-verbosity-judge",
+    "helpsteer2-helpfulness-judge-relevance-to-intent",
+    "helpsteer2-helpfulness-judge-completeness-of-solution",
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions",
+    "helpsteer2-helpfulness-judge-organization-for-immediate-application",
+    "helpsteer2-correctness-judge-requirement-coverage",
+    "helpsteer2-correctness-judge-procedural-correctness",
+    "helpsteer2-coherence-judge-logical-flow-and-sequencing",
+    "helpsteer2-coherence-judge-structure-and-formatting-support",
+    "helpsteer2-complexity-judge-lexical-sophistication",
+    "helpsteer2-verbosity-judge-extras-density"
+  ],
+  "peak_avg_r2": 0.21224705969058646,
+  "final_avg_r2": 0.1796967899867879,
+  "trajectory": [
+    {
+      "iteration": 0,
+      "n_judges": 30,
+      "avg_r2": 0.09734321084499939,
+      "removed": "helpsteer2-coherence-judge-internal-consistency",
+      "dimension_r2": {
+        "helpfulness": 0.20358527997567033,
+        "correctness": 0.21627237636290997,
+        "coherence": -0.13014554144051638,
+        "complexity": 0.049172678919946144,
+        "verbosity": 0.1478312604069869
+      }
+    },
+    {
+      "iteration": 1,
+      "n_judges": 29,
+      "avg_r2": 0.12635877511671317,
+      "removed": "helpsteer2-verbosity-judge-framing-padding",
+      "dimension_r2": {
+        "helpfulness": 0.22744078714459826,
+        "correctness": 0.24907891308864993,
+        "coherence": -0.06511106767105512,
+        "complexity": 0.059596637597116975,
+        "verbosity": 0.16078860542425588
+      }
+    },
+    {
+      "iteration": 2,
+      "n_judges": 28,
+      "avg_r2": 0.13746889366510215,
+      "removed": "helpsteer2-helpfulness-judge-actionability-and-specificity",
+      "dimension_r2": {
+        "helpfulness": 0.23448753987232263,
+        "correctness": 0.2602250875563037,
+        "coherence": -0.07387416729172025,
+        "complexity": 0.07105897453119603,
+        "verbosity": 0.19544703365740868
+      }
+    },
+    {
+      "iteration": 3,
+      "n_judges": 27,
+      "avg_r2": 0.14604501370688697,
+      "removed": "helpsteer2-verbosity-judge-redundancy",
+      "dimension_r2": {
+        "helpfulness": 0.2399386658834819,
+        "correctness": 0.2661027341833446,
+        "coherence": -0.05137285407524694,
+        "complexity": 0.06764897256304037,
+        "verbosity": 0.20790754997981487
+      }
+    },
+    {
+      "iteration": 4,
+      "n_judges": 26,
+      "avg_r2": 0.14089103548417728,
+      "removed": "helpsteer2-coherence-judge-concision-and-non-redundancy",
+      "dimension_r2": {
+        "helpfulness": 0.2259264271207525,
+        "correctness": 0.25398243341812443,
+        "coherence": -0.06748338745970095,
+        "complexity": 0.07733049007288195,
+        "verbosity": 0.21469921426882843
+      }
+    },
+    {
+      "iteration": 5,
+      "n_judges": 25,
+      "avg_r2": 0.15674100653944242,
+      "removed": "helpsteer2-correctness-judge-factual-accuracy",
+      "dimension_r2": {
+        "helpfulness": 0.23000202038041417,
+        "correctness": 0.2561631935451658,
+        "coherence": -0.04404540199467899,
+        "complexity": 0.10288377489499523,
+        "verbosity": 0.23870144587131592
+      }
+    },
+    {
+      "iteration": 6,
+      "n_judges": 24,
+      "avg_r2": 0.15895650659499844,
+      "removed": "helpsteer2-verbosity-judge-minimal-overage",
+      "dimension_r2": {
+        "helpfulness": 0.23433581478970444,
+        "correctness": 0.26243952399221293,
+        "coherence": -0.008903625031435825,
+        "complexity": 0.0927493225094067,
+        "verbosity": 0.21416149671510398
+      }
+    },
+    {
+      "iteration": 7,
+      "n_judges": 23,
+      "avg_r2": 0.16061180085532867,
+      "removed": "helpsteer2-complexity-judge-syntactic-complexity",
+      "dimension_r2": {
+        "helpfulness": 0.24197297338496937,
+        "correctness": 0.2668797820350596,
+        "coherence": -0.012974757833784878,
+        "complexity": 0.0876561932374913,
+        "verbosity": 0.21952481345290797
+      }
+    },
+    {
+      "iteration": 8,
+      "n_judges": 22,
+      "avg_r2": 0.17372484386935694,
+      "removed": "helpsteer2-coherence-judge-referential-clarity-and-terminology",
+      "dimension_r2": {
+        "helpfulness": 0.2571939290143772,
+        "correctness": 0.2749118609784955,
+        "coherence": 0.04129331568009609,
+        "complexity": 0.09126588315109874,
+        "verbosity": 0.20395923052271714
+      }
+    },
+    {
+      "iteration": 9,
+      "n_judges": 21,
+      "avg_r2": 0.1731864536853378,
+      "removed": "helpsteer2-correctness-judge-uncertainty-handling",
+      "dimension_r2": {
+        "helpfulness": 0.26440599440224244,
+        "correctness": 0.2758363093005156,
+        "coherence": 0.03381735500958072,
+        "complexity": 0.10956186648232202,
+        "verbosity": 0.18231074323202823
+      }
+    },
+    {
+      "iteration": 10,
+      "n_judges": 20,
+      "avg_r2": 0.17909500535855358,
+      "removed": "helpsteer2-correctness-judge-grounding-and-non-hallucination",
+      "dimension_r2": {
+        "helpfulness": 0.2632550375514461,
+        "correctness": 0.2790548383554472,
+        "coherence": 0.05580496204615304,
+        "complexity": 0.09823967692304592,
+        "verbosity": 0.19912051191667568
+      }
+    },
+    {
+      "iteration": 11,
+      "n_judges": 19,
+      "avg_r2": 0.1811031727296164,
+      "removed": "helpsteer2-complexity-judge-assumed-knowledge",
+      "dimension_r2": {
+        "helpfulness": 0.2730122625887068,
+        "correctness": 0.2799631661008922,
+        "coherence": 0.08878099910964499,
+        "complexity": 0.09923245171638417,
+        "verbosity": 0.1645269841324538
+      }
+    },
+    {
+      "iteration": 12,
+      "n_judges": 18,
+      "avg_r2": 0.19692754202400758,
+      "removed": "helpsteer2-verbosity-judge-structural-expansion",
+      "dimension_r2": {
+        "helpfulness": 0.29710099990146177,
+        "correctness": 0.2975214818478833,
+        "coherence": 0.0990669925777482,
+        "complexity": 0.1198275277224965,
+        "verbosity": 0.1711207080704482
+      }
+    },
+    {
+      "iteration": 13,
+      "n_judges": 17,
+      "avg_r2": 0.19256317359184,
+      "removed": "helpsteer2-complexity-judge-terminology-density",
+      "dimension_r2": {
+        "helpfulness": 0.2813214223803059,
+        "correctness": 0.28643026223859647,
+        "coherence": 0.06534260750842813,
+        "complexity": 0.16001472262296068,
+        "verbosity": 0.16970685320890877
+      }
+    },
+    {
+      "iteration": 14,
+      "n_judges": 16,
+      "avg_r2": 0.1981003104486419,
+      "removed": "helpsteer2-complexity-judge-formalism-and-references",
+      "dimension_r2": {
+        "helpfulness": 0.2966341589131444,
+        "correctness": 0.28958638351854626,
+        "coherence": 0.06419102222791606,
+        "complexity": 0.16131446165708752,
+        "verbosity": 0.17877552592651524
+      }
+    },
+    {
+      "iteration": 15,
+      "n_judges": 15,
+      "avg_r2": 0.21224705969058646,
+      "removed": "helpsteer2-correctness-judge",
+      "dimension_r2": {
+        "helpfulness": 0.32188873388325756,
+        "correctness": 0.321148495501949,
+        "coherence": 0.06774126597269048,
+        "complexity": 0.1631788526510657,
+        "verbosity": 0.18727795044396955
+      }
+    },
+    {
+      "iteration": 16,
+      "n_judges": 14,
+      "avg_r2": 0.20294212138242385,
+      "removed": "helpsteer2-coherence-judge",
+      "dimension_r2": {
+        "helpfulness": 0.3004847334372803,
+        "correctness": 0.29716343051899496,
+        "coherence": 0.029254148579003547,
+        "complexity": 0.17200710997286706,
+        "verbosity": 0.21580118440397333
+      }
+    },
+    {
+      "iteration": 17,
+      "n_judges": 13,
+      "avg_r2": 0.20388447453328098,
+      "removed": "helpsteer2-correctness-judge-procedural-correctness",
+      "dimension_r2": {
+        "helpfulness": 0.2869041853272494,
+        "correctness": 0.28736316643728166,
+        "coherence": 0.05335054372232295,
+        "complexity": 0.17313906704002158,
+        "verbosity": 0.21866541013952945
+      }
+    },
+    {
+      "iteration": 18,
+      "n_judges": 12,
+      "avg_r2": 0.18789995830186618,
+      "removed": "helpsteer2-correctness-judge-requirement-coverage",
+      "dimension_r2": {
+        "helpfulness": 0.25296324348686783,
+        "correctness": 0.2543651829115239,
+        "coherence": 0.03449631467829195,
+        "complexity": 0.1845369868704676,
+        "verbosity": 0.21313806356217957
+      }
+    },
+    {
+      "iteration": 19,
+      "n_judges": 11,
+      "avg_r2": 0.1796967899867879,
+      "removed": null,
+      "dimension_r2": {
+        "helpfulness": 0.24211245351339294,
+        "correctness": 0.24260212933182657,
+        "coherence": 0.028409556924728907,
+        "complexity": 0.17586964609545497,
+        "verbosity": 0.20949016406853616
+      }
+    }
+  ]
+}

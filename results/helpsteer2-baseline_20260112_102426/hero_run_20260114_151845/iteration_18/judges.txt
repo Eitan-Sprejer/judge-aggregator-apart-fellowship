@@ -1,0 +1,12 @@
+helpsteer2-helpfulness-judge
+helpsteer2-complexity-judge
+helpsteer2-verbosity-judge
+helpsteer2-helpfulness-judge-relevance-to-intent
+helpsteer2-helpfulness-judge-completeness-of-solution
+helpsteer2-helpfulness-judge-context-tailoring-and-assumptions
+helpsteer2-helpfulness-judge-organization-for-immediate-application
+helpsteer2-correctness-judge-requirement-coverage
+helpsteer2-coherence-judge-logical-flow-and-sequencing
+helpsteer2-coherence-judge-structure-and-formatting-support
+helpsteer2-complexity-judge-lexical-sophistication
+helpsteer2-verbosity-judge-extras-density
