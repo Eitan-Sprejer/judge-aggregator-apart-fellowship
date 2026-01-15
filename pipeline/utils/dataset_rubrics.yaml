@@ -241,15 +241,6 @@ recipe:
       scale: [1, 5]
   response_format: "json"
 
-wmt_en_de:
-  # TODO: Add WMT English-German translation quality rubric
-  rubric: |
-    # Placeholder - add actual human annotation instructions
-  dimensions:
-    - name: "quality"
-      scale: [1, 5]
-  response_format: "json"
-
 wmt_zh_en:
   # TODO: Add WMT Chinese-English translation quality rubric
   rubric: |
@@ -257,4 +248,66 @@ wmt_zh_en:
   dimensions:
     - name: "quality"
       scale: [1, 5]
+  response_format: "json"
+
+mslr:
+  # Based on ACL 2023 paper "Automated Metrics for Medical Multi-Document Summarization Disagree with Human Evaluations"
+  # Source: https://aclanthology.org/2023.acl-long.549/
+  # Note: Rubric constructed from scoring criteria in paper/GitHub - exact verbatim instructions not available
+  rubric: |
+    You are evaluating the quality of a medical literature review summary.
+    Given source documents from a Cochrane systematic review and a generated summary,
+    rate the summary on four dimensions used in medical summarization evaluation.
+
+    ## Dimensions to Evaluate
+
+    ### 1. Fluency (0-2)
+    Evaluate if the summary is fluent English without grammatical errors that impact comprehension.
+    - 2: No errors that impact comprehension of the summary
+    - 1: Some errors but still comprehensible
+    - 0: Major errors impacting comprehension
+
+    ### 2. PIO Consistency (0-2)
+    Evaluate alignment of Population, Intervention, and Outcome elements with the reference summary.
+    PIO refers to:
+    - Population: Who was studied? (e.g., "women with gestational diabetes")
+    - Intervention: What treatment/action was studied?
+    - Outcome: What effects/results were measured?
+
+    Score based on how well these elements match the reference:
+    - 2: Population, Intervention, and Outcome all correctly match the reference summary
+    - 1: Partial match - some PIO elements are correct, others are missing or incorrect
+    - 0: No match - PIO elements do not align with the reference
+
+    ### 3. Effect Direction (0-1)
+    Does the summary correctly report whether the intervention has a positive, negative, or neutral effect?
+    - 1: Effect direction matches the reference summary (e.g., both say "intervention helps" or "no effect")
+    - 0: Effect direction does not match or is unclear/contradictory
+
+    ### 4. Evidence Strength (0-1)
+    Does the summary appropriately represent how strongly the evidence supports the claims?
+    Medical summaries should not overstate or understate the certainty of findings.
+    - 1: Claim strength appropriately matches the evidence level in the reference
+    - 0: Claim strength overstates or understates the evidence (e.g., saying "definitely works" when evidence is weak)
+
+    ## Instructions
+    - Read the source documents and reference summary carefully
+    - Evaluate the generated summary against each dimension
+    - For each dimension, provide a brief explanation (1-2 sentences) and then a score
+    - Return in JSON format: {"fluency": {"explanation": "...", "score": X}, "pio_consistency": {"explanation": "...", "score": X}, "effect_direction": {"explanation": "...", "score": X}, "evidence_strength": {"explanation": "...", "score": X}}
+
+  dimensions:
+    - name: "fluency"
+      scale: [0, 2]
+      description: "Grammatical fluency - no errors impacting comprehension"
+    - name: "pio_consistency"
+      scale: [0, 2]
+      description: "Population/Intervention/Outcome alignment with reference"
+    - name: "effect_direction"
+      scale: [0, 1]
+      description: "Correct reporting of intervention effect direction"
+    - name: "evidence_strength"
+      scale: [0, 1]
+      description: "Appropriate claim strength matching evidence level"
+
   response_format: "json"

@@ -6,7 +6,7 @@
 # Dimensions: quality (0-6 scale)
 
 name: "wmt-en-de-baseline"
-dataset: "judge_bench"
+dataset: "wmt_en_de"
 target: "target_human_aggregated"
 
 # Single dimension for translation quality

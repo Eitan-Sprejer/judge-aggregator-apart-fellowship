@@ -1,0 +1,325 @@
+judges:
+- id: summeval-coherence-judge
+  name: coherence Judge
+  version: '1.0'
+  description: Evaluates how well the sentences of a news-summary work together as
+    a whole. Focuses on global flow, logical ordering, and how naturally the summary
+    reads as a unified piece.
+  scoring_description: "Score 0\u20134 based on how smoothly and logically the sentences\
+    \ connect and whether the summary reads naturally as a whole. Do not judge factual\
+    \ accuracy or coverage except when they cause internal contradictions or disrupt\
+    \ flow."
+  definition: 'Coherence measures the paragraph-level organization and connectedness
+    of the summary: whether sentences collectively form a clear, logical, and natural-sounding
+    whole. It includes sensible ordering of information, clear entity and pronoun
+    references across sentences, and consistent point of view and timeline. It tolerates
+    minor grammar issues if they do not disrupt the overall flow, and it ignores faithfulness
+    to the article unless it creates internal contradictions. Strong coherence typically
+    resembles a concise news brief with a lead and supporting details that progress
+    logically.'
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Sentences are largely unrelated or contradictory, making the overall meaning
+      hard to follow
+    - Frequent unresolved references (e.g., 'he/she/they/it' with no identifiable
+      antecedent)
+    - Severe jumps in topic or timeline with no connective cues; appears as a jumbled
+      collage of statements
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Partial topical relation but with frequent abrupt shifts or ordering that confuses
+      the storyline
+    - Multiple unclear cross-sentence references or entity mix-ups (names/titles swapped
+      or inconsistent)
+    - List-like accumulation of facts with little to no linking language, yielding
+      a choppy read
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - A main thread is discernible, but flow is uneven with noticeable choppiness
+      or weak transitions
+    - Occasional unclear pronouns or mild entity/time disorientation that momentarily
+      disrupts reading
+    - Some redundancy or minor internal tension, yet the overall narrative remains
+      understandable
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Information is logically ordered with clear progression from main point to supporting
+      details
+    - References across sentences (pronouns, entities, time) are mostly clear and
+      consistent
+    - Minimal redundancy and no internal contradictions; reads smoothly with light
+      connective cues
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Highly natural, cohesive narrative with strong paragraph unity and purposeful
+      sentence-to-sentence linkage
+    - Crystal-clear referential coherence (entities, pronouns, and timeline maintained
+      without ambiguity)
+    - "Tight structure resembling a polished news brief (lead \u2192 support \u2192\
+      \ wrap) with no redundancy or drift"
+  guidelines:
+  - Focus on paragraph-level flow, ordering, and cross-sentence clarity; do not penalize
+    for missing key points (relevance) or factual errors (consistency) unless they
+    create internal contradictions or disrupt narrative flow.
+  - Treat grammar issues under fluency; only penalize them here if they materially
+    break cross-sentence cohesion or make the whole hard to follow.
+  - Prefer summaries that present a clear lead and logically ordered supporting details
+    with coherent references over those that list facts without connective tissue.
+  score_range: [0.0, 4.0]
+  dataset: summeval
+  parent_id: null
+  auto_generated: true
+  dimension: coherence
+- id: summeval-consistency-judge
+  name: consistency Judge
+  version: '1.0'
+  description: Evaluates whether a summary is factually consistent with its source
+    news article. Assesses if stated facts are accurate, traceable to the article,
+    and free of contradictions or fabricated details.
+  scoring_description: Assign a score from 0 to 4 based on the degree of factual alignment
+    with the article, penalizing contradictions and unsupported or invented details.
+    Use the indicators to locate the closest level within the specified numeric range.
+  definition: "Consistency measures factual faithfulness of the summary to the original\
+    \ article. A consistent summary accurately reproduces entities, numbers, dates,\
+    \ relationships, and attributions and does not introduce unverified or fabricated\
+    \ information. Contradictions, role swaps, causal reversals, incorrect magnitudes,\
+    \ and attribution errors reduce consistency. Omissions are not penalized unless\
+    \ they cause an incorrect implication or change of meaning. Paraphrasing is acceptable\
+    \ when it preserves the article\u2019s meaning, scope, and uncertainty/modality."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Multiple core claims contradict the article or are unsupported by it (e.g.,
+      wrong outcome, reversed causality).
+    - Misidentifies primary entities or events (wrong person/organization/place/date)
+      in key statements.
+    - Invents salient facts such as quotes, numbers, or outcomes not present in the
+      article.
+    - Systematically misattributes actions or statements to the wrong sources.
+    - Introduces fabricated central events or relationships absent from the article.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - At least one major contradiction of a key article fact (e.g., incorrect main
+      actor, result, or location).
+    - Two or more unsupported specific details (names, dates, counts) that cannot
+      be verified in the article.
+    - Introduces causal or scope claims that the article does not make, materially
+      changing meaning.
+    - Noticeable attribution errors (e.g., quotes or claims assigned to the wrong
+      party) affecting interpretation.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "Overall meaning aligns, but contains one major error or 2\u20133 minor inaccuracies\
+      \ in peripheral details."
+    - "Slight misstatements of numbers, time frames, or degrees of certainty (e.g.,\
+      \ turning \u201Calleged\u201D into a definitive claim)."
+    - Adds a speculative or unverifiable detail that extends beyond the article without
+      contradicting core facts.
+    - Ambiguous phrasing that could imply an unsupported nuance or emphasis not present
+      in the article.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Core facts, relationships, and outcomes match the article; at most one minor
+      discrepancy in a non-salient detail.
+    - "No invented specifics; any added context is generic and does not alter the\
+      \ article\u2019s meaning."
+    - "Preserves attribution and modality/uncertainty present in the article (e.g.,\
+      \ \u201Cpolice said,\u201D \u201Calleged\u201D)."
+    - Numeric and named-entity details are correct or safely summarized without changing
+      magnitude or scope.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All claims are fully traceable to the article with exact or equivalent meaning;
+      zero contradictions.
+    - Entities, dates, locations, numbers, and relationships match precisely; no unsupported
+      additions.
+    - Attributions, hedges, and scope are faithfully preserved; no speculative or
+      extrapolated content.
+  guidelines:
+  - Judge only factual alignment with the article; do not consider relevance, fluency,
+    or coherence except where they affect factual meaning.
+  - 'Distinguish major from minor errors: major errors change core meaning (actors,
+    outcomes, causality, key numbers); minor errors affect peripheral details (small
+    count drift, minor timeframe vagueness). Score by the highest-severity error present.'
+  - Penalize any specific claim not verifiable from the article, even if plausible;
+    do not penalize faithful paraphrases or omissions unless they create an incorrect
+    implication.
+  score_range: [0.0, 4.0]
+  dataset: summeval
+  parent_id: null
+  auto_generated: true
+  dimension: consistency
+- id: summeval-fluency-judge
+  name: fluency Judge
+  version: '1.0'
+  description: Evaluates the sentence-level writing quality of a news summary. Focuses
+    on grammar, syntax, spelling, punctuation, capitalization, and naturalness of
+    phrasing in each sentence.
+  scoring_description: "Assign a score from 0 to 4 based on the highest level whose\
+    \ indicators best describe the summary\u2019s sentences. When mixed, choose the\
+    \ level that reflects the overall frequency and severity of errors."
+  definition: Fluency measures how well each sentence is written and whether it is
+    grammatically correct and natural-sounding. It concerns mechanics (grammar, spelling,
+    punctuation, capitalization), syntax (sentence completeness, agreement, tense),
+    and idiomatic phrasing. It does not consider factual accuracy, coverage of the
+    article, or how sentences connect to each other (coherence). In this context,
+    a fluent summary reads like standard journalistic English with clear, error-free
+    sentences.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Multiple sentences are ungrammatical, incoherent, or incomplete (fragments/run-ons
+      dominate).
+    - Frequent severe errors in basic mechanics (capitalization, punctuation, spelling)
+      that impede understanding.
+    - Word order and agreement errors make meaning unclear in many sentences.
+    - Non-English or garbled phrases appear, or sentence boundaries are consistently
+      broken.
+    - Reader must exert significant effort to decipher sentences; several are unintelligible.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Frequent grammatical mistakes across sentences (e.g., agreement, tense, article/preposition
+      misuse).
+    - Several fragments or run-on sentences; sentence boundaries often incorrect.
+    - Punctuation/capitalization and spelling errors are common and distract the reader.
+    - Unnatural or unidiomatic phrasing in many sentences reduces clarity, though
+      meaning is usually recoverable.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "Most sentences are understandable but contain noticeable issues (roughly one\
+      \ clear error every 1\u20132 sentences)."
+    - Occasional fragment or run-on; sporadic agreement/tense or article/preposition
+      errors.
+    - Some awkward or overly literal phrasing; readability mildly affected.
+    - Minor punctuation/capitalization or spelling mistakes occur but rarely obscure
+      meaning.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Sentences are generally grammatical and natural; at most one or two minor errors
+      in the entire summary.
+    - No fragments or run-ons; correct sentence boundaries and consistent tense/voice.
+    - Punctuation, capitalization, and spelling are mostly correct with only minor
+      lapses.
+    - Word choice is appropriate and idiomatic; sentences read smoothly.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All sentences are grammatically correct, complete, and idiomatic (error-free
+      or virtually error-free).
+    - Precise word choice and natural phrasing; professional journalistic tone.
+    - Consistent and correct punctuation, capitalization, and spelling throughout.
+    - No fragments, run-ons, or sentence-boundary mistakes; agreement and tense are
+      flawless.
+    - Names, numbers, and formatting are clean and standard for news-style English.
+  guidelines:
+  - Evaluate only sentence-level writing quality (grammar, syntax, spelling, punctuation,
+    capitalization, and phrasing); ignore relevance, factual correctness, and cross-sentence
+    organization.
+  - 'Weigh both frequency and severity of errors: repeated major errors (e.g., fragments,
+    run-ons, agreement) lower the score more than isolated typos; a few minor lapses
+    can still merit Good.'
+  - If any sentence is non-English, garbled, or lacks proper sentence boundaries,
+    penalize strongly; prefer consistent correctness and readability over stylistic
+    variation.
+  score_range: [0.0, 4.0]
+  dataset: summeval
+  parent_id: null
+  auto_generated: true
+  dimension: fluency
+- id: summeval-relevance-judge
+  name: relevance Judge
+  version: '1.0'
+  description: Evaluates how well a summary captures the key points of a source news
+    article. Focuses on inclusion of central facts and avoidance of extraneous or
+    off-topic content, reflecting 'all and only' the important aspects.
+  scoring_description: "Score 0\u20134 based on the proportion of salient article\
+    \ points the summary includes and how little irrelevant material it adds. Judge\
+    \ content selection only; ignore factual accuracy (consistency) and writing quality\
+    \ (fluency/coherence)."
+  definition: "Relevance measures whether the summary covers the article\u2019s central\
+    \ points and avoids unimportant or off-topic details. Key points typically include\
+    \ the main event/action, principal actors, outcome or significance, and salient\
+    \ specifics such as time, place, and critical numbers emphasized by the article.\
+    \ A highly relevant summary captures most or all of these emphasized elements\
+    \ without adding minor background or unrelated items. Relevance is about what\
+    \ was selected for inclusion, not whether it is factually correct or well written."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - "Omits the article\u2019s main event/takeaway entirely."
+    - Focuses on topics/entities not present in the article or is largely off-topic.
+    - "Captures none or at most a negligible share (<10%) of the article\u2019s salient\
+      \ points."
+    - Content is predominantly generic filler or minor background not emphasized by
+      the article.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - "Vaguely references the article\u2019s topic but fails to express the core event\
+      \ or outcome."
+    - "Covers only a small fraction (\u224810\u201330%) of salient points; most who/what/when/where\
+      \ elements are missing."
+    - Includes multiple peripheral or off-topic details relative to covered key points.
+    - "Misprioritizes minor facts over the article\u2019s central information."
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - States the main event or actor but misses several critical aspects (e.g., outcome,
+      key numbers, time, or location).
+    - "Covers a moderate fraction (\u224830\u201360%) of salient points."
+    - Includes at least one irrelevant/minor detail or overgeneralization that displaces
+      key content.
+    - Emphasis is partially misaligned with what the article highlights as most important.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Conveys the main event plus most critical aspects (e.g., outcome and at least
+      two of who/when/where/numbers).
+    - "Covers a large fraction (\u224860\u201385%) of salient points, with at most\
+      \ one significant omission."
+    - Contains little to no irrelevant/background information (at most one minor extraneous
+      item).
+    - "Focus tracks the article\u2019s emphasis, prioritizing central facts over minor\
+      \ details."
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - 'Includes all central points emphasized by the article: main event, key actors,
+      outcome/significance, and salient specifics (time/place/figures/causes) as relevant.'
+    - "Covers \u226585\u2013100% of salient points with no substantive omissions."
+    - Avoids off-topic, speculative, or minor details not emphasized by the article.
+    - "Selection is tightly focused, reflecting \u201Call and only\u201D the important\
+      \ aspects."
+  guidelines:
+  - "First identify 3\u20137 salient points from the article (use headline/lead, repeated\
+    \ emphasis, and concluding statements); typical points are main event/action,\
+    \ principal actors, outcome/significance, and salient time/place/figures."
+  - Map each summary statement to these points, estimate coverage proportion, and
+    note extraneous items; count a statement as covering a point if it targets the
+    same aspect (e.g., outcome or actor) regardless of factual correctness; ignore
+    grammar and accuracy here.
+  - 'Apply caps/adjustments for consistency: if the main event/takeaway is missing,
+    the score cannot exceed 2.9; if two or more off-topic/extraneous claims are present,
+    reduce by one level; if all central points are present with no extraneous content,
+    assign 4.0.'
+  score_range: [0.0, 4.0]
+  dataset: summeval
+  parent_id: null
+  auto_generated: true
+  dimension: relevance

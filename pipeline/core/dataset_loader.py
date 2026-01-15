@@ -920,37 +920,59 @@ class DatasetLoader:
         )
 
     def _load_mslr_source_docs(self) -> dict:
-        """Load source documents from HuggingFace for MSLR reviews."""
+        """Load source documents from local CSV files for MSLR reviews.
+
+        Reads from datasets/mslr-source/mslr_data/cochrane/*.csv files.
+        These contain the study titles and abstracts for each Cochrane review.
+
+        Returns:
+            Dict mapping review_id -> {'titles': [...], 'abstracts': [...]}
+        """
+        from pathlib import Path
+
+        # Calculate path to source data
+        project_root = Path(__file__).parent.parent.parent
+        source_dir = project_root / "datasets" / "mslr-source" / "mslr_data" / "cochrane"
+
+        if not source_dir.exists():
+            logger.warning(
+                f"MSLR source documents not found at {source_dir}. "
+                "Download from: https://ai2-s2-mslr.s3.us-west-2.amazonaws.com/mslr_data.tar.gz"
+            )
+            return {}
+
+        logger.info(f"Loading source documents from {source_dir}...")
+
         try:
-            from datasets import load_dataset
-            import os
+            # Load all CSV files and combine
+            all_data = []
+            for split in ['train', 'dev', 'test']:
+                csv_path = source_dir / f"{split}-inputs.csv"
+                if csv_path.exists():
+                    df = pd.read_csv(csv_path)
+                    all_data.append(df)
+                    logger.info(f"  Loaded {len(df)} rows from {split}-inputs.csv")
 
-            logger.info("Loading source documents from allenai/mslr2022...")
+            if not all_data:
+                logger.warning("No CSV files found in source directory")
+                return {}
 
-            hf_token = os.getenv('HF_TOKEN') or os.getenv('HUGGING_FACE_HUB_TOKEN')
-            load_kwargs = {"cache_dir": self.cache_dir}
-            if hf_token:
-                load_kwargs["token"] = hf_token
+            # Combine all splits
+            combined = pd.concat(all_data, ignore_index=True)
 
-            mslr_hf = load_dataset("allenai/mslr2022", "cochrane", **load_kwargs)
-
-            # Build review_id -> source docs mapping
+            # Group by ReviewID and collect titles/abstracts
             source_docs = {}
-            for split in ['train', 'validation', 'test']:
-                if split in mslr_hf:
-                    for item in mslr_hf[split]:
-                        source_docs[item['review_id']] = {
-                            'titles': item.get('title', []),
-                            'abstracts': item.get('abstract', [])
-                        }
+            for review_id, group in combined.groupby('ReviewID'):
+                source_docs[review_id] = {
+                    'titles': group['Title'].dropna().tolist(),
+                    'abstracts': group['Abstract'].dropna().tolist()
+                }
 
             logger.info(f"Loaded source documents for {len(source_docs)} reviews")
             return source_docs
 
         except Exception as e:
             logger.warning(f"Failed to load source documents: {e}")
-            if "401" in str(e):
-                logger.warning("Set HF_TOKEN env variable: https://huggingface.co/settings/tokens")
             return {}
 
     def _build_mslr_question(self, review_id: str, target: str, source_docs: dict) -> str:
@@ -1003,23 +1025,142 @@ class DatasetLoader:
 
     def _preprocess_mslr(
         self,
+        n_samples: Optional[int] = None,
+        random_seed: int = 42,
         **kwargs
     ) -> pd.DataFrame:
         """
         Load MSLR annotated dataset and preprocess to standardized format.
 
-        MSLR has sparse annotations (only 7.8% of samples annotated).
-        Not implemented for fellowship experiments.
+        MSLR (Medical Summarization for Literature Reviews) contains human-annotated
+        quality judgments for medical summary outputs. Only ~600 samples have annotations
+        (100 per model × 6 models) - this loader filters for annotated samples only.
 
-        Note:
-            Not implemented - sparse annotations (only 364/4654 samples have annotations).
-            Use JUDGE-BENCH datasets instead for medical/summarization tasks.
+        Dimensions (MAJ-Eval format):
+        - fluency: 0-2 (no errors → major errors)
+        - pio_consistency: 0-2 (average of Population, Intervention, Outcome alignment)
+        - effect_direction: 0-1 (whether intervention effect direction matches)
+        - evidence_strength: 0-1 (whether claim strength matches evidence)
+
+        Args:
+            n_samples: Number of samples to return (None = all annotated samples, ~600)
+            random_seed: Random seed for sampling
+
+        Returns:
+            DataFrame in standardized 15-column format
         """
-        raise NotImplementedError(
-            "MSLR loader not implemented. "
-            "Dataset has sparse annotations (only 7.8% of samples). "
-            "Use JUDGE-BENCH summarization datasets (SummEval, NewsRoom) instead."
-        )
+        import json
+        import urllib.request
+        import os
+        from pathlib import Path
+
+        logger.info("Loading MSLR annotated dataset")
+
+        # Define paths - calculate project root from this file's location
+        # This file is at: project/pipeline/core/dataset_loader.py
+        project_root = Path(__file__).parent.parent.parent
+        local_path = project_root / "datasets" / "mslr-annotated" / "data" / "data_with_overlap_scores.json"
+        github_url = "https://raw.githubusercontent.com/allenai/mslr-annotated-dataset/main/data/data_with_overlap_scores.json"
+
+        # Auto-download if not present
+        if not local_path.exists():
+            logger.info(f"Downloading MSLR annotated data from GitHub...")
+            local_path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                urllib.request.urlretrieve(github_url, str(local_path))
+                logger.info(f"Downloaded to {local_path}")
+            except Exception as e:
+                raise RuntimeError(f"Failed to download MSLR data from {github_url}: {e}")
+
+        # Load annotated JSON
+        logger.info(f"Loading annotated data from {local_path}")
+        with open(local_path, 'r', encoding='utf-8') as f:
+            # File is JSON Lines format (one JSON object per line)
+            data = [json.loads(line) for line in f]
+        logger.info(f"Loaded {len(data)} reviews from MSLR")
+
+        # Load source documents from HuggingFace (for building questions)
+        source_docs = self._load_mslr_source_docs()
+
+        # Define dimensions and score ranges
+        DIMENSIONS = ['fluency', 'pio_consistency', 'effect_direction', 'evidence_strength']
+        SCORE_RANGE = {
+            'fluency': (0, 2),
+            'pio_consistency': (0, 2),
+            'effect_direction': (0, 1),
+            'evidence_strength': (0, 1)
+        }
+
+        # Process each review and its predictions
+        processed_data = []
+        total_predictions = 0
+        annotated_predictions = 0
+
+        for review in data:
+            review_id = review.get('review_id', '')
+            target = review.get('target', '')  # Reference summary
+
+            # Get source docs for this review
+            review_source_docs = source_docs.get(review_id, {})
+
+            # Process each model prediction
+            for pred in review.get('predictions', []):
+                total_predictions += 1
+                model_id = pred.get('exp_short', 'unknown')
+                prediction_text = pred.get('prediction', '')
+                annotations = pred.get('annotations', [])
+
+                # Skip if no annotations
+                if not annotations:
+                    continue
+
+                # Process annotations using existing helper
+                aggregated, individual, raw = self._process_mslr_annotations(annotations)
+
+                if aggregated is None:
+                    continue
+
+                annotated_predictions += 1
+
+                # Build question with source docs and reference
+                question = self._build_mslr_question(review_id, target, review_source_docs)
+
+                # Create standardized record
+                processed_data.append({
+                    # Core fields
+                    'question': question,
+                    'response': prediction_text,
+                    'dataset': 'mslr',
+                    # Human annotations
+                    'target_human_aggregated': aggregated,
+                    'target_human_individual': individual,
+                    'score_range_human': SCORE_RANGE,
+                    # Synthetic annotations
+                    'target_synthetic': None,
+                    'score_range_synthetic': None,
+                    # Metadata
+                    'dimensions': DIMENSIONS,
+                    'task_type': 'summarization',
+                    'reference_output': target,
+                    'context': None,
+                    'response_metadata': {'model_id': model_id, 'review_id': review_id},
+                    'annotator_metadata': {'num_annotators': len(annotations), 'raw_annotations': raw},
+                    # Traceability
+                    'original_index': f"{review_id}_{model_id}"
+                })
+
+        logger.info(f"Total predictions: {total_predictions}, Annotated: {annotated_predictions}")
+        logger.info(f"Successfully processed {len(processed_data)} annotated samples")
+
+        # Sample if requested
+        if n_samples is not None and n_samples < len(processed_data):
+            random.seed(random_seed)
+            processed_data = random.sample(processed_data, n_samples)
+            logger.info(f"Sampled {n_samples} samples")
+
+        # Convert to DataFrame
+        df = pd.DataFrame(processed_data)
+        return df
 
     def _preprocess_helpsteer2(
         self,

@@ -1,0 +1,492 @@
+[
+  {
+    "config": {
+      "n_splines": 5,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.24492572115211292,
+      "mae": 0.39150236247756043,
+      "r2": 0.10023806407876334,
+      "spearman_rho": 0.2962772934773355,
+      "kendall_tau": 0.2061200851002399,
+      "pearson_r": 0.31660403271950144
+    },
+    "gam_metrics": {
+      "aic": 2089.558091063962,
+      "edof": 6.141554917715352,
+      "gcv": 0.2512390765661489,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9995248259418926,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.02054991048605137,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.13810403098689727,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9821733571322792,
+      "Summeval Relevance Judge Focus Alignment": 0.48223792489349104
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.10185009503208757,
+      "train_r2_std": 0.01145111306718749,
+      "val_r2_mean": 0.07873220027247733,
+      "val_r2_std": 0.053461062459957596,
+      "train_mse_mean": 0.24441730864050704,
+      "train_mse_std": 0.005839261809572077,
+      "val_mse_mean": 0.24944251996837505,
+      "val_mse_std": 0.023633585285248344,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2383510506569482,
+      "mae": 0.3837712341109164,
+      "r2": 0.0368598888703805,
+      "spearman_rho": 0.21948683196579755,
+      "kendall_tau": 0.15823227656364916,
+      "pearson_r": 0.22731510625926535
+    }
+  },
+  {
+    "config": {
+      "n_splines": 7,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.24464928290529847,
+      "mae": 0.39126210702291325,
+      "r2": 0.10125359079007168,
+      "spearman_rho": 0.296530164580798,
+      "kendall_tau": 0.206560445422444,
+      "pearson_r": 0.3182080140029057
+    },
+    "gam_metrics": {
+      "aic": 2086.3594104928147,
+      "edof": 7.305849775466705,
+      "gcv": 0.25217849177003226,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9976687750050444,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.002379167545671912,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.09385420501687058,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9889230843995551,
+      "Summeval Relevance Judge Focus Alignment": 0.37130924662825493
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.10345387998622355,
+      "train_r2_std": 0.012015955457747945,
+      "val_r2_mean": 0.07593443121421173,
+      "val_r2_std": 0.0552700190621206,
+      "train_mse_mean": 0.24398175678517547,
+      "train_mse_std": 0.005952846440431326,
+      "val_mse_mean": 0.25021576536018475,
+      "val_mse_std": 0.024139845920363837,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2388918491242273,
+      "mae": 0.38388491104272454,
+      "r2": 0.03467460504453479,
+      "spearman_rho": 0.21675179356123936,
+      "kendall_tau": 0.15735806509092182,
+      "pearson_r": 0.22511730340617558
+    }
+  },
+  {
+    "config": {
+      "n_splines": 10,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.24391419883438956,
+      "mae": 0.3906206299365303,
+      "r2": 0.10395400405657018,
+      "spearman_rho": 0.3005675660182034,
+      "kendall_tau": 0.20925652902777514,
+      "pearson_r": 0.32244955635841127
+    },
+    "gam_metrics": {
+      "aic": 2077.2169161278325,
+      "edof": 10.564595900553693,
+      "gcv": 0.25488127812129524,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9998609581537549,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.6787060394318752,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.522938238285356,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9713354071156066,
+      "Summeval Relevance Judge Focus Alignment": 0.30950679215819954
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.10727974939979505,
+      "train_r2_std": 0.012694469932104055,
+      "val_r2_mean": 0.06931696011589301,
+      "val_r2_std": 0.05883271426167351,
+      "train_mse_mean": 0.24294297686176183,
+      "train_mse_std": 0.006134137726096486,
+      "val_mse_mean": 0.25204896028265145,
+      "val_mse_std": 0.025268405531879208,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2411331307300232,
+      "mae": 0.3849646869415636,
+      "r2": 0.025617929150179686,
+      "spearman_rho": 0.2100362974786187,
+      "kendall_tau": 0.15152998860607286,
+      "pearson_r": 0.21643102023282515
+    }
+  },
+  {
+    "config": {
+      "n_splines": 12,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.2434063752961402,
+      "mae": 0.3901036948326145,
+      "r2": 0.10581955042602575,
+      "spearman_rho": 0.3027836715629061,
+      "kendall_tau": 0.21098202253518705,
+      "pearson_r": 0.3253539691326437
+    },
+    "gam_metrics": {
+      "aic": 2071.1918673489413,
+      "edof": 12.74913548147174,
+      "gcv": 0.25670564562836873,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9997470325718276,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.5893530559484511,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.6731770605380022,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9591748994018964,
+      "Summeval Relevance Judge Focus Alignment": 0.46792359323297394
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.10983037830667457,
+      "train_r2_std": 0.012821024858556782,
+      "val_r2_mean": 0.06542789532416846,
+      "val_r2_std": 0.060167812240692696,
+      "train_mse_mean": 0.24225034151424932,
+      "train_mse_std": 0.006199855882778181,
+      "val_mse_mean": 0.2531243183640079,
+      "val_mse_std": 0.025783969709003124,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2430843629828271,
+      "mae": 0.38607475040485123,
+      "r2": 0.017733298293191813,
+      "spearman_rho": 0.2093560264468727,
+      "kendall_tau": 0.14890735418789083,
+      "pearson_r": 0.2091008587106564
+    }
+  },
+  {
+    "config": {
+      "n_splines": 15,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.24248564482781765,
+      "mae": 0.38935254373806394,
+      "r2": 0.1092019564254555,
+      "spearman_rho": 0.3089394331071257,
+      "kendall_tau": 0.21552941688284555,
+      "pearson_r": 0.3305803172603663
+    },
+    "gam_metrics": {
+      "aic": 2063.5925984774026,
+      "edof": 15.889333263400324,
+      "gcv": 0.2591645706072784,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9995583741444926,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.4935817137126359,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.6739402402598214,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9747503802235061,
+      "Summeval Relevance Judge Focus Alignment": 0.5298582679449263
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.11438556418411991,
+      "train_r2_std": 0.013008292267425876,
+      "val_r2_mean": 0.05963647980516442,
+      "val_r2_std": 0.061034774026314846,
+      "train_mse_mean": 0.24101327124284358,
+      "train_mse_std": 0.006305020910292007,
+      "val_mse_mean": 0.2547173323744817,
+      "val_mse_std": 0.02628398452181814,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.24595546142244076,
+      "mae": 0.38760183830583406,
+      "r2": 0.006131628979916703,
+      "spearman_rho": 0.1938563126312449,
+      "kendall_tau": 0.13725120121819293,
+      "pearson_r": 0.19834776156617898
+    }
+  },
+  {
+    "config": {
+      "n_splines": 18,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.24144904107125797,
+      "mae": 0.3884377648566413,
+      "r2": 0.11301003586438918,
+      "spearman_rho": 0.3164874786015629,
+      "kendall_tau": 0.22173939612045823,
+      "pearson_r": 0.3364030953752256
+    },
+    "gam_metrics": {
+      "aic": 2057.830731910797,
+      "edof": 18.729722553543915,
+      "gcv": 0.26120542332084296,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9990423074513847,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.38535723900872665,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.5858477366478616,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9659453763504626,
+      "Summeval Relevance Judge Focus Alignment": 0.5364580718163089
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.11936056104900514,
+      "train_r2_std": 0.013363953585569324,
+      "val_r2_mean": 0.05366155033064712,
+      "val_r2_std": 0.06156739256142013,
+      "train_mse_mean": 0.23966227569581605,
+      "train_mse_std": 0.006443024385621114,
+      "val_mse_mean": 0.256361499961438,
+      "val_mse_std": 0.026746698645366086,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.24837205648791005,
+      "mae": 0.38864349269577997,
+      "r2": -0.0036334617696152094,
+      "spearman_rho": 0.18981306070409826,
+      "kendall_tau": 0.1328801438545562,
+      "pearson_r": 0.18934779159010234
+    }
+  },
+  {
+    "config": {
+      "n_splines": 20,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.24068604482012868,
+      "mae": 0.38769989469103844,
+      "r2": 0.11581298763600156,
+      "spearman_rho": 0.3219052974978034,
+      "kendall_tau": 0.22537910898765526,
+      "pearson_r": 0.3406476230123994
+    },
+    "gam_metrics": {
+      "aic": 2055.0180772679196,
+      "edof": 20.46283747498622,
+      "gcv": 0.2623234992445984,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.998775629284457,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.35154668950617485,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.6564841888226232,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9486239836813563,
+      "Summeval Relevance Judge Focus Alignment": 0.6763371422049564
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.12287640722908859,
+      "train_r2_std": 0.013687240492325156,
+      "val_r2_mean": 0.04971673730211301,
+      "val_r2_std": 0.06197568308885944,
+      "train_mse_mean": 0.23870758193661942,
+      "train_mse_std": 0.006552011752594893,
+      "val_mse_mean": 0.25745368150133224,
+      "val_mse_std": 0.027126078124727566,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.24979451896476945,
+      "mae": 0.3891554434462352,
+      "r2": -0.009381414901199703,
+      "spearman_rho": 0.18812110454821723,
+      "kendall_tau": 0.134045759151526,
+      "pearson_r": 0.184045767734698
+    }
+  },
+  {
+    "config": {
+      "n_splines": 25,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.2387674526687428,
+      "mae": 0.3858301563077191,
+      "r2": 0.12286114974920859,
+      "spearman_rho": 0.33201788317504016,
+      "kendall_tau": 0.23242487414292057,
+      "pearson_r": 0.3511421951211593
+    },
+    "gam_metrics": {
+      "aic": 2050.3428079837554,
+      "edof": 24.21843380447573,
+      "gcv": 0.2644851401256629,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9980689440358576,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.4810859289542745,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.5945750358385619,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9557220459974937,
+      "Summeval Relevance Judge Focus Alignment": 0.7187021162183505
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.13140329407437307,
+      "train_r2_std": 0.014546344315536357,
+      "val_r2_mean": 0.040755865835928294,
+      "val_r2_std": 0.06343277106033646,
+      "train_mse_mean": 0.23639162855901885,
+      "train_mse_std": 0.006803923710746999,
+      "val_mse_mean": 0.25994868610793415,
+      "val_mse_std": 0.028198961252643793,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.25287581147428934,
+      "mae": 0.3900681120164692,
+      "r2": -0.02183244627640102,
+      "spearman_rho": 0.17602274589131936,
+      "kendall_tau": 0.12442943295152521,
+      "pearson_r": 0.17326168909355566
+    }
+  },
+  {
+    "config": {
+      "n_splines": 30,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.23685554194300346,
+      "mae": 0.38396787818377737,
+      "r2": 0.12988476690059558,
+      "spearman_rho": 0.34228222596545843,
+      "kendall_tau": 0.2403962946693496,
+      "pearson_r": 0.3613337804540274
+    },
+    "gam_metrics": {
+      "aic": 2048.1578149593,
+      "edof": 27.341181049288743,
+      "gcv": 0.26595432081187503,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9979910308795447,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.4855441068981625,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.5969862825775426,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9625175509501012,
+      "Summeval Relevance Judge Focus Alignment": 0.7156769342351104
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.1395008608202508,
+      "train_r2_std": 0.015149078233210428,
+      "val_r2_mean": 0.0336847649707217,
+      "val_r2_std": 0.06507348875642537,
+      "train_mse_mean": 0.23419165155820743,
+      "train_mse_std": 0.006985023206316839,
+      "val_mse_mean": 0.2619360880334674,
+      "val_mse_std": 0.029280779443719273,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2559427614576198,
+      "mae": 0.391245586027346,
+      "r2": -0.034225521698691974,
+      "spearman_rho": 0.16795368488399387,
+      "kendall_tau": 0.1200583755878885,
+      "pearson_r": 0.1635549507771763
+    }
+  },
+  {
+    "config": {
+      "n_splines": 35,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.2350398681931667,
+      "mae": 0.3821852314830943,
+      "r2": 0.13655484679449081,
+      "spearman_rho": 0.3517627104420478,
+      "kendall_tau": 0.24763078567698812,
+      "pearson_r": 0.37075081936759213
+    },
+    "gam_metrics": {
+      "aic": 2047.2531036796258,
+      "edof": 30.016915407875672,
+      "gcv": 0.26702396730771427,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Relevance Judge Main Event Coverage": 0.9979953065868813,
+      "Summeval Relevance Judge Principal Actors Coverage": 0.4830110085584085,
+      "Summeval Relevance Judge Outcome Or Significance Coverage": 0.6022080595992937,
+      "Summeval Relevance Judge Salient Specifics Coverage": 0.9687110821581557,
+      "Summeval Relevance Judge Focus Alignment": 0.7131244647080353
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.14702493026673263,
+      "train_r2_std": 0.015435621017535893,
+      "val_r2_mean": 0.028370097570343124,
+      "val_r2_std": 0.06647209939450976,
+      "train_mse_mean": 0.23214708237898313,
+      "train_mse_std": 0.007094909486071234,
+      "val_mse_mean": 0.2634417865478935,
+      "val_mse_std": 0.030208805974360573,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.25928204428518936,
+      "mae": 0.3926734093843148,
+      "r2": -0.0477190524583595,
+      "spearman_rho": 0.16458023828041252,
+      "kendall_tau": 0.11627012587273666,
+      "pearson_r": 0.15394141335382633
+    }
+  }
+]

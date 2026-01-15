@@ -1,0 +1,58 @@
+{
+  "experiment_name": "summeval-baseline",
+  "dimension": "coherence",
+  "dataset": "summeval",
+  "target": "target_human_aggregated",
+  "judge_files": [
+    "judges/summeval/depth_0_parents.yaml",
+    "judges/summeval/depth_1_children.yaml"
+  ],
+  "judges": [
+    "summeval-coherence-judge-narrative-structure-and-ordering",
+    "summeval-coherence-judge-referential-coherence",
+    "summeval-coherence-judge-temporal-and-causal-continuity",
+    "summeval-coherence-judge-transitions-and-cohesive-devices",
+    "summeval-coherence-judge-topic-and-pov-consistency"
+  ],
+  "n_judges": 5,
+  "random_seed": 42,
+  "gam_results": {
+    "train": {
+      "mse": 0.3095581111200944,
+      "mae": 0.4454553160118165,
+      "r2": 0.1134487444204405,
+      "spearman_rho": 0.32133621178581384,
+      "kendall_tau": 0.22256782399527575,
+      "pearson_r": 0.33716332874018173
+    },
+    "val": {
+      "mse": 0.29766753198580564,
+      "mae": 0.4329025328117447,
+      "r2": 0.06076644511204676,
+      "spearman_rho": 0.30656224343039395,
+      "kendall_tau": 0.21140998214801754,
+      "pearson_r": 0.30281055787031247
+    },
+    "test": {
+      "mse": 0.3532086086536899,
+      "mae": 0.45470468766915517,
+      "r2": 0.1503273020036382,
+      "spearman_rho": 0.3996656741046618,
+      "kendall_tau": 0.28669515550628183,
+      "pearson_r": 0.3909675815288596
+    }
+  },
+  "baseline_results": {
+    "human_rubric_judge": {
+      "mse": 0.958671875,
+      "mae": 0.790625,
+      "r2": -1.3061649647478695,
+      "spearman_rho": 0.298188990243615,
+      "kendall_tau": 0.24089661418242295,
+      "pearson_r": 0.3106106121335975
+    }
+  },
+  "run_dir": "results/summeval-baseline_20260111_202822",
+  "dimension_dir": "results/summeval-baseline_20260111_202822/dimensions/coherence",
+  "timestamp": "2026-01-11T21:30:12.725789"
+}

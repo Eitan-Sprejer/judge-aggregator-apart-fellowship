@@ -6,7 +6,7 @@
 # Dimensions: coherence, consistency, fluency, relevance (1-5 scale)
 
 name: "summeval-baseline"
-dataset: "judge_bench"
+dataset: "summeval"
 target: "target_human_aggregated"
 
 # List of dimensions to train on

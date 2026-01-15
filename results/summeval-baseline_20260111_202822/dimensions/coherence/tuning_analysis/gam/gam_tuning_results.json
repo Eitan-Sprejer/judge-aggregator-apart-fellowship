@@ -1,0 +1,492 @@
+[
+  {
+    "config": {
+      "n_splines": 10,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.30955811112009435,
+      "mae": 0.4454553160118165,
+      "r2": 0.11344874442044062,
+      "spearman_rho": 0.32133621178581384,
+      "kendall_tau": 0.22256782399527575,
+      "pearson_r": 0.3371633287401816
+    },
+    "gam_metrics": {
+      "aic": 1828.1509380085974,
+      "edof": 10.66541680981809,
+      "gcv": 0.3236140475161697,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9961848570515021,
+      "Summeval Coherence Judge Referential Coherence": 0.5892495911968524,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.9111914534670444,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.2704795708418132,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9988926662301402
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.11590028579615404,
+      "train_r2_std": 0.00824124906699741,
+      "val_r2_mean": 0.07592609454254091,
+      "val_r2_std": 0.04010491862660264,
+      "train_mse_mean": 0.30853506954873344,
+      "train_mse_std": 0.004507407000997801,
+      "val_mse_mean": 0.31987243867305415,
+      "val_mse_std": 0.019186233248243683,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2976675319858051,
+      "mae": 0.43290253281174373,
+      "r2": 0.06076644511204865,
+      "spearman_rho": 0.30656224343039395,
+      "kendall_tau": 0.21140998214801754,
+      "pearson_r": 0.3028105578703118
+    }
+  },
+  {
+    "config": {
+      "n_splines": 12,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.3075124218410357,
+      "mae": 0.44392819061485195,
+      "r2": 0.11930744536777749,
+      "spearman_rho": 0.32500076122584487,
+      "kendall_tau": 0.22530480850881102,
+      "pearson_r": 0.3459091954857332
+    },
+    "gam_metrics": {
+      "aic": 1828.01693386493,
+      "edof": 12.904591445179593,
+      "gcv": 0.32452762584319156,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9911829915358259,
+      "Summeval Coherence Judge Referential Coherence": 0.5362358607175809,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.830685906761647,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.35301809458322597,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9973230569828192
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.12245316734398011,
+      "train_r2_std": 0.008267597345151539,
+      "val_r2_mean": 0.07426857097678867,
+      "val_r2_std": 0.03877750309476916,
+      "train_mse_mean": 0.3062486385251405,
+      "train_mse_std": 0.004518678003788409,
+      "val_mse_mean": 0.32046925011939137,
+      "val_mse_std": 0.01934500085740032,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2965193667004323,
+      "mae": 0.43255582105215523,
+      "r2": 0.06438926334615513,
+      "spearman_rho": 0.311197891128169,
+      "kendall_tau": 0.21372680387018758,
+      "pearson_r": 0.3107444983573755
+    }
+  },
+  {
+    "config": {
+      "n_splines": 7,
+      "lam": 76.38549704971106,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.31259611185931435,
+      "mae": 0.4475285457693434,
+      "r2": 0.10474813773931835,
+      "spearman_rho": 0.3114259128197693,
+      "kendall_tau": 0.21524236544434316,
+      "pearson_r": 0.3237580906330742
+    },
+    "gam_metrics": {
+      "aic": 1827.5153860395892,
+      "edof": 7.703050715146582,
+      "gcv": 0.3227521302913154,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9967452626406146,
+      "Summeval Coherence Judge Referential Coherence": 0.606154961986292,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.9825807010522699,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.3348229513175217,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9986769565582776
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.10743318232596377,
+      "train_r2_std": 0.008739493121836316,
+      "val_r2_mean": 0.07415491927739541,
+      "val_r2_std": 0.04248019499903047,
+      "train_mse_mean": 0.311485786031022,
+      "train_mse_std": 0.004361853477350391,
+      "val_mse_mean": 0.3204167717137384,
+      "val_mse_std": 0.018477849908832698,
+      "best_lam_mean": 76.38549704971106,
+      "best_lam_std": 29.29449969915076
+    },
+    "test_metrics": {
+      "mse": 0.3016014817418783,
+      "mae": 0.43430348153058235,
+      "r2": 0.048353611271898966,
+      "spearman_rho": 0.29825569214625164,
+      "kendall_tau": 0.2050387224120499,
+      "pearson_r": 0.27910443080849423
+    }
+  },
+  {
+    "config": {
+      "n_splines": 15,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.30452248846574315,
+      "mae": 0.44171552330965136,
+      "r2": 0.12787039071711293,
+      "spearman_rho": 0.3355751842331878,
+      "kendall_tau": 0.2329254320563013,
+      "pearson_r": 0.35837432394503577
+    },
+    "gam_metrics": {
+      "aic": 1828.0847366022288,
+      "edof": 16.066828003529736,
+      "gcv": 0.32571455991254006,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.992739934592328,
+      "Summeval Coherence Judge Referential Coherence": 0.47598444822226127,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.7591299625335651,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.5886535356376057,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9898896678015067
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.13178480873837625,
+      "train_r2_std": 0.008647918614449364,
+      "val_r2_mean": 0.07272238812819827,
+      "val_r2_std": 0.037816522334227054,
+      "train_mse_mean": 0.30299073261498943,
+      "train_mse_std": 0.004487392131123405,
+      "val_mse_mean": 0.32101106001020774,
+      "val_mse_std": 0.019288493835886718,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.29617930605825615,
+      "mae": 0.4324658761811566,
+      "r2": 0.06546226033611169,
+      "spearman_rho": 0.3149454169905326,
+      "kendall_tau": 0.21807084459925646,
+      "pearson_r": 0.31537576608748463
+    }
+  },
+  {
+    "config": {
+      "n_splines": 18,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.30193613123712526,
+      "mae": 0.4394207932809164,
+      "r2": 0.13527752419557926,
+      "spearman_rho": 0.3430721071150467,
+      "kendall_tau": 0.23858723335390855,
+      "pearson_r": 0.3687661819871715
+    },
+    "gam_metrics": {
+      "aic": 1828.020440703825,
+      "edof": 18.856696956815046,
+      "gcv": 0.32681952527568053,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9856189144296401,
+      "Summeval Coherence Judge Referential Coherence": 0.396528834787103,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.7156414651868785,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.6124812548050589,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9764551832808043
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.14002329837826163,
+      "train_r2_std": 0.00922284926407218,
+      "val_r2_mean": 0.07185889881052794,
+      "val_r2_std": 0.037856234403022555,
+      "train_mse_mean": 0.30011428859554995,
+      "train_mse_std": 0.004512558393483539,
+      "val_mse_mean": 0.3213027975404551,
+      "val_mse_std": 0.019192243716552742,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2968598529178157,
+      "mae": 0.4325335725845284,
+      "r2": 0.06331492353418455,
+      "spearman_rho": 0.325540188062382,
+      "kendall_tau": 0.22473170705049536,
+      "pearson_r": 0.3153093898071525
+    }
+  },
+  {
+    "config": {
+      "n_splines": 20,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.30051197107010835,
+      "mae": 0.43794581271260685,
+      "r2": 0.13935621229600315,
+      "spearman_rho": 0.3480943957614088,
+      "kendall_tau": 0.24262115497353076,
+      "pearson_r": 0.3743000388006118
+    },
+    "gam_metrics": {
+      "aic": 1827.6696350007019,
+      "edof": 20.525571056818297,
+      "gcv": 0.32761606557411416,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9795185101032885,
+      "Summeval Coherence Judge Referential Coherence": 0.3898967958010766,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.5943562372649465,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.61107204496513,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9758230724546226
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.14469203029962918,
+      "train_r2_std": 0.009611379491391823,
+      "val_r2_mean": 0.0711468071028963,
+      "val_r2_std": 0.038215727628854765,
+      "train_mse_mean": 0.29848461259397896,
+      "train_mse_std": 0.004573949207912038,
+      "val_mse_mean": 0.32154460371603594,
+      "val_mse_std": 0.019201490585767277,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2976398453587648,
+      "mae": 0.4325803411238726,
+      "r2": 0.060853805023169616,
+      "spearman_rho": 0.32556456787747173,
+      "kendall_tau": 0.22444210433522413,
+      "pearson_r": 0.31407967861653274
+    }
+  },
+  {
+    "config": {
+      "n_splines": 5,
+      "lam": 61.285868217892514,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.314430934144626,
+      "mae": 0.44878491144515065,
+      "r2": 0.0994933440757878,
+      "spearman_rho": 0.30274261290321447,
+      "kendall_tau": 0.20850723688652606,
+      "pearson_r": 0.3154297963693182
+    },
+    "gam_metrics": {
+      "aic": 1826.357612079806,
+      "edof": 6.256343201808109,
+      "gcv": 0.32269035532194806,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9973939388923467,
+      "Summeval Coherence Judge Referential Coherence": 0.26152177678071276,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.989004185776472,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.5046381468590896,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9985780851722575
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.10561628986439549,
+      "train_r2_std": 0.00933743739124609,
+      "val_r2_mean": 0.07048431792578477,
+      "val_r2_std": 0.04277004858203791,
+      "train_mse_mean": 0.3121217167999476,
+      "train_mse_std": 0.004636543077199539,
+      "val_mse_mean": 0.321666267133095,
+      "val_mse_std": 0.018190437469877436,
+      "best_lam_mean": 61.285868217892514,
+      "best_lam_std": 47.416343618503966
+    },
+    "test_metrics": {
+      "mse": 0.30537950179663487,
+      "mae": 0.4361853193848177,
+      "r2": 0.03643278408999384,
+      "spearman_rho": 0.29180897247038273,
+      "kendall_tau": 0.2015634898287948,
+      "pearson_r": 0.25725046810490376
+    }
+  },
+  {
+    "config": {
+      "n_splines": 25,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.29779199260506434,
+      "mae": 0.4347674225168296,
+      "r2": 0.14714602699221246,
+      "spearman_rho": 0.35574546809676993,
+      "kendall_tau": 0.24885539747658328,
+      "pearson_r": 0.38449887694972257
+    },
+    "gam_metrics": {
+      "aic": 1825.7716521618022,
+      "edof": 24.222020469713915,
+      "gcv": 0.32987235181568403,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.961103297926219,
+      "Summeval Coherence Judge Referential Coherence": 0.3765826419832967,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.784845808763679,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.5599143369190362,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9746806458960036
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.15388715957540783,
+      "train_r2_std": 0.01040009615554169,
+      "val_r2_mean": 0.06804735470492942,
+      "val_r2_std": 0.03942718121946217,
+      "train_mse_mean": 0.2952761001003193,
+      "train_mse_std": 0.004782943487839419,
+      "val_mse_mean": 0.3226193994791805,
+      "val_mse_std": 0.019535666626012166,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.3001488188675913,
+      "mae": 0.4326779230686393,
+      "r2": 0.05293721401274265,
+      "spearman_rho": 0.33727384478199435,
+      "kendall_tau": 0.23168217221700552,
+      "pearson_r": 0.30917186021766035
+    }
+  },
+  {
+    "config": {
+      "n_splines": 30,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.29586817340460714,
+      "mae": 0.43243034946682146,
+      "r2": 0.15265570115808091,
+      "spearman_rho": 0.36136084963426823,
+      "kendall_tau": 0.2532828724249491,
+      "pearson_r": 0.3914766102713615
+    },
+    "gam_metrics": {
+      "aic": 1822.9821989328614,
+      "edof": 27.433100670791127,
+      "gcv": 0.33235020401897875,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9409507435987686,
+      "Summeval Coherence Judge Referential Coherence": 0.3671138359926407,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.7876693537610739,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.547851472907763,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9736488552705541
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.16055807925564372,
+      "train_r2_std": 0.010951185847437933,
+      "val_r2_mean": 0.06347783883169647,
+      "val_r2_std": 0.040602882165732095,
+      "train_mse_mean": 0.2929493738133586,
+      "train_mse_std": 0.004990566431493327,
+      "val_mse_mean": 0.3242225600395257,
+      "val_mse_std": 0.0201974136578381,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.3027398019790454,
+      "mae": 0.43287931086463305,
+      "r2": 0.044761857223942214,
+      "spearman_rho": 0.33768481880779255,
+      "kendall_tau": 0.23168217221700552,
+      "pearson_r": 0.3037707800030204
+    }
+  },
+  {
+    "config": {
+      "n_splines": 35,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.29437544150004347,
+      "mae": 0.4305986626438236,
+      "r2": 0.15693077358130414,
+      "spearman_rho": 0.36620077909463244,
+      "kendall_tau": 0.256959018291168,
+      "pearson_r": 0.3968088857890594
+    },
+    "gam_metrics": {
+      "aic": 1819.8740787432314,
+      "edof": 30.313786056311642,
+      "gcv": 0.33487006336363906,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Coherence Judge Narrative Structure And Ordering": 0.9281596247093171,
+      "Summeval Coherence Judge Referential Coherence": 0.3601636515167024,
+      "Summeval Coherence Judge Temporal And Causal Continuity": 0.7872446665206488,
+      "Summeval Coherence Judge Transitions And Cohesive Devices": 0.5357088702174208,
+      "Summeval Coherence Judge Topic And Pov Consistency": 0.9724542408304657
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.16579877185341013,
+      "train_r2_std": 0.011315239510518892,
+      "val_r2_mean": 0.058261112501180934,
+      "val_r2_std": 0.04165767426979438,
+      "train_mse_mean": 0.2911219291095362,
+      "train_mse_std": 0.005156793836553807,
+      "val_mse_mean": 0.3260603593571242,
+      "val_mse_std": 0.021001375411982458,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.30515438449316645,
+      "mae": 0.4331310837716264,
+      "r2": 0.037143099131049406,
+      "spearman_rho": 0.33981631121278,
+      "kendall_tau": 0.23370939122390436,
+      "pearson_r": 0.298311976692492
+    }
+  }
+]

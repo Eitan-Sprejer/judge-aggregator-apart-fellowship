@@ -1,0 +1,44 @@
+name: wmt-en-de-baseline
+dataset: wmt_en_de
+target: target_human_aggregated
+target_dimensions:
+- quality
+judges:
+  judge_file: null
+  judge_files: null
+  score_range: !!python/tuple
+  - 0.0
+  - 6.0
+models:
+  gam:
+    n_splines: 10
+    lam: 0.6
+    max_iter: 200
+  mlp:
+    hidden_dim: 64
+    learning_rate: 0.005
+    batch_size: 16
+    n_epochs: 100
+    dropout: 0.0
+    l2_reg: 0.0
+    early_stopping_patience: 15
+    min_delta: 0.0001
+  train_gam: true
+  train_mlp: false
+  test_size: 0.2
+  val_size: 0.15
+  tuning:
+    enabled: true
+dataset_kwargs:
+  task_name: wmt_en_de
+  n_samples: 1000
+  random_seed: 42
+concurrency: 10
+random_seed: 42
+judge_cache_strategy: auto
+judge_decomposition_depth: 1
+judge_creation_config:
+  model: openai/gpt-5
+  temperature: 0.4
+  max_tokens: 10000
+judge_model: openai/gpt-5-nano

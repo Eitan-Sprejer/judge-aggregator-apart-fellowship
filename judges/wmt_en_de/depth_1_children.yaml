@@ -1,0 +1,347 @@
+judges:
+- id: wmt_en_de-quality-judge-semantic-fidelity
+  name: Semantic Fidelity
+  version: '1.0'
+  description: "Measures how faithfully the translation preserves the source\u2019\
+    s truth-conditional meaning, including who did what to whom, whether events did\
+    \ or did not occur, quantities, conditions, time, and degrees of certainty. Stylistic\
+    \ rephrasing is acceptable when all propositions and nuances (roles, polarity,\
+    \ quantifiers/scope, and modality) are maintained without unsupported additions\
+    \ or omissions."
+  scoring_description: Score how well the response demonstrates semantic fidelity
+  definition: "Measures how faithfully the translation preserves the source\u2019\
+    s truth-conditional meaning, including who did what to whom, whether events did\
+    \ or did not occur, quantities, conditions, time, and degrees of certainty. Stylistic\
+    \ rephrasing is acceptable when all propositions and nuances (roles, polarity,\
+    \ quantifiers/scope, and modality) are maintained without unsupported additions\
+    \ or omissions."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Nonsense/Unrelated
+    indicators:
+    - Content is unrelated to or contradicts the source; most propositions are missing
+      or fabricated.
+    - Widespread failures in polarity, roles, or quantification prevent mapping source
+      propositions to the target.
+    - Critical entities, numbers, or relations are wrong or absent such that the source
+      meaning cannot be recovered.
+  - range: [1.0, 1.9]
+    label: Very Low
+    indicators:
+    - Core meaning is distorted by major errors (e.g., negation flipped, agent/patient
+      reversal, wrong numbers/dates/entities).
+    - Multiple propositions are omitted or added, or modality/quantifier shifts materially
+      change the claim.
+    - Key relational structure (cause/effect, condition, comparison) is incorrect
+      or contradictory to the source.
+  - range: [2.0, 2.9]
+    label: Medium
+    indicators:
+    - Main proposition is present, but at least one significant deviation in roles,
+      polarity, quantification, or modality alters nuance/scope or a secondary fact.
+    - One or more omissions/additions change details or strength of claims, yet the
+      central claim remains intact.
+    - Ambiguity is introduced (e.g., unclear condition/negation) requiring inference
+      to recover intended meaning.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Nearly all propositions are preserved with correct roles; entities and numbers
+      are correct; no negation or conditional errors.
+    - "Only minor, non\u2013truth-conditional shifts (slight modality or quantifier\
+      \ shading) that do not change what would make the statement true."
+    - No unsupported additions; at most one minor omission of peripheral detail.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All source propositions are present with correct argument roles, entities, numbers,
+      and coreference.
+    - Polarity, quantifiers/scope, conditionals, temporality, and modality/hedging
+      are preserved exactly.
+    - No unsupported additions or omissions; nuance and emphasis faithfully match
+      the source.
+  guidelines:
+  - Correct rendering of entities, numbers, dates, roles, and logical relations (negation,
+    modality, quantifiers).
+  - No proposition-level distortions or mistranslations that change intent or facts.
+  - Paraphrases preserve nuance and emphasis without adding interpretations.
+  score_range: [0.0, 4.0]
+  parent_id: wmt_en_de-quality-judge
+  dataset: wmt_en_de
+  auto_generated: true
+  dimension: quality
+- id: wmt_en_de-quality-judge-coverage-and-integrity
+  name: Coverage and Integrity
+  version: '1.0'
+  description: "Measures how completely the translation represents the source\u2019\
+    s information units and whether it avoids introducing unsupported content. The\
+    \ evaluator segments the source into discrete units (core facts, relations, scope/modifiers)\
+    \ and checks that each is conveyed without ungrounded additions; concise paraphrase\
+    \ or compression is acceptable if all meaning is preserved."
+  scoring_description: Score how well the response demonstrates coverage and integrity
+  definition: "Measures how completely the translation represents the source\u2019\
+    s information units and whether it avoids introducing unsupported content. The\
+    \ evaluator segments the source into discrete units (core facts, relations, scope/modifiers)\
+    \ and checks that each is conveyed without ungrounded additions; concise paraphrase\
+    \ or compression is acceptable if all meaning is preserved."
+  criteria:
+  - range: [0.0, 0.9]
+    label: None
+    indicators:
+    - Preserves fewer than 30% of information units; main message not recoverable.
+    - Adds major unsupported content or contradictions (new facts/entities/quantities,
+      flipped roles/polarity).
+    - 'Coverage/integrity breakdown: content largely unrelated or distorted beyond
+      recognition.'
+  - range: [1.0, 1.9]
+    label: Low
+    indicators:
+    - "Preserves about 30\u201359% of units; multiple core units omitted or merged\
+      \ incorrectly."
+    - Introduces one or more ungrounded facts that alter emphasis or imply specifics
+      not in the source.
+    - Key relations (who did what, numbers, polarity/scope) are unreliable or partially
+      lost.
+  - range: [2.0, 2.9]
+    label: Medium
+    indicators:
+    - "Conveys the gist but only about 60\u201389% of units; at least one core unit\
+      \ is missing or blurred."
+    - May include a minor ungrounded addition or overgeneralization/overspecification
+      that does not invert core meaning.
+    - Some modifier/scope or relational details are dropped or aggregated, reducing
+      completeness.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - "Covers all core units and roughly 90\u201395% of total units; any omissions\
+      \ are minor details."
+    - No substantive additions; only neutral connectives or discourse fillers that
+      add no new facts.
+    - Preserves relations, quantities, and polarity/scopal constraints with minimal
+      loss.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "Represents 95\u2013100% of identified units, including all core facts, roles,\
+      \ relations, and relevant modifiers."
+    - No ungrounded additions; compression/paraphrase remains fully supported by the
+      source.
+    - Accurate preservation of scope and polarity (negation, quantifiers) and any
+      numbers/dates.
+  guidelines:
+  - All salient information units are present; no essential omissions.
+  - No added claims or details not licensed by the source.
+  - Scope and emphasis of the original are maintained.
+  score_range: [0.0, 4.0]
+  parent_id: wmt_en_de-quality-judge
+  dataset: wmt_en_de
+  auto_generated: true
+  dimension: quality
+- id: wmt_en_de-quality-judge-grammar-and-syntax
+  name: German Grammar and Syntax
+  version: '1.0'
+  description: This rubric evaluates sentence-level correctness of German grammar
+    and syntax. It focuses on morphology, agreement, case/government, tense/aspect
+    selection, and clause word order (V2 in main clauses, verb-final in subordinate
+    clauses), prioritizing errors that hinder comprehension or alter meaning while
+    not over-penalizing minor punctuation lapses.
+  scoring_description: Score how well the response demonstrates german grammar and
+    syntax
+  definition: This rubric evaluates sentence-level correctness of German grammar and
+    syntax. It focuses on morphology, agreement, case/government, tense/aspect selection,
+    and clause word order (V2 in main clauses, verb-final in subordinate clauses),
+    prioritizing errors that hinder comprehension or alter meaning while not over-penalizing
+    minor punctuation lapses.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Unintelligible
+    indicators:
+    - 'Chaotic or non-German clause structure: missing/incorrect finite verbs, pervasive
+      word-order breakdown.'
+    - Systematic failure of morphology and agreement (random or missing inflections,
+      unusable case marking) obscures roles and references.
+    - Errors so pervasive that sentences are largely unintelligible and meaning cannot
+      be reliably recovered.
+  - range: [1.0, 1.9]
+    label: Very Low
+    indicators:
+    - Frequent major word-order errors (regular V2 violations, incorrect subordinate
+      clause verb-final placement) that impede understanding.
+    - Widespread agreement/case and morphological errors (misconjugated verbs, wrong
+      endings) often altering roles or relations.
+    - Negation/particles and separable prefixes often misplaced, sometimes yielding
+      misleading or reversed meaning.
+  - range: [2.0, 2.9]
+    label: Medium
+    indicators:
+    - Recurring word-order issues (occasional V2 violations, verb-final mistakes,
+      misplaced separable prefixes) causing awkwardness but sentences remain interpretable.
+    - Several agreement/case or government errors; morphology and tense/aspect choices
+      sometimes odd yet not fundamentally misleading.
+    - Some errors introduce ambiguity or require rereading, but the core propositional
+      meaning is recoverable.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Word order is mostly correct with rare minor lapses (e.g., adverb or particle
+      placement) that do not obscure meaning.
+    - Occasional minor agreement or case slips; morphology and tense/aspect are appropriate
+      with infrequent inconsistencies.
+    - Negation and separable prefixes are generally well placed; any punctuation lapses
+      do not hinder comprehension.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Correct clause word order throughout (V2 in main clauses; verb-final in subordinate
+      clauses); precise placement of particles, negation, and separable prefixes.
+    - Accurate morphology and agreement (case/government, gender/number, article/adjective
+      endings, verb conjugation); natural, context-appropriate tense/aspect.
+    - No grammar or syntax errors; any punctuation variation is minor and does not
+      affect clarity.
+  guidelines:
+  - Proper verb placement (V2 in main clauses, verb-final in subordinates) and correct
+    case/government.
+  - Well-formed sentences with correct inflection and agreement; errors do not impede
+    understanding.
+  - Punctuation and orthography support readability; no run-ons or fragments that
+    obscure meaning.
+  score_range: [0.0, 4.0]
+  parent_id: wmt_en_de-quality-judge
+  dataset: wmt_en_de
+  auto_generated: true
+  dimension: quality
+- id: wmt_en_de-quality-judge-idiomaticity-and-naturalness
+  name: Idiomaticity and Naturalness
+  version: '1.0'
+  description: Measures how native-like and fluent the German reads, focusing on idiomatic
+    phrasing, collocations, and natural word order. Compares expressions to common
+    German usage for the genre and rewards non-literal paraphrases that improve flow.
+    Penalizes calques, stiffness, translationese, and machine-like constructions when
+    noticeable.
+  scoring_description: Score how well the response demonstrates idiomaticity and naturalness
+  definition: Measures how native-like and fluent the German reads, focusing on idiomatic
+    phrasing, collocations, and natural word order. Compares expressions to common
+    German usage for the genre and rewards non-literal paraphrases that improve flow.
+    Penalizes calques, stiffness, translationese, and machine-like constructions when
+    noticeable.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Nonsense / Highly Unnatural
+    indicators:
+    - German is largely incoherent or non-idiomatic (pervasive V2 violations, malformed
+      phrases, or English word order dominates).
+    - Heavy code-switching or literal calques severely hinder natural reading and
+      comprehension.
+    - Collocations/function words frequently wrong or missing; reads as disfluent,
+      machine-like output.
+  - range: [1.0, 1.9]
+    label: Very Low Naturalness
+    indicators:
+    - Predominantly literal, translationese phrasing with many calques and stiff constructions.
+    - Frequent unidiomatic collocations/prepositions and connector/particle misuse;
+      halting rhythm.
+    - Register is inappropriate or inconsistent for the genre; would need substantial
+      rewriting to sound native.
+  - range: [2.0, 2.9]
+    label: Medium Naturalness
+    indicators:
+    - 'Understandable but noticeably non-native: several literal turns of phrase or
+      unnatural word order.'
+    - Some collocation or preposition choices are off; occasional odd clause structure
+      or article choice.
+    - Style is serviceable but wooden or repetitive; clear edits needed for smoothness.
+  - range: [3.0, 3.9]
+    label: Good Naturalness
+    indicators:
+    - Generally fluent and idiomatic with only minor literal phrasing or slightly
+      stiff segments.
+    - Appropriate collocations, prepositions, and register in most places; correct
+      clause structure with rare lapses.
+    - Flows well across sentences; minor tweaks would polish it to native-like smoothness.
+  - range: [4.0, 4.0]
+    label: Excellent Naturalness
+    indicators:
+    - 'Reads as if originally written in German: idiomatic expressions, natural collocations,
+      and authentic rhythm.'
+    - Phrasing avoids calques; word order, particles, and connectors sound native
+      throughout.
+    - Consistent, genre-appropriate register and style; no edits needed for naturalness.
+  guidelines:
+  - Uses natural collocations and phrasing; avoids literal calques that sound stilted.
+  - Smooth flow and rhythm; sentences read effortlessly for a native speaker.
+  - Register fits the context/genre without awkwardness.
+  score_range: [0.0, 4.0]
+  parent_id: wmt_en_de-quality-judge
+  dataset: wmt_en_de
+  auto_generated: true
+  dimension: quality
+- id: wmt_en_de-quality-judge-terminology-and-consistency
+  name: Terminology and Consistency
+  version: '1.0'
+  description: Assesses whether domain-specific terms, names, acronyms, and style
+    conventions are chosen appropriately and applied uniformly in German. Evaluates
+    adherence to German formatting norms (e.g., decimal comma, DD.MM.YYYY dates, thousands
+    separators, currency and unit spacing, capitalization) across the text. Focuses
+    on terminology and conventions without judging overall semantic correctness.
+  scoring_description: Score how well the response demonstrates terminology and consistency
+  definition: Assesses whether domain-specific terms, names, acronyms, and style conventions
+    are chosen appropriately and applied uniformly in German. Evaluates adherence
+    to German formatting norms (e.g., decimal comma, DD.MM.YYYY dates, thousands separators,
+    currency and unit spacing, capitalization) across the text. Focuses on terminology
+    and conventions without judging overall semantic correctness.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Nonsense/Unusable
+    indicators:
+    - Terminology is largely incorrect or unrelated; repeated terms are never rendered
+      consistently; names/acronyms are mangled or arbitrarily changed.
+    - German formatting conventions are ignored throughout (e.g., decimal point used
+      everywhere, en-US date order, erratic thousands separators).
+    - Chaotic or contradictory term and name usage prevents reliable identification
+      of entities or concepts.
+  - range: [1.0, 1.9]
+    label: Very Low
+    indicators:
+    - Frequent misuse of domain terms or false friends; the same term appears with
+      conflicting translations or untranslated vs. translated forms.
+    - Systematic non-German formatting in multiple places (e.g., mixed decimal point/comma,
+      inconsistent date styles, incorrect currency/unit spacing).
+    - Names, product labels, and acronyms show unstable spelling/capitalization across
+      sentences.
+  - range: [2.0, 2.9]
+    label: Medium
+    indicators:
+    - 'Mixed term choices: several noticeable inconsistencies or occasional incorrect
+      choices for key terms; alternation between German and English forms.'
+    - Formatting norms applied inconsistently (e.g., some numbers use decimal comma,
+      others point; varying date or quotation mark styles).
+    - Names and acronyms are mostly identifiable but show occasional variation in
+      spelling, expansion, or capitalization.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Appropriate German equivalents or accepted borrowings chosen and used consistently,
+      with at most isolated minor lapses.
+    - German formatting conventions are followed, with only rare low-impact slips
+      (e.g., a single missing space before a unit or one atypical thousands separator).
+    - Names, product names, and acronyms are rendered correctly and consistently,
+      with only minor one-off variations.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Domain terminology is precise and consistently applied throughout; repeated
+      terms/names use a single, correct rendering aligned with domain usage.
+    - 'German formatting is fully consistent: decimal comma and thousands separators,
+      DD.MM.YYYY dates, correct currency placement/spacing, and SI unit spacing.'
+    - Names, brands, and acronyms are handled flawlessly (correct spelling, capitalization,
+      inflection where appropriate) and remain stable across the text.
+  guidelines:
+  - Correct and consistent translation of technical terms and proper names.
+  - Stable rendering of recurring terms; no unwarranted term variation.
+  - Conforms to German conventions for units, number/date formatting, and capitalization.
+  score_range: [0.0, 4.0]
+  parent_id: wmt_en_de-quality-judge
+  dataset: wmt_en_de
+  auto_generated: true
+  dimension: quality
