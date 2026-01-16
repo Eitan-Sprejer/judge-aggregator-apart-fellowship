@@ -1,0 +1,58 @@
+{
+  "experiment_name": "wmt-en-de-baseline",
+  "dimension": "quality",
+  "dataset": "wmt_en_de",
+  "target": "target_human_aggregated",
+  "judge_files": [
+    "judges/wmt_en_de/depth_0_parents.yaml",
+    "judges/wmt_en_de/depth_1_children.yaml"
+  ],
+  "judges": [
+    "wmt_en_de-quality-judge-semantic-fidelity",
+    "wmt_en_de-quality-judge-coverage-and-integrity",
+    "wmt_en_de-quality-judge-grammar-and-syntax",
+    "wmt_en_de-quality-judge-idiomaticity-and-naturalness",
+    "wmt_en_de-quality-judge-terminology-and-consistency"
+  ],
+  "n_judges": 5,
+  "random_seed": 42,
+  "gam_results": {
+    "train": {
+      "mse": 1.134128413478462,
+      "mae": 0.8506902557173889,
+      "r2": 0.34839166263899,
+      "spearman_rho": 0.5479035293940985,
+      "kendall_tau": 0.40040746112928427,
+      "pearson_r": 0.5902907185171787
+    },
+    "val": {
+      "mse": 0.8270955474180385,
+      "mae": 0.7487796517241414,
+      "r2": 0.38766911573289664,
+      "spearman_rho": 0.5861772848018476,
+      "kendall_tau": 0.42752692051017177,
+      "pearson_r": 0.6229415935344993
+    },
+    "test": {
+      "mse": 1.2107081627252103,
+      "mae": 0.8354446983059592,
+      "r2": 0.264335151872391,
+      "spearman_rho": 0.6050168800663532,
+      "kendall_tau": 0.44535894349563615,
+      "pearson_r": 0.5316263994436764
+    }
+  },
+  "baseline_results": {
+    "human_rubric_judge": {
+      "mse": 2.2177100958826848,
+      "mae": 1.2115059221658206,
+      "r2": -0.3320745242492722,
+      "spearman_rho": 0.5540284262991573,
+      "kendall_tau": 0.4503200043784474,
+      "pearson_r": 0.5748133150145873
+    }
+  },
+  "run_dir": "results/wmt-en-de-baseline_20260112_085934",
+  "dimension_dir": "results/wmt-en-de-baseline_20260112_085934/dimensions/quality",
+  "timestamp": "2026-01-12T09:04:32.545832"
+}

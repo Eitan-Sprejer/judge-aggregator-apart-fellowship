@@ -1,0 +1,492 @@
+[
+  {
+    "config": {
+      "n_splines": 25,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.22901898225354336,
+      "mae": 0.36381829091236345,
+      "r2": 0.17058891913283736,
+      "spearman_rho": 0.3444314744975715,
+      "kendall_tau": 0.2462008516971826,
+      "pearson_r": 0.4137128763362181
+    },
+    "gam_metrics": {
+      "aic": 2108.93919118857,
+      "edof": 23.63426715550148,
+      "gcv": 0.2530456386291286,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.9999999999979639,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.7743203859458372,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.15477701120864729,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9999842220514551,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.004409163327786958
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.17636512143958366,
+      "train_r2_std": 0.006253957905995507,
+      "val_r2_mean": 0.09943680664951701,
+      "val_r2_std": 0.04160484859590268,
+      "train_mse_mean": 0.22732284159315208,
+      "train_mse_std": 0.010040735812081028,
+      "val_mse_mean": 0.24567570724657664,
+      "val_mse_std": 0.04026770368273502,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.24273246037844634,
+      "mae": 0.384821102086921,
+      "r2": -0.025973497790652944,
+      "spearman_rho": 0.06951078095113693,
+      "kendall_tau": 0.0477919429637051,
+      "pearson_r": 0.17692959485009357
+    }
+  },
+  {
+    "config": {
+      "n_splines": 20,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.23126327781663447,
+      "mae": 0.36545724406431784,
+      "r2": 0.16246101815951108,
+      "spearman_rho": 0.34120894394507006,
+      "kendall_tau": 0.2442076572180642,
+      "pearson_r": 0.40369379112960463
+    },
+    "gam_metrics": {
+      "aic": 2112.004707572821,
+      "edof": 19.767943608125044,
+      "gcv": 0.2513023891898444,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.999999999998672,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.5345782282932318,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.19982642531203676,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9999882164414956,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.0056214484186578595
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.16704570721323886,
+      "train_r2_std": 0.006665094387301078,
+      "val_r2_mean": 0.09862331057729753,
+      "val_r2_std": 0.04505565223086333,
+      "train_mse_mean": 0.22988538578826131,
+      "train_mse_std": 0.009938220065670423,
+      "val_mse_mean": 0.24570493230418258,
+      "val_mse_std": 0.039641200346119745,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2410408648067404,
+      "mae": 0.3835444390093966,
+      "r2": -0.018823517838056247,
+      "spearman_rho": 0.06305093831225711,
+      "kendall_tau": 0.0436489881557059,
+      "pearson_r": 0.18383374435034852
+    }
+  },
+  {
+    "config": {
+      "n_splines": 18,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.23233248801924417,
+      "mae": 0.3662247273809476,
+      "r2": 0.15858878546903943,
+      "spearman_rho": 0.3384732027549021,
+      "kendall_tau": 0.24211342523078777,
+      "pearson_r": 0.3988066792228385
+    },
+    "gam_metrics": {
+      "aic": 2112.9695060526205,
+      "edof": 18.040605143670895,
+      "gcv": 0.2506027532063574,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.9999999999995126,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.3681716219670026,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.18501636711765945,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9999968536475149,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.00510504715632909
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.1627871671862557,
+      "train_r2_std": 0.007022860378479508,
+      "val_r2_mean": 0.09781772131029128,
+      "val_r2_std": 0.04662463491917534,
+      "train_mse_mean": 0.23105610328226436,
+      "train_mse_std": 0.009892963515703878,
+      "val_mse_mean": 0.24585562399800498,
+      "val_mse_std": 0.0394717258703715,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.24007485127766384,
+      "mae": 0.3830189324744188,
+      "r2": -0.01474040395293974,
+      "spearman_rho": 0.07137898286460571,
+      "kendall_tau": 0.049863420367704706,
+      "pearson_r": 0.18837084853141028
+    }
+  },
+  {
+    "config": {
+      "n_splines": 30,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.22720890610246083,
+      "mae": 0.3625580539354714,
+      "r2": 0.17714425879136042,
+      "spearman_rho": 0.3489403202703721,
+      "kendall_tau": 0.24958101560647086,
+      "pearson_r": 0.42158622213561725
+    },
+    "gam_metrics": {
+      "aic": 2105.178062772455,
+      "edof": 27.04750463470315,
+      "gcv": 0.2547959554208322,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.9999999999969147,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.8176824454202931,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.48365068273846734,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9999703119575422,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.004448672836862455
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.18412002194901686,
+      "train_r2_std": 0.006618123246227204,
+      "val_r2_mean": 0.09756682376274835,
+      "val_r2_std": 0.04126446865744468,
+      "train_mse_mean": 0.2251866096756392,
+      "train_mse_std": 0.010067606691669733,
+      "val_mse_mean": 0.24630722813916991,
+      "val_mse_std": 0.040833854488147144,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2438992711146229,
+      "mae": 0.3862706681492382,
+      "r2": -0.030905334638465787,
+      "spearman_rho": 0.07406386591473157,
+      "kendall_tau": 0.05104712174141876,
+      "pearson_r": 0.17353472657214733
+    }
+  },
+  {
+    "config": {
+      "n_splines": 15,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.234112981029046,
+      "mae": 0.36748011209738296,
+      "r2": 0.15214058358985516,
+      "spearman_rho": 0.3339591556236058,
+      "kendall_tau": 0.2381729624126229,
+      "pearson_r": 0.3905240589975618
+    },
+    "gam_metrics": {
+      "aic": 2114.2176047350276,
+      "edof": 15.248698953344098,
+      "gcv": 0.24953503291930984,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.999999999999918,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.17342017109359675,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.08474157482083744,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9999230560925568,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.008411333330231363
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.155859034951416,
+      "train_r2_std": 0.007526200996460629,
+      "val_r2_mean": 0.09668997172258356,
+      "val_r2_std": 0.04834149471640063,
+      "train_mse_mean": 0.2329625787403972,
+      "train_mse_std": 0.009859397626738353,
+      "val_mse_mean": 0.24610466716474222,
+      "val_mse_std": 0.039420158246162136,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.23830858194963145,
+      "mae": 0.38191719988706296,
+      "r2": -0.00727479544843046,
+      "spearman_rho": 0.08567966542924473,
+      "kendall_tau": 0.05666970326656053,
+      "pearson_r": 0.1969403894550255
+    }
+  },
+  {
+    "config": {
+      "n_splines": 10,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.23751443917395476,
+      "mae": 0.3699662111474222,
+      "r2": 0.13982192315073982,
+      "spearman_rho": 0.30643930722253226,
+      "kendall_tau": 0.2162478231423209,
+      "pearson_r": 0.3743189365395669
+    },
+    "gam_metrics": {
+      "aic": 2115.9248847106032,
+      "edof": 10.079951422747566,
+      "gcv": 0.2476882338531939,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.9999999999999998,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.10294368048768976,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.25205760142762856,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9992216253509439,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.009088446170402165
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.14257435294890838,
+      "train_r2_std": 0.007355615327347521,
+      "val_r2_mean": 0.0961798071836745,
+      "val_r2_std": 0.04978968562129182,
+      "train_mse_mean": 0.2366304508842579,
+      "train_mse_std": 0.010023195346386852,
+      "val_mse_mean": 0.24626768585958664,
+      "val_mse_std": 0.03990961329871446,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.23449546090863252,
+      "mae": 0.3789522948961192,
+      "r2": 0.008842377861778217,
+      "spearman_rho": 0.1626369660148365,
+      "kendall_tau": 0.11467107057854939,
+      "pearson_r": 0.21433169487946752
+    }
+  },
+  {
+    "config": {
+      "n_splines": 12,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.23607357843849194,
+      "mae": 0.36893703236479913,
+      "r2": 0.14504011881391088,
+      "spearman_rho": 0.31895820655026474,
+      "kendall_tau": 0.22688431718296173,
+      "pearson_r": 0.3812348472312498
+    },
+    "gam_metrics": {
+      "aic": 2115.4983641174213,
+      "edof": 12.19884508587967,
+      "gcv": 0.24839385446160767,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.999999999999998,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.11690705360477116,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.1937286442781897,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9998465336289679,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.0017927442807459393
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.14829336727847583,
+      "train_r2_std": 0.007624389280258422,
+      "val_r2_mean": 0.09617589719592654,
+      "val_r2_std": 0.04918765487556866,
+      "train_mse_mean": 0.23504960972692973,
+      "train_mse_std": 0.009920005707227706,
+      "val_mse_mean": 0.24624636922035315,
+      "val_mse_std": 0.03962881575453021,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.23613511446828103,
+      "mae": 0.38029974111637876,
+      "r2": 0.0019119446797691841,
+      "spearman_rho": 0.12134725017869732,
+      "kendall_tau": 0.08715001363969754,
+      "pearson_r": 0.20721875244665833
+    }
+  },
+  {
+    "config": {
+      "n_splines": 7,
+      "lam": 35.39424340321505,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.23894768808564154,
+      "mae": 0.3711971087086994,
+      "r2": 0.13463129433344045,
+      "spearman_rho": 0.30087996041219905,
+      "kendall_tau": 0.21165520913513572,
+      "pearson_r": 0.3672876483882626
+    },
+    "gam_metrics": {
+      "aic": 2114.6030384508176,
+      "edof": 8.386017483195145,
+      "gcv": 0.24741742195583438,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.9999999999999999,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.17714075642445115,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.06749755260077195,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9349583631773318,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.03113116526913462
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.137474730483455,
+      "train_r2_std": 0.0073793646153452585,
+      "val_r2_mean": 0.0937317444913696,
+      "val_r2_std": 0.05159739558198859,
+      "train_mse_mean": 0.23804356042096927,
+      "train_mse_std": 0.010230677210239108,
+      "val_mse_mean": 0.24689302167555152,
+      "val_mse_std": 0.04001700808913315,
+      "best_lam_mean": 35.39424340321505,
+      "best_lam_std": 11.203905173362289
+    },
+    "test_metrics": {
+      "mse": 0.23302556666498422,
+      "mae": 0.37826484204268823,
+      "r2": 0.015055278007835904,
+      "spearman_rho": 0.17501687062716612,
+      "kendall_tau": 0.12177327882083373,
+      "pearson_r": 0.2206971349961148
+    }
+  },
+  {
+    "config": {
+      "n_splines": 35,
+      "lam": 100.0,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.2256229034522617,
+      "mae": 0.3615384809256239,
+      "r2": 0.18288809783656024,
+      "spearman_rho": 0.35516364938912864,
+      "kendall_tau": 0.25476148420657574,
+      "pearson_r": 0.4283848245920655
+    },
+    "gam_metrics": {
+      "aic": 2101.6180392240935,
+      "edof": 30.097145295704067,
+      "gcv": 0.2564158280371782,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.999999999994967,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.7983798559512314,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.5031020434548442,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9999680318406549,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.004490218191335105
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.1908773853431381,
+      "train_r2_std": 0.007331785654868674,
+      "val_r2_mean": 0.0932266087756007,
+      "val_r2_std": 0.04493661190492013,
+      "train_mse_mean": 0.2233216125764109,
+      "train_mse_std": 0.010031563625914793,
+      "val_mse_mean": 0.24749896254685888,
+      "val_mse_std": 0.04117372874668489,
+      "best_lam_mean": 100.0,
+      "best_lam_std": 0.0
+    },
+    "test_metrics": {
+      "mse": 0.2449414738498224,
+      "mae": 0.3877335164690303,
+      "r2": -0.03531048252833813,
+      "spearman_rho": 0.07134743724130135,
+      "kendall_tau": 0.0457204655597055,
+      "pearson_r": 0.17142501325792048
+    }
+  },
+  {
+    "config": {
+      "n_splines": 5,
+      "lam": 3.2709134960387845,
+      "max_iter": 100,
+      "tol": 0.0001
+    },
+    "train_metrics": {
+      "mse": 0.23929107975694958,
+      "mae": 0.371551047814321,
+      "r2": 0.13338767315209643,
+      "spearman_rho": 0.29987894933753934,
+      "kendall_tau": 0.21111328068228788,
+      "pearson_r": 0.3655172364783461
+    },
+    "gam_metrics": {
+      "aic": 2113.690846972943,
+      "edof": 8.121722498537732,
+      "gcv": 0.24749883113568677,
+      "n_terms": 6
+    },
+    "feature_importance": {
+      "Summeval Fluency Judge Sentence Structure And Boundaries": 0.9999999999999999,
+      "Summeval Fluency Judge Grammar Agreement And Tense": 0.1502509801197136,
+      "Summeval Fluency Judge Mechanics Punctuation Capitalization Spelling": 0.013139487906926761,
+      "Summeval Fluency Judge Idiomaticity And Word Choice": 0.9510470046989864,
+      "Summeval Fluency Judge News Style Conventions And Formatting": 0.007850566201988207
+    },
+    "cv_summary": {
+      "train_r2_mean": 0.1363382623865825,
+      "train_r2_std": 0.006332191203958066,
+      "val_r2_mean": 0.09216518059605108,
+      "val_r2_std": 0.05212440347480088,
+      "train_mse_mean": 0.2383659995309408,
+      "train_mse_std": 0.010396012903836405,
+      "val_mse_mean": 0.24726835274233344,
+      "val_mse_std": 0.03981404622196965,
+      "best_lam_mean": 3.2709134960387845,
+      "best_lam_std": 1.258357025345469
+    },
+    "test_metrics": {
+      "mse": 0.23316812904026873,
+      "mae": 0.3786869724216669,
+      "r2": 0.014452700097176696,
+      "spearman_rho": 0.17754753063002626,
+      "kendall_tau": 0.12206920416426226,
+      "pearson_r": 0.2199502281399489
+    }
+  }
+]

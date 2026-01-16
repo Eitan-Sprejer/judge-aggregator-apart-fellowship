@@ -1,0 +1,1341 @@
+judges:
+- id: summeval-coherence-judge-narrative-structure-and-ordering
+  name: Narrative Structure and Ordering
+  version: '1.0'
+  description: Assesses whether the summary opens with a clear lead, presents supporting
+    details in a logical sequence, and optionally provides a wrap or takeaway. Focuses
+    on macro-level organization and flow that make the piece read as a unified whole,
+    not on factual accuracy or coverage.
+  scoring_description: Score how well the response demonstrates narrative structure
+    and ordering
+  definition: Assesses whether the summary opens with a clear lead, presents supporting
+    details in a logical sequence, and optionally provides a wrap or takeaway. Focuses
+    on macro-level organization and flow that make the piece read as a unified whole,
+    not on factual accuracy or coverage.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - No discernible lead or progression; sentences read as disconnected fragments.
+    - Severe, unexplained jumps in time/topic or circular back-and-forth that prevent
+      a unified whole.
+    - Ordering actively obscures meaning (e.g., outcomes before events with no cues,
+      context scattered unpredictably).
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - No clear lead; opening fails to frame the main point.
+    - Facts appear in list-like or arbitrary order with weak or missing sequencing
+      cues.
+    - Frequent disruptive shifts in time/topic or repeated backtracking between points.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - A lead exists but is vague, delayed, or only partially frames the main point.
+    - Support is unevenly ordered with noticeable choppiness or context arriving after
+      specifics.
+    - One or two disruptive jumps in time/topic that momentarily interrupt the overall
+      flow.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Clear lead followed by generally logical sequencing of supporting details.
+    - Minor reordering quirks or light backtracking that do not impede understanding.
+    - Closing idea may be implicit or brief, but the piece reads as a coherent whole.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "Strong, concise lead that frames the main point, followed by purposefully ordered\
+      \ support (e.g., event \u2192 context \u2192 implication)."
+    - Consistent forward progression with no disruptive jumps or backtracking; timeline
+      and focus are maintained.
+    - Optional wrap reinforces the takeaway or closes the thread cleanly without redundancy.
+  guidelines:
+  - Begins with a concise lead that frames the main point
+  - Supporting sentences follow in a logically organized sequence
+  - No jarring backtracking or reordering that disrupts the storyline
+  score_range: [0.0, 4.0]
+  parent_id: summeval-coherence-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: coherence
+- id: summeval-coherence-judge-referential-coherence
+  name: Referential Coherence
+  version: '1.0'
+  description: Assesses how clearly pronouns, definite noun phrases, and entity labels
+    point to identifiable antecedents across sentences and remain consistent. It focuses
+    solely on reference tracking (who/what is being talked about), not on topical
+    transitions or logical ordering.
+  scoring_description: Score how well the response demonstrates referential coherence
+  definition: Assesses how clearly pronouns, definite noun phrases, and entity labels
+    point to identifiable antecedents across sentences and remain consistent. It focuses
+    solely on reference tracking (who/what is being talked about), not on topical
+    transitions or logical ordering.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Pervasive unresolved or contradictory references; readers cannot determine who/what
+      is being discussed across sentences
+    - Multiple cross-sentence swaps or misattributions (actions/quotes assigned to
+      the wrong entity)
+    - References routinely lack antecedents or change referents mid-discussion, collapsing
+      entity tracking
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Frequent pronouns or definite NPs have no unique antecedent or could refer to
+      multiple entities
+    - Inconsistent naming or role labels (e.g., switching among similar titles/names)
+      causes ongoing confusion
+    - Misaligned references lead to repeated uncertainty about which entity performed
+      actions or statements
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Several unclear or weakly anchored references that require rereading to infer
+      antecedents
+    - At least one instance of label drift or role/name switching that momentarily
+      confuses entity identity
+    - "Ambiguous deictics or plurals (e.g., \u201Cthis,\u201D \u201Cthey\u201D) when\
+      \ multiple candidates are present"
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - References are clear in nearly all cases; rare minor ambiguities do not impede
+      entity tracking
+    - Occasional distant or implicit antecedent, but resolvable from context
+    - Entity labels remain consistent with at most one harmless variation (e.g., surname
+      vs. title) used unambiguously
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Every pronoun and definite NP has a single, unmistakable antecedent in context
+    - Entity names/titles are stable across sentences with no label drift or swaps
+    - Deictics (this/that/these) are explicitly anchored, requiring no rereading to
+      resolve
+  guidelines:
+  - Pronouns (he/she/they/it/this) resolve unambiguously to a specific prior mention
+  - Entity names, titles, and acronyms are used consistently without mix-ups
+  - Avoids introducing new referents without proper identification
+  score_range: [0.0, 4.0]
+  parent_id: summeval-coherence-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: coherence
+- id: summeval-coherence-judge-temporal-and-causal-continuity
+  name: Temporal and Causal Continuity
+  version: '1.0'
+  description: "Assesses how clearly and consistently the summary presents the sequence\
+    \ of events and the cause\u2013effect relationships connecting them. Emphasizes\
+    \ consistent tense, accurate use of temporal/causal connectives, and internally\
+    \ consistent ordering so readers can reconstruct when things happened and why;\
+    \ ignores external factual accuracy unless it creates internal contradictions."
+  scoring_description: Score how well the response demonstrates temporal and causal
+    continuity
+  definition: "Assesses how clearly and consistently the summary presents the sequence\
+    \ of events and the cause\u2013effect relationships connecting them. Emphasizes\
+    \ consistent tense, accurate use of temporal/causal connectives, and internally\
+    \ consistent ordering so readers can reconstruct when things happened and why;\
+    \ ignores external factual accuracy unless it creates internal contradictions."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Timeline is unintelligible with contradictory ordering or dates and frequent
+      tense shifts that obscure sequence.
+    - Causal links are confused or self-contradictory (e.g., effects precede their
+      stated causes or incompatible causes are given).
+    - Temporal/causal connectives are misused or absent, making reconstruction of
+      when and why events occurred impossible.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Ordering is often ambiguous with abrupt time jumps and inconsistent tense requiring
+      heavy reader inference.
+    - Effects or causes are presented without the other, or causal claims are weak/implicit,
+      leading to confusion.
+    - Temporal or causal connectives are used inconsistently or incorrectly, creating
+      frequent uncertainty about sequence or rationale.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - A basic timeline is discernible but includes occasional ambiguity, minor tense
+      drift, or muddled relative timing.
+    - "Some cause\u2013effect links are clear while others are implied or unsupported,\
+      \ with occasional leaps in logic."
+    - Temporal/causal markers appear sporadically, leaving gaps that require moderate
+      inference to connect events.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Chronology is clear and mostly consistent, aided by appropriate temporal cues
+      and stable tense.
+    - Causal relationships are largely explicit and logical with no reversals or incompatible
+      explanations.
+    - Temporal and causal connectives are correct and sufficient, with only minor
+      gaps that do not impede understanding.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Unambiguous, well-signposted chronology with consistent tense and precise temporal
+      markers enabling effortless reconstruction.
+    - Complete and coherent causal chain where causes, mediating events, and outcomes
+      are explicitly linked without gaps.
+    - No internal conflicts in timing or causality; connectives are precise and purposeful,
+      yielding a smooth, natural flow.
+  guidelines:
+  - Tense and temporal markers (e.g., earlier, after, meanwhile) align to a coherent
+    timeline
+  - Sequence of events is easy to follow without unexplained jumps
+  - Cause-effect relationships are signaled and not contradicted by later sentences
+  score_range: [0.0, 4.0]
+  parent_id: summeval-coherence-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: coherence
+- id: summeval-coherence-judge-transitions-and-cohesive-devices
+  name: Transitions and Cohesive Devices
+  version: '1.0'
+  description: 'Assesses micro-level cohesion between sentences: how well transitions,
+    referential ties, and lexical chaining connect adjacent sentences to avoid a choppy,
+    list-like feel. Judges presence, variety, and appropriateness of cohesive devices
+    (e.g., connectives, anaphora, synonymy) without penalizing minor grammar unless
+    it breaks cohesion.'
+  scoring_description: Score how well the response demonstrates transitions and cohesive
+    devices
+  definition: 'Assesses micro-level cohesion between sentences: how well transitions,
+    referential ties, and lexical chaining connect adjacent sentences to avoid a choppy,
+    list-like feel. Judges presence, variety, and appropriateness of cohesive devices
+    (e.g., connectives, anaphora, synonymy) without penalizing minor grammar unless
+    it breaks cohesion.'
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Sentences read as isolated items with no connective cues; relations (time/cause/contrast)
+      are absent or contradictory.
+    - Pronouns or definite noun phrases lack clear antecedents, causing breakdowns
+      in linkage.
+    - Connectives, when present, are misused (e.g., 'however' for addition), creating
+      confusion.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Sparse or mechanical linking; mostly list-like with punctuation-only joins or
+      repeated 'and' without signaling relations.
+    - Inconsistent lexical chains (names/titles alternate without bridging), producing
+      choppiness.
+    - Key relations are left implicit across adjacent sentences, forcing readers to
+      infer through gaps.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Mix of linked and unlinked sentence pairs; several adjacency gaps yield intermittent
+      choppiness.
+    - Limited variety or occasional misuse of cohesive devices (e.g., overreliance
+      on 'also' or 'meanwhile').
+    - Lexical chaining and pronoun use are present but uneven, with occasional ambiguity.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Most adjacent sentences signal their relation with accurate transitions or structural
+      cues (contrast, elaboration, chronology).
+    - Clear referential ties via pronouns, repetition, and synonymy maintain topic
+      continuity without awkward redundancy.
+    - Only minor lapses or brief gaps; overall flow avoids a list-like feel.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Every adjacency is supported by precise, varied cohesive cues (connectives,
+      anaphora, lexical chains, parallelism) matching intended relations.
+    - Transitions are unobtrusive yet clarifying (e.g., 'however,' 'as a result,'
+      'earlier,' 'in contrast'), with no overuse.
+    - Referents are consistently resolved with zero ambiguity; the passage reads seamlessly
+      with no choppiness.
+  guidelines:
+  - Uses linking words or lexical ties to show addition, contrast, or elaboration
+  - Sentences build on prior ones rather than read as isolated bullet points
+  - Smooth shifts between related points without abrupt topic jumps
+  score_range: [0.0, 4.0]
+  parent_id: summeval-coherence-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: coherence
+- id: summeval-coherence-judge-topic-and-pov-consistency
+  name: Topic and Point-of-View Consistency
+  version: '1.0'
+  description: Assesses whether the summary maintains a single, unified topic and
+    a consistent narrative point of view (person, tense, stance, and attribution)
+    across sentences. Penalizes digressions, unjustified shifts in perspective, or
+    internal contradictions that break unity. Factual accuracy is ignored unless it
+    creates internal conflict or viewpoint inconsistency.
+  scoring_description: Score how well the response demonstrates topic and point-of-view
+    consistency
+  definition: Assesses whether the summary maintains a single, unified topic and a
+    consistent narrative point of view (person, tense, stance, and attribution) across
+    sentences. Penalizes digressions, unjustified shifts in perspective, or internal
+    contradictions that break unity. Factual accuracy is ignored unless it creates
+    internal conflict or viewpoint inconsistency.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - No clear central topic; sentences introduce unrelated or conflicting storylines
+    - Perspective changes repeatedly (person/tense/stance) with no rationale, making
+      the narrator viewpoint unclear
+    - "Direct internal contradictions about who did what or when that undermine the\
+      \ paragraph\u2019s unity"
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Main topic appears but is frequently disrupted by digressions or side threads
+    - One or more unjustified shifts in person, tense, or stance; attributions are
+      inconsistent across sentences
+    - Internal inconsistencies (e.g., incompatible claims about roles or timing) that
+      impede smooth reading
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Central topic is discernible but includes tangential details or a minor off-topic
+      sentence
+    - Perspective is mostly stable with occasional brief shifts in person/tense/stance
+      that momentarily distract
+    - Minor internal tension (e.g., soft or implied contradictions) without derailing
+      the overall viewpoint
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Clear central topic maintained; supporting details remain relevant and aligned
+    - Consistent narrative perspective (person, tense, stance, attribution) with no
+      meaningful slips
+    - No substantive internal contradictions; reads as a unified account
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Unwavering focus on a single storyline; every sentence directly supports the
+      same topic
+    - Seamlessly consistent point of view and tense; attributions and stance remain
+      uniform throughout
+    - Zero internal contradictions or perspective shifts; unity is tight and effortless
+  guidelines:
+  - Maintains the same central topic/event without drift to unrelated points
+  - Point of view, voice, and framing remain consistent across sentences
+  - No internal contradictions that undermine the unified narrative
+  score_range: [0.0, 4.0]
+  parent_id: summeval-coherence-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: coherence
+- id: summeval-consistency-judge-entity-and-event-accuracy
+  name: Entity and Event Accuracy
+  version: '1.0'
+  description: "Assesses whether the summary correctly identifies the core entities\
+    \ and the central event\u2014who did what, where (and when, if stated)\u2014as\
+    \ presented in the source article. Emphasizes accurate roles, actions, and locations\
+    \ without introducing unsupported entities or events. Faithful paraphrasing that\
+    \ preserves identities and roles is acceptable; omissions are not penalized unless\
+    \ they alter who did what or where."
+  scoring_description: Score how well the response demonstrates entity and event accuracy
+  definition: "Assesses whether the summary correctly identifies the core entities\
+    \ and the central event\u2014who did what, where (and when, if stated)\u2014as\
+    \ presented in the source article. Emphasizes accurate roles, actions, and locations\
+    \ without introducing unsupported entities or events. Faithful paraphrasing that\
+    \ preserves identities and roles is acceptable; omissions are not penalized unless\
+    \ they alter who did what or where."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - 'Multiple core elements contradict the article: wrong main actor and/or wrong
+      event and/or wrong primary location, or a fabricated central event.'
+    - Systematic role swaps or conflation of key entities that invert who did what;
+      major location/date errors.
+    - Introduces invented central entities or events not present in the article.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - 'At least one major misidentification of a core element: wrong main actor, wrong
+      event type, or wrong primary location.'
+    - Misattributes the central action to the wrong entity (role reversal) or asserts
+      an unsupported linkage between entities/events.
+    - Two or more specific entities or event details that cannot be verified from
+      the article.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Main actor and central event are correct, but there is one clear error in a
+      secondary role/detail (e.g., wrong title/affiliation) or an incorrect sub-location/date
+      that does not change the primary location.
+    - Two minor inaccuracies in peripheral entities or event descriptors (e.g., committee/department
+      name, venue section) that introduce some ambiguity without changing who did
+      what or where.
+    - No fabricated central event, but includes one unverifiable peripheral entity
+      or place detail.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Core who-what-where are correct; at most one minor, non-salient discrepancy
+      (e.g., secondary affiliation or sub-location nuance) that does not alter the
+      central event or roles.
+    - No invented entities or events; any added context is generic and does not change
+      actors, event type, or location.
+    - Roles and attributions are preserved; any ambiguity does not shift responsibility
+      or the identity of the event.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All core entities, roles, and the central event match the article exactly or
+      with faithful paraphrase; primary location (and date/time, if given) aligns
+      precisely.
+    - No unsupported or invented entities, events, or role details; no role swaps,
+      conflations, or causal reversals.
+    - Attributions and identities are faithfully preserved, maintaining who did what
+      and where without extrapolation.
+  guidelines:
+  - Main actors, organizations, and locations match the article with correct roles
+    (no role swaps).
+  - Event identity and outcome align with the article (no wrong event or result).
+  - No substitution of similarly named entities or places.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-consistency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: consistency
+- id: summeval-consistency-judge-quantitative-detail-accuracy
+  name: Quantitative and Temporal Detail Accuracy
+  version: '1.0'
+  description: Evaluates how faithfully a summary reproduces numbers, counts, magnitudes,
+    dates, and timeframes from the source article. Checks each quantitative and temporal
+    claim for exact or equivalent meaning, including acceptable rounding bounds and
+    proper hedging. Key figures (e.g., official totals, event dates, central monetary
+    amounts) must be preserved precisely; small peripheral drifts may be tolerated
+    only within clearly defined limits.
+  scoring_description: Score how well the response demonstrates quantitative and temporal
+    detail accuracy
+  definition: Evaluates how faithfully a summary reproduces numbers, counts, magnitudes,
+    dates, and timeframes from the source article. Checks each quantitative and temporal
+    claim for exact or equivalent meaning, including acceptable rounding bounds and
+    proper hedging. Key figures (e.g., official totals, event dates, central monetary
+    amounts) must be preserved precisely; small peripheral drifts may be tolerated
+    only within clearly defined limits.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Multiple key numeric/temporal facts are wrong or fabricated (e.g., order-of-magnitude
+      errors, wrong month/year, reversed chronology).
+    - Invents counts, dates, durations, or rates not in the article or directly contradicts
+      reported figures.
+    - Pervasive inconsistencies make quantitative/temporal claims untraceable to the
+      source.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - "At least one key number or date/timeframe is misstated (e.g., deviation >\xB1\
+      10%, wrong specific date/day, or duration category changed such as days to weeks)."
+    - Two or more significant peripheral drifts or unhedged roundings that materially
+      shift totals or timing, though not by an order of magnitude.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "No errors in key numbers/dates, but includes one significant peripheral drift\
+      \ (\xB15\u201310% or \xB12 days) or 2\u20133 smaller unhedged approximations."
+    - Loss of specificity that does not change month/year, magnitude class, or event
+      sequence (e.g., '50' for '47' without 'about'; 'May' for 'May 3').
+    - Ambiguous temporal phrasing could suggest a slightly broader/narrower window
+      than stated in the source.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - "All key numbers and dates/timeframes are exact; at most one minor peripheral\
+      \ drift within \xB15% or \xB11 unit (whichever larger) for counts, or \xB11\
+      \ day for multi-day periods."
+    - Approximations, if used, are clearly hedged (e.g., 'about', 'approximately')
+      and do not change scale (hundreds vs. thousands) or named periods (week/month).
+    - Numeric and temporal order is preserved with no change to event sequence.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All numeric and temporal details are exact or strictly equivalent in meaning;
+      key figures and specific dates match precisely with no date/day shift or sequence
+      change.
+    - "Any peripheral rounding is explicitly hedged and stays within \xB12% or \xB1\
+      1 unit (whichever larger) for counts; durations/timeframes, if summarized, remain\
+      \ category-equivalent (e.g., 'two weeks' for '14 days') without shifting the\
+      \ calendar date."
+    - No unsupported numeric/temporal additions or extrapolations.
+  guidelines:
+  - Counts, percentages, and amounts match or are safely summarized without changing
+    magnitude or scope.
+  - Dates, times, and durations are correct and do not shift the timeframe.
+  - No invented or altered numeric specifics (e.g., fabricated tallies or misreported
+    dates).
+  score_range: [0.0, 4.0]
+  parent_id: summeval-consistency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: consistency
+- id: summeval-consistency-judge-causal-and-relational-consistency
+  name: Causal and Relational Consistency
+  version: '1.0'
+  description: "Evaluates whether the summary preserves the article\u2019s cause\u2013\
+    effect links, actor\u2013action\u2013recipient roles, temporal order, and stated\
+    \ outcomes exactly as presented. Neutral paraphrasing is acceptable only when\
+    \ it keeps directionality, agency, sequence, and certainty/modality intact. Flags\
+    \ role swaps, causal inversions, unsupported causal claims, and altered outcomes\
+    \ as major errors."
+  scoring_description: Score how well the response demonstrates causal and relational
+    consistency
+  definition: "Evaluates whether the summary preserves the article\u2019s cause\u2013\
+    effect links, actor\u2013action\u2013recipient roles, temporal order, and stated\
+    \ outcomes exactly as presented. Neutral paraphrasing is acceptable only when\
+    \ it keeps directionality, agency, sequence, and certainty/modality intact. Flags\
+    \ role swaps, causal inversions, unsupported causal claims, and altered outcomes\
+    \ as major errors."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Multiple core role swaps or causal inversions (e.g., attributing effects to
+      the wrong cause or switching who did what to whom).
+    - Invents pivotal relationships or outcomes not in the article, or replaces the
+      main causal chain with a contradictory one.
+    - Breaks event sequence and agency so that the overall narrative meaning is misleading
+      or opposite to the source.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - 'At least one clear major relational error: role swap, causal inversion, or
+      misattributed outcome for a key event.'
+    - Two or more unsupported causal assertions or sequence changes that materially
+      alter interpretation.
+    - Misstates a necessary precondition/mechanism such that why/how an outcome occurred
+      is incorrectly represented.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "Overall relationships align, but contains one major relational/causal error\
+      \ or 2\u20133 minor misalignments (e.g., ambiguous agency or weakened/strengthened\
+      \ causality)."
+    - Compresses or reorders non-causal background in a way that could imply an unsupported
+      causal link without flipping direction.
+    - "Alters strength/modality of causation (e.g., turns \u201Cwas linked to\u201D\
+      \ into \u201Ccaused\u201D) while keeping actors and outcome the same."
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - "Core cause\u2013effect links, roles, and outcomes match the article; at most\
+      \ one minor imprecision that does not change directionality or responsibility."
+    - Temporal order of key events is preserved; no invented causal claims or mechanisms.
+    - "Attribution and modality are mostly preserved (e.g., \u201Calleged,\u201D \u201C\
+      according to\u201D) with only minor, non-impactful drift."
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All causal links, roles (who did what to whom), and event sequence exactly match
+      the article; zero inversions or swaps.
+    - Outcomes and attributions are faithfully preserved with no added or strengthened
+      causal claims; modality/uncertainty is intact.
+    - Every claimed relationship is traceable to the article with equivalent meaning;
+      paraphrases do not alter scope, direction, or timing.
+  guidelines:
+  - No reversed causality or outcome misreporting (e.g., effect presented as cause).
+  - Inter-entity relationships (e.g., affiliations, responsibilities) match the article.
+  - Chronological ordering of events is consistent with the source.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-consistency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: consistency
+- id: summeval-consistency-judge-attribution-and-modality-fidelity
+  name: Attribution and Modality Fidelity
+  version: '1.0'
+  description: "Measures whether the summary correctly attributes statements to the\
+    \ appropriate sources and preserves the article\u2019s hedges, uncertainty, and\
+    \ reported-speech framing. Evaluates if reported claims remain reported, certainty\
+    \ is not overstated or understated, and no new attributions or unwarranted confidence\
+    \ are introduced."
+  scoring_description: Score how well the response demonstrates attribution and modality
+    fidelity
+  definition: "Measures whether the summary correctly attributes statements to the\
+    \ appropriate sources and preserves the article\u2019s hedges, uncertainty, and\
+    \ reported-speech framing. Evaluates if reported claims remain reported, certainty\
+    \ is not overstated or understated, and no new attributions or unwarranted confidence\
+    \ are introduced."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Multiple core claims are assigned to incorrect sources or to the narrator, including
+      reversals of who accused/denied/confirmed.
+    - 'Widespread modality distortion: allegations or tentative findings are presented
+      as confirmed facts, or denials treated as admissions.'
+    - Fabricated or contradictory attributions and confident causal assertions appear
+      that are not supported by the article.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - "At least one key statement is misattributed to the wrong party or presented\
+      \ as the narrator\u2019s assertion, changing who is making the claim."
+    - Important hedges/uncertainty are removed or strengthened (e.g., 'alleged' ->
+      'confirmed', 'could' -> 'will'), overstating certainty on salient points.
+    - Multiple unsupported attributions or quotes, or systematic conversion of reported
+      speech into asserted facts.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Overall attribution aligns, but includes one significant nuance error or two
+      minor issues (e.g., conflating two officials into 'authorities', omitting a
+      speaker for a secondary claim).
+    - Modality is miscalibrated in places (e.g., 'alleged' -> 'likely', 'could' ->
+      'probably') affecting emphasis but not reversing the main takeaway.
+    - At least one secondary reported claim is rendered as a fact or vague wording
+      (e.g., 'they') obscures who said what.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Core attributions match the article; at most one minor compression/generalization
+      of a source (e.g., 'police' vs. 'police spokesperson') without changing responsibility
+      or authority.
+    - Modality and uncertainty are largely preserved; at most one minor hedge dropped/softened
+      in a non-salient detail without increasing certainty of key claims.
+    - No invented quotations; central allegations are not turned into definitive facts.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All statements are attributed to the correct sources (or neutrally to the article
+      for stated facts) with no invented or shifted speakers.
+    - Hedges and uncertainty markers (e.g., alleged, reportedly, according to, estimates)
+      are faithfully preserved; no inflation or downgrading of certainty.
+    - Reported claims remain reported (direct or indirect speech preserved) and no
+      unsupported attributions or quotes are added.
+  guidelines:
+  - Quotes and claims are attributed to the correct speaker/source (e.g., police,
+    officials).
+  - Hedging and modality (e.g., alleged, reportedly) are retained and not overstated
+    or downplayed.
+  - No conversion of reported claims into asserted facts or vice versa.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-consistency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: consistency
+- id: summeval-consistency-judge-unsupported-additions-and-scope-drift
+  name: Unsupported Additions and Scope Drift
+  version: '1.0'
+  description: "Evaluates whether a summary avoids fabricated or untraceable details\
+    \ and maintains the original article\u2019s scope. Checks that specific claims\
+    \ (entities, numbers, causal links, attributions, outcomes) are directly traceable\
+    \ to the source and that any added background is purely generic and does not change\
+    \ meaning, emphasis, or scope."
+  scoring_description: Score how well the response demonstrates unsupported additions
+    and scope drift
+  definition: "Evaluates whether a summary avoids fabricated or untraceable details\
+    \ and maintains the original article\u2019s scope. Checks that specific claims\
+    \ (entities, numbers, causal links, attributions, outcomes) are directly traceable\
+    \ to the source and that any added background is purely generic and does not change\
+    \ meaning, emphasis, or scope."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Introduces multiple central claims or events (key actors, outcomes, numbers,
+      quotes) that are not present in the article.
+    - "Substantially expands or reframes scope (e.g., local \u2192 national/global;\
+      \ single case \u2192 general trend) without support."
+    - "Asserts new causal relationships or policy impacts not mentioned, altering\
+      \ the article\u2019s core meaning."
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Contains at least one major unsupported addition (new main actor/outcome/number)
+      or two or more untraceable specifics.
+    - Adds scope claims (broader geography, population, timeframe) or trend/generalization
+      language not in the article.
+    - Introduces non-generic background that injects new facts or emphasis affecting
+      interpretation.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Overall grounded but includes one untraceable specific detail (e.g., a number,
+      date, or named entity) or a speculative add-on.
+    - Mild scope drift via overgeneralization (e.g., turning a single instance into
+      a typical pattern) or vague extrapolation.
+    - Ambiguous additions whose traceability is unclear yet do not contradict core
+      facts or outcomes.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - All specific claims are traceable; at most one minor, generic background note
+      that is neutral and non-inferential.
+    - Preserves scope for actors, geography, timeframe, and magnitude; avoids trend/extrapolation
+      language beyond the source.
+    - No invented numbers, quotes, new events, or causal attributions; hedges/modality
+      are retained.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Every specific claim is exactly or equivalently traceable to the article; zero
+      fabricated or unverifiable details.
+    - Scope strictly preserved with no expansion of actors, geography, timeframe,
+      magnitude, or causality; uncertainty is faithfully maintained.
+    - Any added context is minimal and purely generic (e.g., definitions) and does
+      not change meaning, emphasis, or scope.
+  guidelines:
+  - No invented entities, quotes, numbers, or events not present in the article.
+  - "No speculative causal or scope claims beyond the article\u2019s evidence."
+  - Omissions do not create new implications or broaden/narrow scope inaccurately.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-consistency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: consistency
+- id: summeval-fluency-judge-sentence-structure-and-boundaries
+  name: Sentence Structure and Boundaries
+  version: '1.0'
+  description: Assesses whether sentences are complete, well-formed units with correct
+    segmentation and clear clause structure. Major boundary errors (fragments, run-ons,
+    comma splices) are weighted heavily. Evaluates clause linking, modifier placement,
+    and word order only insofar as they affect sentence completeness and boundary
+    integrity; ignore punctuation typos that do not create structural errors.
+  scoring_description: Score how well the response demonstrates sentence structure
+    and boundaries
+  definition: Assesses whether sentences are complete, well-formed units with correct
+    segmentation and clear clause structure. Major boundary errors (fragments, run-ons,
+    comma splices) are weighted heavily. Evaluates clause linking, modifier placement,
+    and word order only insofar as they affect sentence completeness and boundary
+    integrity; ignore punctuation typos that do not create structural errors.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - 'Boundary integrity fails in most sentences (>50%): pervasive fragments, fused
+      sentences, or comma splices.'
+    - Clause structure is frequently incoherent; many sentences cannot be parsed as
+      complete thoughts.
+    - Severe word-order or segmentation errors regularly impede comprehension.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - "Multiple boundary errors across the summary (\u224830\u201350% of sentences)\
+      \ including fragments, run-ons, or comma splices."
+    - Clause relations are often unclear due to faulty linking or misplaced modifiers.
+    - Word order or segmentation problems repeatedly disrupt sentence completeness.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - One clear boundary error (e.g., a single fragment/run-on/comma splice) or two
+      minor structural lapses across the summary.
+    - "Clause linking or modifier placement causes brief ambiguity in a minority of\
+      \ sentences (\u226420%)."
+    - Sentences are generally recoverable, but structure is occasionally strained.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - No fragments, run-ons, or comma splices; boundaries are correct throughout.
+    - At most one minor structural lapse (e.g., slightly awkward modifier placement)
+      that does not obscure clause relations.
+    - Word order is sound; sentences are clearly complete and well-formed.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - All sentences are complete and correctly segmented; zero fragments, run-ons,
+      or comma splices.
+    - Clause linking and modifier placement are consistently clear and unambiguous.
+    - Word order consistently supports precise clause structure and unmistakable sentence
+      boundaries.
+  guidelines:
+  - No fragments, run-ons, or comma splices; clear sentence boundaries.
+  - Correct use of subordination/coordination; modifiers attached to the right head.
+  - Word order supports clarity; avoids misplaced or dangling modifiers.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-fluency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: fluency
+- id: summeval-fluency-judge-grammar-agreement-and-tense
+  name: Grammar, Agreement, and Tense
+  version: '1.0'
+  description: "Assesses clause-level grammatical correctness within sentences, focusing\
+    \ on subject\u2013verb agreement, pronoun reference/case/number, and tense/voice\
+    \ accuracy and consistency. Counts and weighs errors, treating agreement/tense/pronoun\
+    \ violations as major, and article/preposition/determiner slips as minor unless\
+    \ frequent. Evaluates consistency across sentences without considering factuality\
+    \ or discourse coherence."
+  scoring_description: Score how well the response demonstrates grammar, agreement,
+    and tense
+  definition: "Assesses clause-level grammatical correctness within sentences, focusing\
+    \ on subject\u2013verb agreement, pronoun reference/case/number, and tense/voice\
+    \ accuracy and consistency. Counts and weighs errors, treating agreement/tense/pronoun\
+    \ violations as major, and article/preposition/determiner slips as minor unless\
+    \ frequent. Evaluates consistency across sentences without considering factuality\
+    \ or discourse coherence."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - "Major grammar errors (agreement, tense/voice, pronoun reference/case) in \u2265\
+      75% of sentences, often multiple per sentence."
+    - Tense/voice is chaotic within and across sentences; time relations are unclear.
+    - Pronoun/agreement mistakes and malformed verb phrases routinely obstruct parsing.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - "Major errors in roughly 30\u201360% of sentences (e.g., subject\u2013verb disagreement,\
+      \ tense mismatch, wrong/unclear pronouns)."
+    - "Frequent minor function-word mistakes (articles/prepositions/determiners) in\
+      \ \u226550% of sentences, sometimes repeated."
+    - Inconsistent tense/voice across sentences with several confusing shifts.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - 'Limited major errors: present in up to ~20% of sentences (e.g., a single agreement
+      or tense/pronoun lapse).'
+    - "Recurring minor function-word issues in ~20\u201350% of sentences (articles/prepositions)\
+      \ but meaning remains clear."
+    - Tense/voice mostly consistent, with one noticeable but isolated mismatch or
+      unnecessary shift.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - No major errors (agreement, tense/voice, pronouns) across sentences.
+    - "At most 1\u20132 minor function-word slips in total; no repeated pattern."
+    - "Tense/voice is stable and consistent in \u226590% of sentences."
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - 'Zero major errors: flawless agreement, tense/voice use, and pronoun reference/case
+      throughout.'
+    - No minor function-word errors or at most one inconsequential slip in the entire
+      summary.
+    - Tense/voice is fully consistent across all sentences (100%).
+  guidelines:
+  - "Subject\u2013verb and pronoun\u2013antecedent agreement are correct."
+  - Tense and voice are consistent and appropriate; sequence of tenses maintained.
+  - Articles and prepositions are used idiomatically (a/the, in/at, to/for).
+  score_range: [0.0, 4.0]
+  parent_id: summeval-fluency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: fluency
+- id: summeval-fluency-judge-mechanics-punctuation-capitalization-spelling
+  name: 'Mechanics: Punctuation, Capitalization, and Spelling'
+  version: '1.0'
+  description: Assesses the correctness of punctuation, capitalization, spelling,
+    and hyphenation within sentences. Focuses on mechanical accuracy of marks and
+    casing (e.g., commas, end punctuation, quotation marks, apostrophes) and standard
+    orthography. Does not judge grammar, style choices, number/date formats, or naming
+    conventions.
+  scoring_description: 'Score how well the response demonstrates mechanics: punctuation,
+    capitalization, and spelling'
+  definition: Assesses the correctness of punctuation, capitalization, spelling, and
+    hyphenation within sentences. Focuses on mechanical accuracy of marks and casing
+    (e.g., commas, end punctuation, quotation marks, apostrophes) and standard orthography.
+    Does not judge grammar, style choices, number/date formats, or naming conventions.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - 'Pervasive mechanical failures: several errors per sentence, or many sentences
+      lack end punctuation or sentence-initial capitalization.'
+    - Marks and spelling are often incorrect or garbled (e.g., random/missing commas
+      or periods, heavy misspelling, mismatched or broken quotation marks/apostrophes);
+      hyphenation is chaotic.
+    - Legibility is seriously impaired; reader must work to decipher the text.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Frequent mechanical errors; most sentences contain one or more punctuation,
+      capitalization, spelling, or hyphenation mistakes.
+    - Systematic misuse (e.g., repeated missing end punctuation, inconsistent or incorrect
+      capitalization, multiple misspellings, mismatched quotes/apostrophes, spacing
+      errors around punctuation).
+    - Errors are distracting and sometimes obscure phrasing.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "Noticeable issues at a light-to-moderate rate (about one clear punctuation/capitalization/spelling/hyphenation\
+      \ error every 1\u20132 sentences)."
+    - Recurrent but not pervasive mistakes (e.g., occasional comma misuse, inconsistent
+      capitalization of titles, repeated misspelling of one term, inconsistent hyphenation).
+    - Readability is mildly affected, but meaning remains clear.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - "Mostly correct mechanics with only 1\u20132 minor slips in the entire summary\
+      \ (e.g., a single typo, a minor comma lapse, or a small hyphenation inconsistency)."
+    - Capitalization is correct at sentence starts and for proper nouns; punctuation
+      marks are largely correct and consistently formatted (including matching quotes/apostrophes).
+    - Issues are isolated and do not distract.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - No mechanical errors; punctuation (end marks, commas, apostrophes/quotation
+      marks, dashes) is correct and consistent throughout.
+    - Correct sentence-initial and proper-noun capitalization; all words are spelled
+      correctly; hyphenation of common compounds is appropriate.
+    - At most one trivial typo in the entire summary, not distracting.
+  guidelines:
+  - Correct use of commas, apostrophes, quotation marks, and dashes.
+  - Accurate spelling; correct capitalization at sentence start and for proper nouns.
+  - Consistent and correct hyphenation of compound modifiers.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-fluency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: fluency
+- id: summeval-fluency-judge-idiomaticity-and-word-choice
+  name: Idiomaticity and Word Choice
+  version: '1.0'
+  description: Assesses how natural and idiomatic the wording is in standard journalistic
+    English, with emphasis on correct collocations, precise and context-appropriate
+    vocabulary, and smooth, native-like phrasing. Garbled or non-English segments
+    are treated as severe issues. Content accuracy and paragraph-level organization
+    are not considered.
+  scoring_description: Score how well the response demonstrates idiomaticity and word
+    choice
+  definition: Assesses how natural and idiomatic the wording is in standard journalistic
+    English, with emphasis on correct collocations, precise and context-appropriate
+    vocabulary, and smooth, native-like phrasing. Garbled or non-English segments
+    are treated as severe issues. Content accuracy and paragraph-level organization
+    are not considered.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Garbled or non-English text appears in multiple sentences or sustained stretches,
+      making phrasing frequently unintelligible.
+    - Severe misuse of words and collocations is widespread; idiomatic phrasing is
+      largely absent and often misleading.
+    - Reader must expend significant effort to infer meaning due to malformed or nonsensical
+      wording.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Awkward, translated-sounding, or non-idiomatic phrasing occurs in at least half
+      of the sentences; collocation errors are common.
+    - Word choice is often imprecise or of the wrong register, sometimes reducing
+      clarity or intended nuance.
+    - May include isolated garbled or non-English tokens/phrases, but overall meaning
+      is usually recoverable.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "Noticeable awkward or overly literal phrasing appears intermittently (about\
+      \ one instance every 1\u20132 sentences)."
+    - Occasional collocation slips or slightly off word choices; flow is somewhat
+      stilted but meaning remains clear.
+    - No garbled or non-English text.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Phrasing is mostly idiomatic and natural; at most one or two minor awkward word
+      choices/collocations in the entire summary.
+    - Vocabulary is generally precise and appropriate to a journalistic register;
+      any infelicities do not affect clarity.
+    - No garbled or non-English segments.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Consistently idiomatic, native-like phrasing with correct collocations and a
+      professional journalistic tone.
+    - Word choice is precise, context-appropriate, and free of literal calques or
+      mistranslation effects.
+    - No garbled or non-English text; sentences read smoothly throughout.
+  guidelines:
+  - "Uses standard collocations and verb\u2013particle pairs; avoids literal/translated-sounding\
+    \ phrases."
+  - Precise, context-appropriate word choice with smooth, concise phrasing.
+  - No non-English or garbled strings; sentences read smoothly aloud.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-fluency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: fluency
+- id: summeval-fluency-judge-news-style-conventions-and-formatting
+  name: News-Style Conventions and Formatting
+  version: '1.0'
+  description: Assesses adherence to common news-style (AP-like) conventions for names,
+    numbers, dates, titles, acronyms, and units within sentences. Emphasizes internal
+    consistency and professional, unambiguous formatting; minor deviations that do
+    not hinder understanding are treated as small lapses, while inconsistent or confusing
+    styles are penalized. This rubric excludes basic grammar and punctuation mechanics
+    already judged elsewhere.
+  scoring_description: Score how well the response demonstrates news-style conventions
+    and formatting
+  definition: Assesses adherence to common news-style (AP-like) conventions for names,
+    numbers, dates, titles, acronyms, and units within sentences. Emphasizes internal
+    consistency and professional, unambiguous formatting; minor deviations that do
+    not hinder understanding are treated as small lapses, while inconsistent or confusing
+    styles are penalized. This rubric excludes basic grammar and punctuation mechanics
+    already judged elsewhere.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Widespread nonstandard or conflicting formats that create ambiguity (e.g., multiple
+      date/time styles, unclear numbers or currencies, undefined acronyms).
+    - Names, titles, acronyms, and units are handled inconsistently or incorrectly
+      in ways that obscure meaning (e.g., malformed units, mixed or misleading title
+      use).
+    - "Chaotic mixing of styles within and across sentences (e.g., shifting between\
+      \ \u201C3/1/24,\u201D \u201CJan 1st, 2024,\u201D and \u201C01-01-24\u201D; \u201C\
+      3pm\u201D and \u201C15:00\u201D) that impairs interpretation."
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Frequent deviations from AP-like conventions across categories (names, numbers,
+      dates/times, titles, acronyms, units) with several inconsistencies.
+    - Undefined or late-defined acronyms; mixed numeral/word usage and inconsistent
+      percent/currency notation that distracts though meaning is usually recoverable.
+    - Titles and name forms are often misapplied (e.g., inconsistent capitalization
+      or placement), and unit styles vary within the piece.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "Several minor style lapses and occasional inconsistencies in one or more areas\
+      \ (e.g., switching between \u201Cpercent\u201D and \u201C%,\u201D or \u201C\
+      January 5\u201D and \u201CJan. 5\u201D)."
+    - Some first-use conventions are missed or uneven (e.g., sporadic acronym definition,
+      irregular use of surname after first reference), but meaning remains clear.
+    - Unit or currency formatting is understandable but not fully standardized (e.g.,
+      spacing around symbols, mixing USD/$ forms).
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Mostly consistent AP-like formatting for names (full name then surname), numbers/dates/times,
+      titles, acronyms (defined on first use), and units; only one or two minor lapses.
+    - Percentages, currency, and units follow a uniform style; dates and times use
+      a standard, recognizable form without ambiguity.
+    - Minor, isolated inconsistencies (e.g., a single month not abbreviated or one
+      numerals/words mismatch) do not affect professionalism.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - 'Consistent, professional application of news-style conventions across all elements:
+      names/titles, numbers (including ordinals and ranges), dates/times, percentages/currency,
+      acronyms, and units.'
+    - First references and abbreviations are handled correctly and uniformly (full
+      name then surname; titles capitalized only before names; acronyms defined once,
+      then used).
+    - "Clean, unambiguous formatting throughout (e.g., standard date/time like \u201C\
+      Jan. 5, 2025, 3 p.m.\u201D; consistent numerals/words rules; standardized unit\
+      \ spacing/symbols and currency/percent styles)."
+  guidelines:
+  - Consistent formatting of names, ages, percentages, currencies, and dates (e.g.,
+    numerals vs. words, percent symbol).
+  - Proper handling of titles, organizations, and acronyms on first and subsequent
+    mentions.
+  - Consistent quotation and attribution style suitable for news prose.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-fluency-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: fluency
+- id: summeval-relevance-judge-main-event-coverage
+  name: Main Event Coverage
+  version: '1.0'
+  description: "Assesses whether the summary clearly states the article\u2019s primary\
+    \ event or takeaway as framed by the headline/lead. Paraphrases are acceptable\
+    \ if they convey the same central event. Judge selection only; ignore factual\
+    \ accuracy and writing quality."
+  scoring_description: Score how well the response demonstrates main event coverage
+  definition: "Assesses whether the summary clearly states the article\u2019s primary\
+    \ event or takeaway as framed by the headline/lead. Paraphrases are acceptable\
+    \ if they convey the same central event. Judge selection only; ignore factual\
+    \ accuracy and writing quality."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - "Omits the article\u2019s main event entirely or is off-topic."
+    - Provides only unrelated content or generic filler with no connection to the
+      central event.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Mentions entities/themes from the article but does not state what happened.
+    - Centers on background/setup or a teaser-like remark instead of the main event.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Alludes to the topic or a related development but leaves the main event implied
+      or unclear.
+    - Emphasizes a secondary angle/consequence rather than the headline event.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - States the central event with minor vagueness or partial specificity (e.g.,
+      actor or action only partly clear).
+    - May include brief context, but the main event remains prominent and identifiable.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "Explicitly states the article\u2019s central event/takeaway as framed in the\
+      \ headline/lead (who/what happened)."
+    - Clearly identifies the core action and principal actor(s) without substituting
+      a secondary theme.
+  guidelines:
+  - Names the central action/event highlighted in the headline or lead.
+  - Expresses the core 'what happened' in a direct statement.
+  - Avoids substituting background context in place of the main event.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-relevance-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: relevance
+- id: summeval-relevance-judge-principal-actors-coverage
+  name: Principal Actors Coverage
+  version: '1.0'
+  description: "Assesses whether the summary includes the primary entities involved\
+    \ in the article\u2019s central event and correctly targets their roles (who did\
+    \ what to whom). Coverage is judged by importance rather than count; capturing\
+    \ the top-tier actors matters most. Ignore factual correctness and exact naming\u2014\
+    clearly identifying the right roles or sides suffices."
+  scoring_description: Score how well the response demonstrates principal actors coverage
+  definition: "Assesses whether the summary includes the primary entities involved\
+    \ in the article\u2019s central event and correctly targets their roles (who did\
+    \ what to whom). Coverage is judged by importance rather than count; capturing\
+    \ the top-tier actors matters most. Ignore factual correctness and exact naming\u2014\
+    clearly identifying the right roles or sides suffices."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Includes none of the principal actors; no clear 'who' for the central event.
+    - Focuses on unrelated or peripheral entities, or uses generic references that
+      do not map to the main roles.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Mentions at least one entity but not a principal actor, or only a vague/incorrect
+      stand-in for a key role.
+    - "Covers a small share (~10\u201330% by importance) of principal actors; emphasis\
+      \ falls on secondary participants or wrong sides."
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Identifies some principal actors by role (e.g., main actor or target) but omits
+      other critical counterparts emphasized by the article.
+    - "Covers a moderate share (~30\u201360% by importance); may conflate roles or\
+      \ give weight to minor participants."
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Includes the main actor and at least one key counterpart (who did what to whom);
+      roles are recognizable even if names are approximate.
+    - "Covers a large share (~60\u201385% by importance) with at most one significant\
+      \ omission and no unrelated actors."
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Includes all principal actors emphasized by the article and captures their relationship
+      (who did what to whom).
+    - "Covers \u226585\u2013100% of principal actors by importance with no extraneous\
+      \ actors; role targeting is correct regardless of name precision."
+  guidelines:
+  - Mentions the key initiating and affected parties emphasized by the article.
+  - Distinguishes principal actors from peripheral or background mentions.
+  - Links at least one named actor to the main action.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-relevance-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: relevance
+- id: summeval-relevance-judge-outcome-or-significance-coverage
+  name: Outcome or Significance Coverage
+  version: '1.0'
+  description: "Evaluates whether the summary includes the article\u2019s emphasized\
+    \ result, resolution/status update, or stated significance/impact. Judging is\
+    \ based on presence and clarity of this aspect as highlighted by the article,\
+    \ not on factual correctness or writing quality. Credit paraphrased coverage that\
+    \ clearly conveys what happened or why it matters, even if details differ."
+  scoring_description: Score how well the response demonstrates outcome or significance
+    coverage
+  definition: "Evaluates whether the summary includes the article\u2019s emphasized\
+    \ result, resolution/status update, or stated significance/impact. Judging is\
+    \ based on presence and clarity of this aspect as highlighted by the article,\
+    \ not on factual correctness or writing quality. Credit paraphrased coverage that\
+    \ clearly conveys what happened or why it matters, even if details differ."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - "Omits any statement of the event\u2019s outcome, resolution/status, or significance/impact."
+    - Content is confined to process, background, or unrelated details with no conveyed
+      result or importance.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - "Only gestures at consequence or importance (e.g., generic claims like \u201C\
+      a significant move\u201D) without specifying a result, resolution, status, or\
+      \ stated significance."
+    - Emphasis remains on process/background, with at most a vague or tangential hint
+      of outcome or impact.
+    - "Any implied result is not the article\u2019s emphasized takeaway."
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Mentions a result-like or significance-related idea but it is vague, incomplete,
+      or partially misaligned with what the article emphasizes.
+    - Misses key qualifiers (e.g., status such as ongoing/settled, scope, or timing)
+      that define the outcome/significance.
+    - Blurs outcome with process/background, weakening the sense of resolution or
+      importance.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Conveys the main outcome/resolution or significance/impact highlighted by the
+      article.
+    - Omits at most one notable qualifier (e.g., scope, timing, status detail) or
+      uses somewhat general wording.
+    - Avoids major extraneous focus; the statement clearly indicates what happened
+      or why it matters.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "Explicitly states the article\u2019s emphasized outcome/resolution or stated\
+      \ significance/impact, clearly capturing the core result or status."
+    - Includes salient qualifier(s) the article highlights (e.g., ongoing vs. resolved
+      status, scope/scale, implications or next steps) without adding unrelated consequences.
+    - Focus is tightly on the outcome/significance with no substitution by background
+      or process details.
+  guidelines:
+  - States the outcome/result or current status if no final outcome exists.
+  - "Conveys the article\u2019s framed significance or implications (why it matters)."
+  - Includes any decisions, announcements, or key changes reported.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-relevance-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: relevance
+- id: summeval-relevance-judge-salient-specifics-coverage
+  name: Salient Specifics Coverage
+  version: '1.0'
+  description: "Measures how completely the summary includes the article\u2019s emphasized\
+    \ specifics (e.g., concrete time, place, and critical figures) that materially\
+    \ define the event. Coverage is counted at the aspect level (e.g., includes a\
+    \ date/time, named place, key number) regardless of factual correctness, and non-salient\
+    \ or generic details are not rewarded."
+  scoring_description: Score how well the response demonstrates salient specifics
+    coverage
+  definition: "Measures how completely the summary includes the article\u2019s emphasized\
+    \ specifics (e.g., concrete time, place, and critical figures) that materially\
+    \ define the event. Coverage is counted at the aspect level (e.g., includes a\
+    \ date/time, named place, key number) regardless of factual correctness, and non-salient\
+    \ or generic details are not rewarded."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - "Covers 0% of the article\u2019s emphasized specifics (none of the identified\
+      \ time/place/figures are present)."
+    - "Specifics provided are generic or non-salient (e.g., \u201Crecently,\u201D\
+      \ \u201Cin the area\u201D) and do not map to the emphasized list."
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - "Covers \u226425% of emphasized specifics (e.g., only one covered when the article\
+      \ lists four or more)."
+    - Includes at least one non-salient or generic detail that does not correspond
+      to the emphasized specifics.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - "Covers about 30\u201360% of emphasized specifics (some key aspects present,\
+      \ several missing)."
+    - "At most one minor non-salient or generic detail; emphasis partially misaligned\
+      \ with the article\u2019s highlighted specifics."
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - "Covers about 60\u201385% of emphasized specifics, including at least two distinct\
+      \ aspect types (e.g., time and a key figure)."
+    - Contains little extraneous specificity (no more than one minor non-salient detail)
+      and few omissions of highlighted specifics.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "Covers \u226585\u2013100% of emphasized specifics, including all highly emphasized\
+      \ time/place/critical figures."
+    - No extraneous or generic specifics not on the emphasized list; selection is
+      tightly focused on the highlighted specifics.
+  guidelines:
+  - Includes time or location when these are emphasized by the article.
+  - Captures critical numbers, counts, or named items the article stresses.
+  - Selects only specifics that are central rather than minor details.
+  score_range: [0.0, 4.0]
+  parent_id: summeval-relevance-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: relevance
+- id: summeval-relevance-judge-focus-alignment
+  name: Focus Alignment and Extraneous Avoidance
+  version: '1.0'
+  description: "Measures how tightly the summary centers on the article\u2019s headline/lead\
+    \ and repeatedly emphasized points while avoiding off-topic, speculative, or minor/background\
+    \ content. Judge what is selected and prioritized, not factual correctness or\
+    \ writing quality. Penalize multiple extraneous additions and misprioritization\
+    \ of minor facts over the main event or significance."
+  scoring_description: Score how well the response demonstrates focus alignment and
+    extraneous avoidance
+  definition: "Measures how tightly the summary centers on the article\u2019s headline/lead\
+    \ and repeatedly emphasized points while avoiding off-topic, speculative, or minor/background\
+    \ content. Judge what is selected and prioritized, not factual correctness or\
+    \ writing quality. Penalize multiple extraneous additions and misprioritization\
+    \ of minor facts over the main event or significance."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - "Omits or ignores the article\u2019s central focus; content is largely off-topic\
+      \ or generic/background filler."
+    - Three or more off-topic/peripheral claims overwhelm any central material.
+    - Selection centers on unrelated background/speculation rather than the main event
+      or emphasized significance.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Central focus is weak or only vaguely implied; multiple extraneous items are
+      present with at least one off-topic or speculative claim.
+    - Central facts make up less than ~40% of the content; tangents or background
+      dominate or lead.
+    - Emphasis misplaces attention on side actors/minor numbers over headline/lead
+      priorities.
+  - range: [2.0, 2.9]
+    label: Fair
+    indicators:
+    - Mixes central points with peripheral content; includes up to two extraneous
+      items or one mildly off-topic aside.
+    - "Central facts account for about 40\u201375% of the content; at least one instance\
+      \ of misprioritization (e.g., background before the main event)."
+    - Includes at least one detail not emphasized by the article or treats a minor
+      point as co-equal with central facts.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Focuses on headline/lead emphasis with at most one minor peripheral detail and
+      no off-topic claims.
+    - "Central facts constitute roughly \u226575% of the content; main event/significance\
+      \ is foregrounded."
+    - Any background is brief and clearly supportive of the central points.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - "All selected content aligns with the article\u2019s headline/lead and repeated\
+      \ emphasis; no extraneous or off-topic items."
+    - "Central facts dominate (\u224890\u2013100% of content) and are prioritized\
+      \ in ordering (main event/significance first)."
+    - Avoids speculative, tangential, or decorative details not emphasized by the
+      article.
+  guidelines:
+  - Contains no off-topic or speculative claims beyond the article.
+  - Avoids minor/background details that displace central points.
+  - "Selected facts reflect the article\u2019s emphasis hierarchy (headline/lead and\
+    \ repeated points)."
+  score_range: [0.0, 4.0]
+  parent_id: summeval-relevance-judge
+  dataset: summeval
+  auto_generated: true
+  dimension: relevance

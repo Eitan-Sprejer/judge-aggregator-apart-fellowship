@@ -1,0 +1,57 @@
+# MSLR Baseline - Medical Summarization (364 annotated samples)
+# Comparison baseline for MAJ-Eval paper
+#
+# Dataset: MSLR-Cochrane (allenai/mslr-annotated-dataset)
+# Task: Medical literature review summarization quality
+# Dimensions: fluency (0-2), pio_consistency (0-2), effect_direction (0-1), evidence_strength (0-1)
+#
+# Note: Small dataset (~364 samples from 6 models). Results will have higher variance than
+# larger datasets. Primary purpose is comparison with MAJ-Eval which used 102 samples.
+#
+# Reference: "Automated Metrics for Medical Multi-Document Summarization Disagree with Human Evaluations"
+# ACL 2023: https://aclanthology.org/2023.acl-long.549/
+
+name: "mslr-baseline"
+dataset: "mslr"
+target: "target_human_aggregated"
+
+# List of dimensions to train on (MAJ-Eval format)
+target_dimensions: ["fluency", "pio_consistency", "effect_direction", "evidence_strength"]
+
+# Dataset configuration
+dataset_kwargs:
+  n_samples: null                       # Use all 364 annotated samples
+  random_seed: 42
+
+# Judge configuration
+judges:
+  create:
+    depth: 1                            # Creates ~6 judges per dimension
+    cache: "auto"
+    model: "openai/gpt-5"
+    temperature: 0.4
+    max_tokens: 10000
+
+  judge_model: "openai/gpt-5-nano"
+  # Note: MSLR has mixed score ranges (0-2 and 0-1)
+  # The loader normalizes to MAJ-Eval format
+  score_range: [0.0, 2.0]               # Primary dimensions use 0-2
+
+# Model training
+# Note: With only 364 samples, we use a smaller test set to preserve training data
+models:
+  train_gam: true
+  train_mlp: false
+  test_size: 0.17                       # ~62 samples for test (close to MAJ-Eval's 102 eval setup)
+  val_size: 0.13                        # ~47 samples for validation
+
+  tuning:
+    enabled: true
+
+  gam:
+    n_splines: 8                        # Fewer splines for small dataset
+    lam: 0.8                            # Higher regularization for small dataset
+    max_iter: 200
+
+concurrency: 10
+random_seed: 42

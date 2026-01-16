@@ -1,0 +1,58 @@
+{
+  "experiment_name": "summeval-baseline",
+  "dimension": "fluency",
+  "dataset": "summeval",
+  "target": "target_human_aggregated",
+  "judge_files": [
+    "judges/summeval/depth_0_parents.yaml",
+    "judges/summeval/depth_1_children.yaml"
+  ],
+  "judges": [
+    "summeval-fluency-judge-sentence-structure-and-boundaries",
+    "summeval-fluency-judge-grammar-agreement-and-tense",
+    "summeval-fluency-judge-mechanics-punctuation-capitalization-spelling",
+    "summeval-fluency-judge-idiomaticity-and-word-choice",
+    "summeval-fluency-judge-news-style-conventions-and-formatting"
+  ],
+  "n_judges": 5,
+  "random_seed": 42,
+  "gam_results": {
+    "train": {
+      "mse": 0.22901898225354334,
+      "mae": 0.3638182909123631,
+      "r2": 0.17058891913283747,
+      "spearman_rho": 0.3444314744975715,
+      "kendall_tau": 0.2462008516971826,
+      "pearson_r": 0.413712876336218
+    },
+    "val": {
+      "mse": 0.24273246037844565,
+      "mae": 0.38482110208692005,
+      "r2": -0.025973497790649835,
+      "spearman_rho": 0.06951078095113693,
+      "kendall_tau": 0.0477919429637051,
+      "pearson_r": 0.17692959485009735
+    },
+    "test": {
+      "mse": 0.28645917544702415,
+      "mae": 0.4047555934710282,
+      "r2": 0.05907234752926149,
+      "spearman_rho": 0.15128417114145964,
+      "kendall_tau": 0.10463929164727821,
+      "pearson_r": 0.27292545642757804
+    }
+  },
+  "baseline_results": {
+    "human_rubric_judge": {
+      "mse": 1.666640625,
+      "mae": 1.086875,
+      "r2": -4.474386527666399,
+      "spearman_rho": 0.15292752108539936,
+      "kendall_tau": 0.12462634052180005,
+      "pearson_r": 0.19977855680992454
+    }
+  },
+  "run_dir": "results/summeval-baseline_20260111_202822",
+  "dimension_dir": "results/summeval-baseline_20260111_202822/dimensions/fluency",
+  "timestamp": "2026-01-11T21:38:42.459995"
+}

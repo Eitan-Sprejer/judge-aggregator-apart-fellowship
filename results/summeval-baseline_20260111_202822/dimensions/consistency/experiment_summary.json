@@ -1,0 +1,58 @@
+{
+  "experiment_name": "summeval-baseline",
+  "dimension": "consistency",
+  "dataset": "summeval",
+  "target": "target_human_aggregated",
+  "judge_files": [
+    "judges/summeval/depth_0_parents.yaml",
+    "judges/summeval/depth_1_children.yaml"
+  ],
+  "judges": [
+    "summeval-consistency-judge-entity-and-event-accuracy",
+    "summeval-consistency-judge-quantitative-detail-accuracy",
+    "summeval-consistency-judge-causal-and-relational-consistency",
+    "summeval-consistency-judge-attribution-and-modality-fidelity",
+    "summeval-consistency-judge-unsupported-additions-and-scope-drift"
+  ],
+  "n_judges": 5,
+  "random_seed": 42,
+  "gam_results": {
+    "train": {
+      "mse": 0.27318959950939076,
+      "mae": 0.40562625057497814,
+      "r2": 0.15689587413030937,
+      "spearman_rho": 0.24796806769864307,
+      "kendall_tau": 0.17677820055890014,
+      "pearson_r": 0.39642814869400367
+    },
+    "val": {
+      "mse": 0.2470459718110651,
+      "mae": 0.3953688889721896,
+      "r2": 0.0782433984021409,
+      "spearman_rho": 0.15558325305770884,
+      "kendall_tau": 0.11012149044893356,
+      "pearson_r": 0.2823865540531975
+    },
+    "test": {
+      "mse": 0.311791542602368,
+      "mae": 0.43567665368575154,
+      "r2": 0.291241282161243,
+      "spearman_rho": 0.3347686018083124,
+      "kendall_tau": 0.24168619208049377,
+      "pearson_r": 0.5667759010834186
+    }
+  },
+  "baseline_results": {
+    "human_rubric_judge": {
+      "mse": 0.843046875,
+      "mae": 0.758125,
+      "r2": -0.9163984283082114,
+      "spearman_rho": 0.3024073707481905,
+      "kendall_tau": 0.2396093792562245,
+      "pearson_r": 0.48809963858268507
+    }
+  },
+  "run_dir": "results/summeval-baseline_20260111_202822",
+  "dimension_dir": "results/summeval-baseline_20260111_202822/dimensions/consistency",
+  "timestamp": "2026-01-11T21:34:18.857235"
+}

@@ -1,0 +1,85 @@
+judges:
+- id: wmt_en_de-quality-judge
+  name: quality Judge
+  version: '1.0'
+  description: Evaluates English-to-German translation quality by assessing meaning
+    preservation and fluency in German. Balances accuracy of conveyed content with
+    naturalness, grammaticality, and idiomaticity of the target text.
+  scoring_description: Assign a score from 0.0 to 4.0 by matching the translation
+    to the closest level using the indicators, prioritizing meaning preservation and
+    then fluency. If evidence spans multiple levels, choose the lowest level that
+    any serious issue warrants.
+  definition: "Quality measures how faithfully the German translation conveys the\
+    \ source\u2019s meaning and how naturally it reads in German. Accuracy covers\
+    \ completeness, correctness of facts, entities, numbers, and logical relations\
+    \ (e.g., polarity/negation), while fluency covers grammar, word order, morphology,\
+    \ and idiomatic phrasing. Minor stylistic differences or acceptable paraphrases\
+    \ are fine if meaning is fully preserved and the German is natural. Severe accuracy\
+    \ errors outweigh fluency strengths; fluent but inaccurate text should score low.\
+    \ The scale compresses the original 0\u20136 human rubric into five levels from\
+    \ Nonsense to Excellent."
+  criteria:
+  - range: [0.0, 0.9]
+    label: Nonsense / Unrelated
+    indicators:
+    - Content is unrelated to the source or not in German; meaning is not preserved.
+    - German is largely incomprehensible (word salad, severe code-switching, broken
+      fragments).
+    - Critical facts are wrong or missing (entities, numbers, dates, negation/polarity
+      flipped).
+    - Massive omissions/additions distort the message beyond recognition.
+    - Multiple sentences are ungrammatical to the point of being unintelligible.
+  - range: [1.0, 1.9]
+    label: Very Low Quality
+    indicators:
+    - Only fragments of meaning are conveyed; key ideas are missing or mistranslated.
+    - Frequent major errors (wrong entities/numbers/roles, incorrect negation) causing
+      misleading content.
+    - Severely broken German syntax or morphology (agreement/case/verb forms) impedes
+      understanding.
+    - Numerous untranslated words or literal calques make the text hard to follow.
+    - Overall comprehension requires guessing; reader effort is high.
+  - range: [2.0, 2.9]
+    label: Medium Quality
+    indicators:
+    - Core meaning is preserved and the text is understandable.
+    - Several significant errors remain in accuracy or fluency (e.g., tense/case/word
+      order issues, awkward calques).
+    - Minor inconsistencies with entities, numbers, or terminology that do not invert
+      core meaning.
+    - Noticeable German unnaturalness or stiffness, but sentences are interpretable.
+    - Some omissions/additions, yet the main message is intact.
+  - range: [3.0, 3.9]
+    label: Good Quality
+    indicators:
+    - Most meaning is accurately preserved; no major accuracy errors.
+    - German is generally fluent with only minor grammatical or stylistic issues (slightly
+      awkward phrasing, minor agreement/punctuation lapses).
+    - Correct handling of key elements (entities, numbers, dates, negation, modality).
+    - Terminology is mostly appropriate and consistent with context/genre.
+    - Natural sentence structure with occasional minor awkwardness that does not impede
+      understanding.
+  - range: [4.0, 4.0]
+    label: Excellent Quality
+    indicators:
+    - All meaning is fully and precisely preserved with no accuracy errors or omissions.
+    - German is natural, idiomatic, and native-like in grammar, word order (V2), morphology,
+      and punctuation.
+    - Appropriate, consistent terminology and register for the context; no calques
+      or awkwardness.
+    - Faithful nuance (tone, modality, emphasis) and correct handling of entities,
+      numbers, and negation.
+    - Reads as if originally written in German; no edit needed.
+  guidelines:
+  - 'Prioritize meaning preservation over fluency: any major accuracy error (entities,
+    numbers, negation, roles, omissions/additions) caps the score at Medium (2.9)
+    or below.'
+  - Accept legitimate paraphrases and reordering typical of natural German; do not
+    penalize for non-literal choices when the meaning and register are correct.
+  - Do not over-penalize minor punctuation or stylistic variation; reserve Excellent
+    only when both accuracy is flawless and German is idiomatic and error-free.
+  score_range: [0.0, 4.0]
+  dataset: wmt_en_de
+  parent_id: null
+  auto_generated: true
+  dimension: quality
