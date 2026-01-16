@@ -1,0 +1,37 @@
+{
+  "total_iterations": 4,
+  "final_n_judges": 7,
+  "final_r2": 0.6949187286876137,
+  "best_r2": 0.6951556309159219,
+  "stop_reason": "plateau_detected_after_2_iterations",
+  "iterations": [
+    {
+      "iteration": 0,
+      "n_judges": 10,
+      "test_r2": 0.6951556309159219,
+      "removed": "explanatory-depth-judge",
+      "added": null
+    },
+    {
+      "iteration": 1,
+      "n_judges": 9,
+      "test_r2": 0.695931892455465,
+      "removed": "honesty-judge",
+      "added": null
+    },
+    {
+      "iteration": 2,
+      "n_judges": 8,
+      "test_r2": 0.695766917287449,
+      "removed": "conciseness-judge",
+      "added": null
+    },
+    {
+      "iteration": 3,
+      "n_judges": 7,
+      "test_r2": 0.6949187286876137,
+      "removed": null,
+      "added": null
+    }
+  ]
+}

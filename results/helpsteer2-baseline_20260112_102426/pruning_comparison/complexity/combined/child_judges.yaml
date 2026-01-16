@@ -1,0 +1,407 @@
+judges:
+- id: helpsteer2-complexity-judge-lexical-sophistication
+  name: Vocabulary Sophistication
+  version: '1.0'
+  description: Measures the breadth and rarity of word choice, emphasizing abstraction
+    and nominalization beyond everyday lexicon. Ratings are anchored to proportions
+    of low-frequency content words (Zipf bands) and nominalizations per 100 words,
+    calibrated with CEFR vocabulary bands. This rubric assesses lexical sophistication,
+    not correctness or clarity.
+  scoring_description: Score how well the response demonstrates vocabulary sophistication
+  definition: Measures the breadth and rarity of word choice, emphasizing abstraction
+    and nominalization beyond everyday lexicon. Ratings are anchored to proportions
+    of low-frequency content words (Zipf bands) and nominalizations per 100 words,
+    calibrated with CEFR vocabulary bands. This rubric assesses lexical sophistication,
+    not correctness or clarity.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Basic
+    indicators:
+    - "CEFR mostly A1-A2; low-frequency content tokens (Zipf < 3.5) \u2264 2%; nominalizations\
+      \ \u2264 1 per 100 words."
+    - Vocabulary is concrete and everyday (e.g., get, make, fix, thing), avoiding
+      Latinate/technical words and abstract nouns.
+  - range:
+    - 1.0
+    - 1.9
+    label: Simple
+    indicators:
+    - "CEFR largely A1-B1; low-frequency content tokens (Zipf < 3.5) 2\u20135%; nominalizations\
+      \ 1\u20132 per 100 words."
+    - Occasional mildly specific words but prefers basic phrasal verbs over single-word
+      Latinate alternatives (e.g., set up vs configure; help vs assistance).
+  - range:
+    - 2.0
+    - 2.9
+    label: Intermediate
+    indicators:
+    - "Mix of A2-B2 with some C1; low-frequency content tokens (Zipf < 3.5) 5\u2013\
+      10%; nominalizations 2\u20134 per 100 words."
+    - Regular use of mid-level abstract/technical terms and some Latinate choices
+      (e.g., configure, parameter, optimize, mitigate) with limited domain jargon.
+    - Shows lexical variation via single-word verbs and precise adjectives (e.g.,
+      assemble, allocate, robust) instead of only basic verbs.
+  - range:
+    - 3.0
+    - 3.9
+    label: Advanced
+    indicators:
+    - "Many B2-C1 items; low-frequency content tokens (Zipf < 3.5) 10\u201318%; nominalizations\
+      \ 4\u20137 per 100 words."
+    - Frequent abstract/Latinate lexis and unglossed discipline terms (e.g., facilitate,
+      orthogonal, granular, throughput), replacing phrasal verbs with compact verbs.
+    - Preference for derived nouns (-tion, -ity, -ance) and noun phrases (e.g., implementation
+      details, risk mitigation strategy).
+  - range:
+    - 4.0
+    - 4.0
+    label: Expert
+    indicators:
+    - Dominant C1-C2; low-frequency content tokens (Zipf < 3.5) > 18%; nominalizations
+      > 7 per 100 words.
+    - Dense specialized terminology and rare items used fluently without explanation
+      (e.g., heteroskedasticity, manifold, epistemic status, operationalization, orthogonality).
+    - Highly abstract, noun-heavy style with layered nominal compounds and precise
+      qualifiers (e.g., marginal identifiability constraints; calibration monotonicity),
+      minimal reliance on everyday verbs.
+  guidelines:
+  - High proportion of low-frequency words or advanced synonyms instead of common
+    equivalents
+  - Frequent nominalizations and abstract nouns (e.g., optimization, heterogeneity)
+  - Preference for precise qualifiers over plain wording (e.g., necessary and sufficient,
+    orthogonal)
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-terminology-density
+  name: Technical Terminology and Acronyms
+  version: '1.0'
+  description: Measures the density of domain-specific terms and acronyms and whether
+    they are defined or expanded on first use. Count unique technical terms/acronyms
+    per 100 words (types, not tokens), excluding everyday vocabulary, and record the
+    share that are explicitly defined at first mention. For texts shorter or longer
+    than 100 words, scale counts proportionally to a per-100-words rate.
+  scoring_description: Score how well the response demonstrates technical terminology
+    and acronyms
+  definition: Measures the density of domain-specific terms and acronyms and whether
+    they are defined or expanded on first use. Count unique technical terms/acronyms
+    per 100 words (types, not tokens), excluding everyday vocabulary, and record the
+    share that are explicitly defined at first mention. For texts shorter or longer
+    than 100 words, scale counts proportionally to a per-100-words rate.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Basic
+    indicators:
+    - "0\u20131 unique technical terms/acronyms per 100 words."
+    - Any rare term is immediately defined in plain language; acronyms expanded on
+      first use.
+    - Meaning does not rely on specialized terminology.
+  - range:
+    - 1.0
+    - 1.9
+    label: Simple
+    indicators:
+    - "2\u20134 unique technical terms/acronyms per 100 words."
+    - "\u226590% of terms/acronyms are expanded or clearly defined on first use."
+    - General wording carries the meaning; jargon is optional and sparing.
+  - range:
+    - 2.0
+    - 2.9
+    label: Intermediate
+    indicators:
+    - "5\u20138 unique technical terms/acronyms per 100 words."
+    - "About 50\u201380% of terms/acronyms are defined on first use; some assumed\
+      \ knowledge."
+    - Some reliance on introduced terms, with brief context mitigating ambiguity.
+  - range:
+    - 3.0
+    - 3.9
+    label: Advanced
+    indicators:
+    - "9\u201314 unique technical terms/acronyms per 100 words."
+    - <50% of terms/acronyms are defined on first use; several left implicit.
+    - Understanding substantially depends on jargon familiarity with limited scaffolding.
+  - range:
+    - 4.0
+    - 4.0
+    label: Expert
+    indicators:
+    - "\u226515 unique technical terms/acronyms per 100 words."
+    - "\u226410% of terms/acronyms are defined on first use; acronyms and shorthand\
+      \ used without expansion."
+    - Heavy reliance on dense, domain-specific terminology throughout; assumes reader
+      fluency.
+  guidelines:
+  - Multiple domain terms or acronyms per 100 words (e.g., SDK, OAuth, heteroskedasticity)
+  - Acronyms introduced without expansion and relied upon for meaning
+  - Jargon integrated as core semantics rather than paraphrased for lay readers
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-syntactic-complexity
+  name: Syntactic and Structural Complexity
+  version: '1.0'
+  description: Measures how structurally complex the writing is, focusing on clause
+    embedding, subordination, hedging/modality, and variation in sentence length.
+    Scoring emphasizes quantitative markers (mean sentence length, clauses per sentence,
+    frequency of subordinators/modals) and the dominant syntactic register, independent
+    of correctness or content. Anchor examples illustrate typical sentences at each
+    level.
+  scoring_description: Score how well the response demonstrates syntactic and structural
+    complexity
+  definition: Measures how structurally complex the writing is, focusing on clause
+    embedding, subordination, hedging/modality, and variation in sentence length.
+    Scoring emphasizes quantitative markers (mean sentence length, clauses per sentence,
+    frequency of subordinators/modals) and the dominant syntactic register, independent
+    of correctness or content. Anchor examples illustrate typical sentences at each
+    level.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Basic
+    indicators:
+    - "Quantitative markers: Mean sentence length (MSL) \u2264 10 words; Clauses per\
+      \ sentence (C/S) \u2248 1.0\u20131.1; Subordinators per 100 words (SUB/100)\
+      \ \u2264 1; sentence-length variation low (CV \u2264 0.25)."
+    - 'Structure/features: Single independent clauses; imperatives or simple declaratives;
+      no hedging or modals beyond can/will used literally; minimal coordination, virtually
+      no subordination.'
+    - 'Anchor example: "Click Save. Enter your name. The form closes."'
+  - range:
+    - 1.0
+    - 1.9
+    label: Simple
+    indicators:
+    - "Quantitative markers: MSL 11\u201315 words; C/S 1.0\u20131.3; SUB/100 1\u2013\
+      3; CV 0.25\u20130.40."
+    - 'Structure/features: Mostly simple or coordinated clauses (and, but); rare subordination
+      (because/when) and few relative clauses; hedging/modals are rare and unlayered
+      (may, might used sparingly).'
+    - 'Anchor example: "Open the app and sign in, then choose Settings. If prompted,
+      enter your PIN."'
+  - range:
+    - 2.0
+    - 2.9
+    label: Intermediate
+    indicators:
+    - "Quantitative markers: MSL 16\u201322 words; C/S 1.4\u20131.9; SUB/100 4\u2013\
+      7; CV 0.35\u20130.55."
+    - 'Structure/features: Mix of compound and complex sentences with some relative
+      and adverbial clauses; occasional non-finite clauses (to/ing) and hedging/modals
+      appear (e.g., may, generally, typically).'
+    - 'Anchor example: "If the service is unavailable, the client retries the request,
+      which may increase latency during peak hours."'
+  - range:
+    - 3.0
+    - 3.9
+    label: Advanced
+    indicators:
+    - "Quantitative markers: MSL 23\u201330 words; C/S 2.0\u20132.7; SUB/100 8\u2013\
+      12; CV 0.50\u20130.70."
+    - 'Structure/features: Frequent subordination and embedded relative/non-finite
+      clauses; layered conditionals and concessives; routine hedging with precise
+      modality (may/might/should/likely) and parenthetical qualifiers.'
+    - 'Anchor example: "Although the cache typically reduces fetch times, which it
+      often does in steady state, it can, under contention, exacerbate tail latency
+      and should therefore be tuned cautiously."'
+  - range:
+    - 4.0
+    - 4.0
+    label: Expert
+    indicators:
+    - "Quantitative markers: MSL \u2265 31 words; C/S \u2265 2.8; SUB/100 \u2265 13;\
+      \ CV \u2265 0.70 (very short sentences interspersed with highly embedded ones)."
+    - 'Structure/features: Dense, nested embedding with stacked relative, concessive,
+      and conditional clauses; frequent non-finite and appositive structures; pervasive
+      hedging and precise modality interwoven with parentheticals or asides.'
+    - "Anchor example: \"While the estimator\u2014which, when regularized appropriately,\
+      \ can mitigate variance under small-n regimes\u2014often outperforms naive baselines,\
+      \ it may, if hyperparameters drift or covariate shift intensifies, induce bias\
+      \ that is nontrivial to diagnose. Proceed cautiously.\""
+  guidelines:
+  - Average clauses per sentence exceeds simple baseline (e.g., frequent subordination/relative
+    clauses)
+  - Regular use of hedges/modality and precise conditionals (e.g., may, unless, provided
+    that)
+  - Long or nested sentences with appositives, parentheticals, or complex coordination
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-assumed-knowledge
+  name: Assumed Background Knowledge
+  version: '1.0'
+  description: Rates how much prior domain familiarity a response presumes from the
+    reader. Low scores indicate extensive scaffolding with definitions, lay rephrasing,
+    and examples; high scores indicate expert-only discourse with little to no onboarding
+    or context.
+  scoring_description: Score how well the response demonstrates assumed background
+    knowledge
+  definition: Rates how much prior domain familiarity a response presumes from the
+    reader. Low scores indicate extensive scaffolding with definitions, lay rephrasing,
+    and examples; high scores indicate expert-only discourse with little to no onboarding
+    or context.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Fully Scaffolded
+    indicators:
+    - Defines all domain terms and expands acronyms at first use with plain-language
+      rephrasing.
+    - Provides step-by-step context and concrete examples or analogies before and
+      during tasks.
+    - States prerequisites explicitly and avoids assuming any prior familiarity.
+  - range:
+    - 1.0
+    - 1.9
+    label: Light Scaffolding
+    indicators:
+    - Explains key terms in simple language and expands most acronyms; includes a
+      brief overview.
+    - Offers at least one example or analogy and clarifies why steps are taken.
+    - Assumes only everyday knowledge; notes basic prerequisites.
+  - range:
+    - 2.0
+    - 2.9
+    label: Moderate Scaffolding
+    indicators:
+    - Uses several domain terms with brief parenthetical definitions or quick clarifications.
+    - Provides a concise overview and high-level steps but omits detailed explanations
+      and some context.
+    - Assumes general technical literacy or familiarity with common tools, not specialized
+      frameworks.
+  - range:
+    - 3.0
+    - 3.9
+    label: Familiarity Assumed
+    indicators:
+    - Employs specialized terms and acronyms with minimal or no definitions; may include
+      terse references.
+    - Presents directives or procedures without examples or justification.
+    - Expects readers to infer prerequisites and context from domain norms.
+  - range:
+    - 4.0
+    - 4.0
+    label: Expert-Only
+    indicators:
+    - Dense, unexpanded jargon and multiple acronyms used throughout with no lay rephrasing.
+    - Provides instructions or arguments that omit context, rationale, examples, and
+      prerequisites entirely.
+    - Relies on advanced references (e.g., standards, theorems, specs) as assumed
+      knowledge.
+  guidelines:
+  - Minimal or no definitions/explanations for nontrivial concepts
+  - References to domain practices or concepts without context or analogies
+  - Instructions that skip foundational steps, implying shared expertise
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity
+- id: helpsteer2-complexity-judge-formalism-and-references
+  name: Formalism and Professional Conventions
+  version: '1.0'
+  description: Measures how strongly a response employs professional standards, protocols,
+    formal notation, schemas, and cross-references typical of scholarly or industry
+    documentation. Distinguishes casual jargon from true formal artifacts (e.g., RFC/ISO
+    identifiers, section citations, typed schemas, equations). Higher scores reflect
+    frequent, central, and precise use of such artifacts to structure and justify
+    the content.
+  scoring_description: Score how well the response demonstrates formalism and professional
+    conventions
+  definition: Measures how strongly a response employs professional standards, protocols,
+    formal notation, schemas, and cross-references typical of scholarly or industry
+    documentation. Distinguishes casual jargon from true formal artifacts (e.g., RFC/ISO
+    identifiers, section citations, typed schemas, equations). Higher scores reflect
+    frequent, central, and precise use of such artifacts to structure and justify
+    the content.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: None
+    indicators:
+    - No standards/protocol citations, identifiers, sections, or formal notation;
+      relies on generic prose.
+    - Jargon may appear, but there are no schemas, equations, parameter names, or
+      cross-references.
+    - Units, definitions, and constraints are omitted or expressed informally.
+  - range:
+    - 1.0
+    - 1.9
+    label: Limited
+    indicators:
+    - Incidental, non-specific nods to formality (e.g., "use HTTPS" or "follow ISO")
+      without IDs, versions, or sections; not central to the argument.
+    - Occasional parameter or field names appear but lack formal definitions, types,
+      or constraints; no schemas/equations.
+    - No normative language, versioning, or cross-references; units used inconsistently
+      or not at all.
+  - range:
+    - 2.0
+    - 2.9
+    label: Moderate
+    indicators:
+    - Includes at least one precise formal reference (e.g., RFC/ISO number) or exact
+      API/CLI parameter names with types or defaults.
+    - Provides a small, correct formal artifact (e.g., minimal JSON/XML snippet, simple
+      equation, brief error code list) that supports but does not organize the whole
+      response.
+    - Limited cross-referencing or versioning; formal elements appear in parts rather
+      than consistently throughout.
+  - range:
+    - 3.0
+    - 3.9
+    label: Advanced
+    indicators:
+    - "Multiple specific standards/protocol references (e.g., RFC 7231 \xA74.3.1;\
+      \ ISO/IEC 27001:2013) or spec-compliant terminology used correctly and centrally."
+    - 'Structured formal artifacts shape the response: validated schemas, function
+      signatures, configuration stanzas, units and constraints, or state-machine descriptions.'
+    - 'Consistent professional conventions: normative keywords (MUST/SHOULD), versioning,
+      and internal cross-references that tie claims to sources or sections.'
+  - range:
+    - 4.0
+    - 4.0
+    label: Expert
+    indicators:
+    - 'Dense, integrated use of formalism across the response: interlinked standards
+      with identifiers and sections, formal definitions and invariants, precise parameterization
+      with units/domains, and explicit assumptions.'
+    - Provides comprehensive, specification-grade artifacts (e.g., full JSON Schema/OpenAPI
+      fragment, UML/ER constraints, algorithm pseudocode with complexity, or mathematical
+      notation) that govern structure and behavior.
+    - "Traceable citations and cross-references (e.g., \"per RFC 5280 \xA74.2.1.2\"\
+      ), accurate normative language, documented versioning/change control, and edge-case\
+      \ handling aligned to the cited standards."
+  guidelines:
+  - Cites or relies on standards/frameworks/protocols (e.g., RFCs, ISO, API/CLI flags)
+    as shared knowledge
+  - Includes formal notation, schemas, parameter signatures, or precise definitions
+  - Interlinks specialized concepts across subdomains with minimal scaffolding
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-complexity-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: complexity

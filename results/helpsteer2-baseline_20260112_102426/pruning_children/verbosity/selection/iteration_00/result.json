@@ -1,0 +1,105 @@
+{
+  "iteration": 0,
+  "judge_names": [
+    "helpsteer2-verbosity-judge-minimal-overage",
+    "helpsteer2-verbosity-judge-structural-expansion",
+    "helpsteer2-verbosity-judge-extras-density",
+    "helpsteer2-verbosity-judge-redundancy",
+    "helpsteer2-verbosity-judge-framing-padding"
+  ],
+  "n_judges": 5,
+  "train_metrics": {
+    "mse": 0.36940901041296625,
+    "mae": 0.4506922012044584,
+    "r2": 0.43660678186656043,
+    "spearman_rho": 0.569111539376213,
+    "kendall_tau": 0.4619853936087598,
+    "pearson_r": 0.6607694335776744
+  },
+  "test_metrics": {
+    "mse": 0.433638592482464,
+    "mae": 0.47559988471590203,
+    "r2": 0.2511853004965222,
+    "spearman_rho": 0.5104592250214662,
+    "kendall_tau": 0.4150706822385293,
+    "pearson_r": 0.5199304278356207
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.2511853004965222,
+      "mse": 0.433638592482464,
+      "mae": 0.47559988471590203,
+      "spearman_rho": 0.5104592250214662,
+      "kendall_tau": 0.4150706822385293,
+      "pearson_r": 0.5199304278356207
+    },
+    "coverage": {
+      "variance_explained": 0.3036939531870856,
+      "coverage_score": 0.3036939531870856
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.2768972461406641,
+      "max_pairwise_correlation": 0.46844784744534085,
+      "redundancy_score": 0.723102753859336,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 3.5194268822657806,
+      "diversity_index": 0.7038853764531561
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.6161890560267231,
+      "entropy": 0.5546830720417044
+    },
+    "composite_score": 0.4466105368985244
+  },
+  "importance_scores": {
+    "helpsteer2-verbosity-judge-minimal-overage": 0.05201730737798473,
+    "helpsteer2-verbosity-judge-structural-expansion": 0.36636750694511677,
+    "helpsteer2-verbosity-judge-extras-density": 0.08397890094322527,
+    "helpsteer2-verbosity-judge-redundancy": 1.0,
+    "helpsteer2-verbosity-judge-framing-padding": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-verbosity-judge-extras-density' scores are low",
+        "severity": 0.5222265805596416,
+        "affected_samples": 98,
+        "characteristics": {
+          "judge": "helpsteer2-verbosity-judge-extras-density",
+          "low_score_error_var": 0.596519184347272,
+          "high_score_error_var": 0.27556531137691953
+        },
+        "suggested_dimension": "helpsteer2-verbosity-judge-extras-density-specificity"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": 0.019507358143997677,
+      "std_error": 0.6582234084721583,
+      "mean_abs_error": 0.47559988471590203,
+      "median_abs_error": 0.3324928172778132,
+      "max_abs_error": 3.0442245139534334,
+      "pct_high_error": 35.5,
+      "skewness": 0.6530358018880404,
+      "kurtosis": 2.6916368980612786
+    },
+    "judge_error_correlations": {
+      "helpsteer2-verbosity-judge-minimal-overage": 0.018911722376074858,
+      "helpsteer2-verbosity-judge-structural-expansion": -0.012930966351366792,
+      "helpsteer2-verbosity-judge-extras-density": -0.012932278947336374,
+      "helpsteer2-verbosity-judge-redundancy": -0.18452281628696968,
+      "helpsteer2-verbosity-judge-framing-padding": -0.11873667602944943
+    },
+    "suggested_dimensions": [
+      "helpsteer2-verbosity-judge-extras-density-specificity"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 35.5% samples with error > 0.5\nMean absolute error: 0.476\nError skewness: 0.653\n\nIdentified 1 gap patterns:\n  1. [high_variance] High error variance when 'helpsteer2-verbosity-judge-extras-density' scores are low\n     Severity: 0.52, Affected: 98 samples\n\nSuggested new dimensions: helpsteer2-verbosity-judge-extras-density-specificity"
+  },
+  "improvement": Infinity,
+  "should_stop": false,
+  "stop_reason": null
+}

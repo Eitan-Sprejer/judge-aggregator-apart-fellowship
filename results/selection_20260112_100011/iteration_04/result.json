@@ -1,0 +1,147 @@
+{
+  "iteration": 4,
+  "judge_names": [
+    "truthfulness-judge",
+    "harmlessness-judge",
+    "helpfulness-judge",
+    "instruction-following-judge",
+    "clarity-judge",
+    "creativity-judge"
+  ],
+  "n_judges": 6,
+  "train_metrics": {
+    "mse": 2.385640758597515,
+    "mae": 1.1096942876594953,
+    "r2": 0.656568621775132,
+    "spearman_rho": 0.7396406843843362,
+    "kendall_tau": 0.5667011071464345,
+    "pearson_r": 0.8102930135932861
+  },
+  "test_metrics": {
+    "mse": 2.207651412860468,
+    "mae": 1.0863845566397834,
+    "r2": 0.6839378838271067,
+    "spearman_rho": 0.7224394767182044,
+    "kendall_tau": 0.5483919843016012,
+    "pearson_r": 0.8287282007429313
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.6839378838271067,
+      "mse": 2.207651412860468,
+      "mae": 1.0863845566397834,
+      "spearman_rho": 0.7224394767182045,
+      "kendall_tau": 0.5483919843016013,
+      "pearson_r": 0.8287282007429312
+    },
+    "coverage": {
+      "variance_explained": 0.68409856616882,
+      "coverage_score": 0.68409856616882
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.6155724627483352,
+      "max_pairwise_correlation": 0.8142447755918075,
+      "redundancy_score": 0.3844275372516648,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 1.8068006713598814,
+      "diversity_index": 0.3011334452266469
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.5807559024848927,
+      "entropy": 0.6533196348263377
+    },
+    "composite_score": 0.5475070632602691
+  },
+  "importance_scores": {
+    "truthfulness-judge": 0.5793083968671151,
+    "harmlessness-judge": 0.04294834529058656,
+    "helpfulness-judge": 0.0,
+    "instruction-following-judge": 1.0,
+    "clarity-judge": 0.15406747965058876,
+    "creativity-judge": 0.1278801302651217
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpfulness-judge' scores are low",
+        "severity": 0.5229530542256438,
+        "affected_samples": 291,
+        "characteristics": {
+          "judge": "helpfulness-judge",
+          "low_score_error_var": 3.01436696423244,
+          "high_score_error_var": 1.431031341090419
+        },
+        "suggested_dimension": "helpfulness-judge-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'instruction-following-judge' scores are low",
+        "severity": 0.553289672777299,
+        "affected_samples": 180,
+        "characteristics": {
+          "judge": "instruction-following-judge",
+          "low_score_error_var": 3.541144929177805,
+          "high_score_error_var": 1.5900411282767282
+        },
+        "suggested_dimension": "instruction-following-judge-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'clarity-judge' scores are low",
+        "severity": 0.5005909155569613,
+        "affected_samples": 262,
+        "characteristics": {
+          "judge": "clarity-judge",
+          "low_score_error_var": 3.048512066181212,
+          "high_score_error_var": 1.5124567463381822
+        },
+        "suggested_dimension": "clarity-judge-specificity"
+      },
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'creativity-judge' scores are low",
+        "severity": 0.5429726025488337,
+        "affected_samples": 291,
+        "characteristics": {
+          "judge": "creativity-judge",
+          "low_score_error_var": 3.0636232056168473,
+          "high_score_error_var": 1.4005790933260358
+        },
+        "suggested_dimension": "creativity-judge-specificity"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": 1.2812505093429867e-05,
+      "std_error": 1.4858167493659196,
+      "mean_abs_error": 1.0863845566397834,
+      "median_abs_error": 0.7969201150105416,
+      "max_abs_error": 6.434365538221519,
+      "pct_high_error": 64.16666666666667,
+      "skewness": -0.07519444900725113,
+      "kurtosis": 1.6806733955102295
+    },
+    "judge_error_correlations": {
+      "truthfulness-judge": 0.08348828960993707,
+      "harmlessness-judge": 0.019246422135954996,
+      "helpfulness-judge": 0.09796772028363804,
+      "instruction-following-judge": 0.13158837236992482,
+      "clarity-judge": 0.10781168670360093,
+      "creativity-judge": 0.0023208857451944634
+    },
+    "suggested_dimensions": [
+      "helpfulness-judge-specificity",
+      "instruction-following-judge-specificity",
+      "clarity-judge-specificity",
+      "creativity-judge-specificity"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 64.2% samples with error > 0.5\nMean absolute error: 1.086\nError skewness: -0.075\n\nIdentified 4 gap patterns:\n  1. [high_variance] High error variance when 'helpfulness-judge' scores are low\n     Severity: 0.52, Affected: 291 samples\n  2. [high_variance] High error variance when 'instruction-following-judge' scores are low\n     Severity: 0.55, Affected: 180 samples\n  3. [high_variance] High error variance when 'clarity-judge' scores are low\n     Severity: 0.50, Affected: 262 samples\n  4. [high_variance] High error variance when 'creativity-judge' scores are low\n     Severity: 0.54, Affected: 291 samples\n\nSuggested new dimensions: helpfulness-judge-specificity, instruction-following-judge-specificity, clarity-judge-specificity, creativity-judge-specificity"
+  },
+  "improvement": -0.01199400862835831,
+  "should_stop": false,
+  "stop_reason": null
+}

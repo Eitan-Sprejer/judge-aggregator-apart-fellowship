@@ -1,0 +1,10 @@
+truthfulness-judge
+harmlessness-judge
+helpfulness-judge
+honesty-judge
+explanatory-depth-judge
+instruction-following-judge
+clarity-judge
+conciseness-judge
+logical-consistency-judge
+creativity-judge

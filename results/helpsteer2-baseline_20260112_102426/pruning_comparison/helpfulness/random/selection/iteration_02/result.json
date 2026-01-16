@@ -1,0 +1,101 @@
+{
+  "iteration": 2,
+  "judge_names": [
+    "helpsteer2-helpfulness-judge-completeness-of-solution",
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions",
+    "helpsteer2-helpfulness-judge-organization-for-immediate-application"
+  ],
+  "n_judges": 3,
+  "train_metrics": {
+    "mse": 1.3940273800398872,
+    "mae": 0.9348311773779536,
+    "r2": 0.15983776114426929,
+    "spearman_rho": 0.29676393694788694,
+    "kendall_tau": 0.23035844251752416,
+    "pearson_r": 0.3998066822465583
+  },
+  "test_metrics": {
+    "mse": 1.4120237997509357,
+    "mae": 0.9704085035909393,
+    "r2": 0.2841088015864247,
+    "spearman_rho": 0.4719158986862295,
+    "kendall_tau": 0.3640759985537895,
+    "pearson_r": 0.5606514370207986
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.2841088015864247,
+      "mse": 1.4120237997509357,
+      "mae": 0.9704085035909393,
+      "spearman_rho": 0.47191589868622946,
+      "kendall_tau": 0.3640759985537895,
+      "pearson_r": 0.5606514370207984
+    },
+    "coverage": {
+      "variance_explained": 0.31598412759531647,
+      "coverage_score": 0.31598412759531647
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.6611818741165506,
+      "max_pairwise_correlation": 0.7155638592889252,
+      "redundancy_score": 0.3388181258834494,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 1.5850171607747863,
+      "diversity_index": 0.5283390535915954
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.35927211399695436,
+      "entropy": 0.6281710427739573
+    },
+    "composite_score": 0.3502717820486422
+  },
+  "importance_scores": {
+    "helpsteer2-helpfulness-judge-completeness-of-solution": 0.8556037070122746,
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 1.0,
+    "helpsteer2-helpfulness-judge-organization-for-immediate-application": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [],
+    "overall_error_stats": {
+      "mean_error": -0.07947885237270048,
+      "std_error": 1.1856251143495797,
+      "mean_abs_error": 0.9704085035909393,
+      "median_abs_error": 0.8330232742824459,
+      "max_abs_error": 3.259466040441695,
+      "pct_high_error": 74.5,
+      "skewness": -0.5296058693634662,
+      "kurtosis": -0.4477696605647794
+    },
+    "judge_error_correlations": {
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 0.14522113210862567,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.2521225062123058,
+      "helpsteer2-helpfulness-judge-organization-for-immediate-application": 0.17837479220685679
+    },
+    "suggested_dimensions": [],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 74.5% samples with error > 0.5\nMean absolute error: 0.970\nError skewness: -0.530\n\nIdentified 0 gap patterns:"
+  },
+  "attribution_correlations": {
+    "helpsteer2-helpfulness-judge-completeness-of-solution": {
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 1.0,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.5670152248846023,
+      "helpsteer2-helpfulness-judge-organization-for-immediate-application": 0.4245573901480916
+    },
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": {
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 0.5670152248846023,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 1.0,
+      "helpsteer2-helpfulness-judge-organization-for-immediate-application": 0.14730773706005867
+    },
+    "helpsteer2-helpfulness-judge-organization-for-immediate-application": {
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 0.4245573901480916,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.14730773706005867,
+      "helpsteer2-helpfulness-judge-organization-for-immediate-application": 1.0
+    }
+  },
+  "improvement": -0.033175652402286926,
+  "should_stop": true,
+  "stop_reason": "target_judges_reached_3"
+}

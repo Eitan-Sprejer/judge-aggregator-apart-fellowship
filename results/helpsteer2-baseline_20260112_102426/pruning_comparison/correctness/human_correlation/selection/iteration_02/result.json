@@ -1,0 +1,101 @@
+{
+  "iteration": 2,
+  "judge_names": [
+    "helpsteer2-correctness-judge-requirement-coverage",
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination",
+    "helpsteer2-correctness-judge-procedural-correctness"
+  ],
+  "n_judges": 3,
+  "train_metrics": {
+    "mse": 1.2382940833407823,
+    "mae": 0.8737458406780295,
+    "r2": 0.2539947687566826,
+    "spearman_rho": 0.40685297469607234,
+    "kendall_tau": 0.3184960174396142,
+    "pearson_r": 0.504012923319537
+  },
+  "test_metrics": {
+    "mse": 1.3780623795228968,
+    "mae": 0.9513912602480167,
+    "r2": 0.2887419976656016,
+    "spearman_rho": 0.47574108263626563,
+    "kendall_tau": 0.3692866176439765,
+    "pearson_r": 0.537720387431198
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.2887419976656016,
+      "mse": 1.3780623795228968,
+      "mae": 0.9513912602480167,
+      "spearman_rho": 0.4757410826362657,
+      "kendall_tau": 0.3692866176439765,
+      "pearson_r": 0.537720387431198
+    },
+    "coverage": {
+      "variance_explained": 0.2895438276340022,
+      "coverage_score": 0.2895438276340022
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.5981576617666965,
+      "max_pairwise_correlation": 0.6870026059739336,
+      "redundancy_score": 0.4018423382333035,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 1.6890725106057367,
+      "diversity_index": 0.5630241702019122
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.5114974493242253,
+      "entropy": 0.4938798486623682
+    },
+    "composite_score": 0.36637886628008426
+  },
+  "importance_scores": {
+    "helpsteer2-correctness-judge-requirement-coverage": 0.30336264119009193,
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination": 1.0,
+    "helpsteer2-correctness-judge-procedural-correctness": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [],
+    "overall_error_stats": {
+      "mean_error": 0.022406550386148357,
+      "std_error": 1.1736951588988895,
+      "mean_abs_error": 0.9513912602480167,
+      "median_abs_error": 0.7709542369424298,
+      "max_abs_error": 3.3633333964980237,
+      "pct_high_error": 70.0,
+      "skewness": -0.44705423648526316,
+      "kurtosis": 0.1743383278383175
+    },
+    "judge_error_correlations": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.0667553129293908,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": -0.05144517628486771,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.041183848236324705
+    },
+    "suggested_dimensions": [],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 70.0% samples with error > 0.5\nMean absolute error: 0.951\nError skewness: -0.447\n\nIdentified 0 gap patterns:"
+  },
+  "attribution_correlations": {
+    "helpsteer2-correctness-judge-requirement-coverage": {
+      "helpsteer2-correctness-judge-requirement-coverage": 1.0,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 0.4960678255648111,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.629192673890214
+    },
+    "helpsteer2-correctness-judge-grounding-and-non-hallucination": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.4960678255648111,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 1.0,
+      "helpsteer2-correctness-judge-procedural-correctness": 0.5563867231364914
+    },
+    "helpsteer2-correctness-judge-procedural-correctness": {
+      "helpsteer2-correctness-judge-requirement-coverage": 0.629192673890214,
+      "helpsteer2-correctness-judge-grounding-and-non-hallucination": 0.5563867231364914,
+      "helpsteer2-correctness-judge-procedural-correctness": 1.0
+    }
+  },
+  "improvement": 0.001424417509443665,
+  "should_stop": true,
+  "stop_reason": "target_judges_reached_3"
+}

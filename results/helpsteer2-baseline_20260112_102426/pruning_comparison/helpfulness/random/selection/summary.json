@@ -1,0 +1,30 @@
+{
+  "total_iterations": 3,
+  "final_n_judges": 3,
+  "final_r2": 0.2841088015864247,
+  "best_r2": 0.31728445398871163,
+  "stop_reason": "target_judges_reached_3",
+  "iterations": [
+    {
+      "iteration": 0,
+      "n_judges": 5,
+      "test_r2": 0.31728445398871163,
+      "removed": "helpsteer2-helpfulness-judge-relevance-to-intent",
+      "added": null
+    },
+    {
+      "iteration": 1,
+      "n_judges": 4,
+      "test_r2": 0.281082183748918,
+      "removed": "helpsteer2-helpfulness-judge-actionability-and-specificity",
+      "added": null
+    },
+    {
+      "iteration": 2,
+      "n_judges": 3,
+      "test_r2": 0.2841088015864247,
+      "removed": null,
+      "added": null
+    }
+  ]
+}

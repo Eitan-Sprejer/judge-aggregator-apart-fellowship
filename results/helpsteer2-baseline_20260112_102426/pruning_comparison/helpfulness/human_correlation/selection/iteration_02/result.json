@@ -1,0 +1,116 @@
+{
+  "iteration": 2,
+  "judge_names": [
+    "helpsteer2-helpfulness-judge-relevance-to-intent",
+    "helpsteer2-helpfulness-judge-completeness-of-solution",
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions"
+  ],
+  "n_judges": 3,
+  "train_metrics": {
+    "mse": 1.3462513494850266,
+    "mae": 0.920745717521239,
+    "r2": 0.18863175570229818,
+    "spearman_rho": 0.33335981226941835,
+    "kendall_tau": 0.2598642979264759,
+    "pearson_r": 0.434330375879451
+  },
+  "test_metrics": {
+    "mse": 1.3631932133588154,
+    "mae": 0.9562678964337123,
+    "r2": 0.3088657405400449,
+    "spearman_rho": 0.48272941483728943,
+    "kendall_tau": 0.3713818485536384,
+    "pearson_r": 0.5731242149166969
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.3088657405400449,
+      "mse": 1.3631932133588154,
+      "mae": 0.9562678964337123,
+      "spearman_rho": 0.4827294148372894,
+      "kendall_tau": 0.3713818485536384,
+      "pearson_r": 0.573124214916697
+    },
+    "coverage": {
+      "variance_explained": 0.33752806142525116,
+      "coverage_score": 0.33752806142525116
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.7056596420143978,
+      "max_pairwise_correlation": 0.7184057725365182,
+      "redundancy_score": 0.2943403579856022,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 1.4938197468456296,
+      "diversity_index": 0.49793991561520984
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.3961088389508365,
+      "entropy": 0.6146912875520874
+    },
+    "composite_score": 0.3495079632212306
+  },
+  "importance_scores": {
+    "helpsteer2-helpfulness-judge-relevance-to-intent": 1.0,
+    "helpsteer2-helpfulness-judge-completeness-of-solution": 0.6830391069121742,
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-helpfulness-judge-completeness-of-solution' scores are low",
+        "severity": 0.5112954527123332,
+        "affected_samples": 69,
+        "characteristics": {
+          "judge": "helpsteer2-helpfulness-judge-completeness-of-solution",
+          "low_score_error_var": 1.9791287113377862,
+          "high_score_error_var": 0.9577030671986488
+        },
+        "suggested_dimension": "helpsteer2-helpfulness-judge-completeness-of-solution-specificity"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": -0.05985833109456115,
+      "std_error": 1.1660232388582097,
+      "mean_abs_error": 0.9562678964337123,
+      "median_abs_error": 0.8128465223234169,
+      "max_abs_error": 3.326107877751964,
+      "pct_high_error": 76.0,
+      "skewness": -0.49565643206682597,
+      "kurtosis": -0.3182448858840399
+    },
+    "judge_error_correlations": {
+      "helpsteer2-helpfulness-judge-relevance-to-intent": 0.16227194705675785,
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 0.13823615720043447,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.2343810376949718
+    },
+    "suggested_dimensions": [
+      "helpsteer2-helpfulness-judge-completeness-of-solution-specificity"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 76.0% samples with error > 0.5\nMean absolute error: 0.956\nError skewness: -0.496\n\nIdentified 1 gap patterns:\n  1. [high_variance] High error variance when 'helpsteer2-helpfulness-judge-completeness-of-solution' scores are low\n     Severity: 0.51, Affected: 69 samples\n\nSuggested new dimensions: helpsteer2-helpfulness-judge-completeness-of-solution-specificity"
+  },
+  "attribution_correlations": {
+    "helpsteer2-helpfulness-judge-relevance-to-intent": {
+      "helpsteer2-helpfulness-judge-relevance-to-intent": 1.0,
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 0.6944181219298057,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.2897043698417579
+    },
+    "helpsteer2-helpfulness-judge-completeness-of-solution": {
+      "helpsteer2-helpfulness-judge-relevance-to-intent": 0.6944181219298057,
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 1.0,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.34191055528273717
+    },
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": {
+      "helpsteer2-helpfulness-judge-relevance-to-intent": 0.2897043698417579,
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 0.34191055528273717,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 1.0
+    }
+  },
+  "improvement": -0.009183263597528413,
+  "should_stop": true,
+  "stop_reason": "target_judges_reached_3"
+}

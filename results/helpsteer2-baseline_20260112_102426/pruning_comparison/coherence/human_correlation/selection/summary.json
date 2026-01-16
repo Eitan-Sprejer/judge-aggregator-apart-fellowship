@@ -1,0 +1,30 @@
+{
+  "total_iterations": 3,
+  "final_n_judges": 3,
+  "final_r2": 0.10389651656901944,
+  "best_r2": 0.10389651656901944,
+  "stop_reason": "target_judges_reached_3",
+  "iterations": [
+    {
+      "iteration": 0,
+      "n_judges": 5,
+      "test_r2": -0.012686211238321476,
+      "removed": "helpsteer2-coherence-judge-internal-consistency",
+      "added": null
+    },
+    {
+      "iteration": 1,
+      "n_judges": 4,
+      "test_r2": 0.09093750567724368,
+      "removed": "helpsteer2-coherence-judge-structure-and-formatting-support",
+      "added": null
+    },
+    {
+      "iteration": 2,
+      "n_judges": 3,
+      "test_r2": 0.10389651656901944,
+      "removed": null,
+      "added": null
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "total_iterations": 3,
+  "final_n_judges": 3,
+  "final_r2": 0.1740275458107381,
+  "best_r2": 0.1945006994160483,
+  "stop_reason": "target_judges_reached_3",
+  "iterations": [
+    {
+      "iteration": 0,
+      "n_judges": 5,
+      "test_r2": 0.1856751935714105,
+      "removed": "helpsteer2-complexity-judge-assumed-knowledge",
+      "added": null
+    },
+    {
+      "iteration": 1,
+      "n_judges": 4,
+      "test_r2": 0.1945006994160483,
+      "removed": "helpsteer2-complexity-judge-formalism-and-references",
+      "added": null
+    },
+    {
+      "iteration": 2,
+      "n_judges": 3,
+      "test_r2": 0.1740275458107381,
+      "removed": null,
+      "added": null
+    }
+  ]
+}

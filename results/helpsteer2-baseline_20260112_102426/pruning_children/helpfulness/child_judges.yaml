@@ -1,0 +1,377 @@
+judges:
+- id: helpsteer2-helpfulness-judge-relevance-to-intent
+  name: Relevance to User Intent
+  version: '1.0'
+  description: "Measures how directly a response targets the user\u2019s stated goal\
+    \ and avoids digressions. Penalizes restatements, filler, and tangents; rewards\
+    \ purpose-built content that prioritizes the core task and context. Higher scores\
+    \ indicate tighter focus and immediate, on-target guidance."
+  scoring_description: Score how well the response demonstrates relevance to user
+    intent
+  definition: "Measures how directly a response targets the user\u2019s stated goal\
+    \ and avoids digressions. Penalizes restatements, filler, and tangents; rewards\
+    \ purpose-built content that prioritizes the core task and context. Higher scores\
+    \ indicate tighter focus and immediate, on-target guidance."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Off-Topic/Not Aligned
+    indicators:
+    - 'No substantive relevance: addresses a different task or is purely filler/irrelevant.'
+    - Actively distracts or misleads from the goal (e.g., unrelated instructions,
+      promotions).
+    - Restates the prompt or offers empty disclaimers without any movement toward
+      the task.
+  - range:
+    - 1.0
+    - 1.9
+    label: Low Alignment
+    indicators:
+    - "\u226440% of content pertains to the goal; mostly generic, off-track, or rephrasing\
+      \ the question."
+    - Hints at the topic but lacks a direct answer or actionable targeting of the
+      core task.
+    - Misinterprets intent or focuses on secondary/adjacent issues.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partial Alignment
+    indicators:
+    - "Approximately 40\u201370% of content is relevant; significant portions are\
+      \ generic, tangential, or restate the prompt."
+    - Addresses the main goal only partially or late; relevant points are buried among
+      filler.
+    - Peripheral details receive equal or greater emphasis than the core task.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Aligned
+    indicators:
+    - "About 70\u201390% of content directly targets the core goal, with minor tangents\
+      \ or brief restatement."
+    - Main answer appears early and remains the focus; small off-topic elements do
+      not impede use.
+    - "Some tailoring to the user\u2019s context; limited generic phrasing present."
+  - range:
+    - 4.0
+    - 4.0
+    label: Fully Aligned
+    indicators:
+    - "\u226590% of content is directly tied to executing the user\u2019s core goal;\
+      \ extraneous material is negligible."
+    - Core answer is provided immediately and maintained without tangents or unnecessary
+      restatement.
+    - "Content is purpose-built to the user\u2019s stated context/constraints, prioritizing\
+      \ the primary objective over peripheral details."
+  guidelines:
+  - Directly answers the question or task the user posed
+  - Avoids unrelated content or tangents
+  - "Frames content around the user\u2019s primary objective"
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-actionability-and-specificity
+  name: Actionability and Specific Detail
+  version: '1.0'
+  description: Measures how concretely a response enables immediate execution by providing
+    steps, commands, code, or examples. Higher scores indicate precise, ordered instructions
+    and runnable snippets with clear parameters and assumptions. Lower scores reflect
+    vague guidance without clear next actions.
+  scoring_description: Score how well the response demonstrates actionability and
+    specific detail
+  definition: Measures how concretely a response enables immediate execution by providing
+    steps, commands, code, or examples. Higher scores indicate precise, ordered instructions
+    and runnable snippets with clear parameters and assumptions. Lower scores reflect
+    vague guidance without clear next actions.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Not Actionable
+    indicators:
+    - Provides no steps, commands, or examples the user can execute.
+    - "Advice is abstract or generic (e.g., \u201Clook into X\u201D) with no next\
+      \ actions."
+    - User cannot determine what to do first or how to proceed.
+  - range:
+    - 1.0
+    - 1.9
+    label: Slightly Actionable
+    indicators:
+    - Mentions relevant tools or high-level actions but lacks procedure or ordering.
+    - Missing concrete details (syntax, file paths, parameters) needed to act.
+    - Requires substantial additional research to translate into steps.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partially Actionable
+    indicators:
+    - Includes an outline or partial steps with some specifics, but key details are
+      absent (e.g., incomplete commands or code).
+    - Examples use placeholders without guidance on how to obtain or replace them.
+    - User can begin the task but must fill multiple gaps to make it work.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Actionable
+    indicators:
+    - Provides ordered steps and concrete commands/code that work with minor adaptation
+      (e.g., set one variable, install one prerequisite).
+    - Specifies key parameters, file names, or expected inputs/outputs.
+    - Notes main assumptions or prerequisites, with only small gaps remaining.
+  - range:
+    - 4.0
+    - 4.0
+    label: Fully Actionable
+    indicators:
+    - End-to-end, copy-pasteable commands or runnable code with precise syntax and
+      clearly labeled parameters/placeholders.
+    - Includes prerequisites, environment/setup, verification steps, and expected
+      results.
+    - Anticipates common pitfalls or variants and provides troubleshooting or alternatives.
+  guidelines:
+  - Includes executable code, commands, or step-by-step instructions
+  - Specifies parameters, values, and exact paths or settings where appropriate
+  - Provides examples that map directly to the task
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-completeness-of-solution
+  name: Completeness of the Solution
+  version: '1.0'
+  description: Measures how fully the response covers the steps, prerequisites, dependencies,
+    and deliverables required to achieve the user's goal. Judges whether the user
+    can execute the solution end-to-end without significant additional research or
+    reconstruction. Higher scores reflect complete, actionable coverage that anticipates
+    typical gaps.
+  scoring_description: Score how well the response demonstrates completeness of the
+    solution
+  definition: Measures how fully the response covers the steps, prerequisites, dependencies,
+    and deliverables required to achieve the user's goal. Judges whether the user
+    can execute the solution end-to-end without significant additional research or
+    reconstruction. Higher scores reflect complete, actionable coverage that anticipates
+    typical gaps.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Absent
+    indicators:
+    - Misses core requirements; provides no usable steps or deliverables.
+    - Content is off-target or contradicts the task, preventing any progress.
+    - Omits prerequisites/dependencies entirely so the user cannot begin.
+  - range:
+    - 1.0
+    - 1.9
+    label: Sparse
+    indicators:
+    - Touches on the task but omits critical steps or dependencies needed to achieve
+      the outcome.
+    - Provides only high-level or vague guidance with no actionable deliverables.
+    - User must perform extensive external research to proceed.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partial
+    indicators:
+    - Covers some key steps but leaves major gaps (e.g., missing setup, configuration,
+      or finalization).
+    - Includes partial code/commands/examples that are not runnable as-is or lack
+      required inputs/context.
+    - User can start but must supply substantial missing pieces to complete the task.
+  - range:
+    - 3.0
+    - 3.9
+    label: Mostly Complete
+    indicators:
+    - Provides most prerequisites, steps, and primary deliverables; generally actionable
+      end-to-end.
+    - Only minor gaps or unstated assumptions remain, requiring small follow-up or
+      troubleshooting.
+    - Includes runnable or directly usable elements for the main path but limited
+      coverage of variants/edge cases.
+  - range:
+    - 4.0
+    - 4.0
+    label: Comprehensive
+    indicators:
+    - 'End-to-end coverage: prerequisites, setup, steps, and final deliverables are
+      explicit and actionable.'
+    - States assumptions/parameters and includes validation/verification steps and
+      common pitfalls or alternatives.
+    - Deliverables are immediately usable (e.g., runnable code/commands, exact configurations)
+      with minimal to no additional work.
+  guidelines:
+  - Covers prerequisites and all key steps end-to-end
+  - Addresses common edge cases or failure modes
+  - Minimizes need for additional information to finish the task
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-context-tailoring-and-assumptions
+  name: Context Tailoring and Assumption Handling
+  version: '1.0'
+  description: "Evaluates how well a response adapts recommendations to the user\u2019\
+    s stated environment and constraints, and how responsibly it handles missing details.\
+    \ Strong responses make relevant assumptions explicit, provide conditional paths\
+    \ or alternatives, and enable progress while clarifying unknowns. Weak responses\
+    \ ignore context, rely on hidden or incorrect assumptions, or ask for clarification\
+    \ without offering interim value."
+  scoring_description: Score how well the response demonstrates context tailoring
+    and assumption handling
+  definition: "Evaluates how well a response adapts recommendations to the user\u2019\
+    s stated environment and constraints, and how responsibly it handles missing details.\
+    \ Strong responses make relevant assumptions explicit, provide conditional paths\
+    \ or alternatives, and enable progress while clarifying unknowns. Weak responses\
+    \ ignore context, rely on hidden or incorrect assumptions, or ask for clarification\
+    \ without offering interim value."
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Not Tailored
+    indicators:
+    - Contradicts or ignores stated context/constraints (e.g., recommends tools/platforms
+      the user cannot use).
+    - Relies on unstated or incorrect assumptions presented as facts, leading to unusable
+      or misleading guidance.
+    - Provides one-size-fits-all steps with no acknowledgement of missing information
+      or environment specifics.
+  - range:
+    - 1.0
+    - 1.9
+    label: Minimal
+    indicators:
+    - "Gives generic, boilerplate advice with little to no adaptation to the user\u2019\
+      s environment."
+    - Requests clarification but offers no provisional steps, options, or assumptions
+      to keep the user moving.
+    - Does not state assumptions or identify what details are missing and why they
+      matter.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partial
+    indicators:
+    - References at least one user-specific detail but remains largely generic or
+      mismatched in places.
+    - Assumptions are implicit or only partly stated; uncertainties are noted superficially.
+    - Provides limited conditional guidance with few or no alternatives if assumptions
+      prove wrong.
+  - range:
+    - 3.0
+    - 3.9
+    label: Good
+    indicators:
+    - Adapts guidance to the stated environment/constraints and avoids conflicting
+      recommendations.
+    - Explicitly states key assumptions or missing details and supplies conditional
+      steps based on them.
+    - Offers practical alternatives for common variations (e.g., platform/language
+      options) with minor gaps remaining.
+  - range:
+    - 4.0
+    - 4.0
+    label: Excellent
+    indicators:
+    - "Fully aligns with the user\u2019s context/constraints and delivers immediately\
+      \ actionable, tailored steps or answers."
+    - Clearly enumerates assumptions and unknowns, justifies sensible defaults, and
+      provides branched paths for likely scenarios.
+    - Anticipates context-specific pitfalls or edge cases and specifies what additional
+      information would refine the solution without blocking progress.
+  guidelines:
+  - States relevant assumptions explicitly and keeps them reasonable
+  - Adapts guidance to stated constraints (platform, tools, skill level)
+  - Asks focused clarification questions while offering interim next steps
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness
+- id: helpsteer2-helpfulness-judge-organization-for-immediate-application
+  name: Organization for Immediate Application
+  version: '1.0'
+  description: Measures how clearly a response is structured so a user can act on
+    it immediately, independent of length. Emphasizes scannability, sequencing, prioritization,
+    and labeling that reduce cognitive load and enable swift execution.
+  scoring_description: Score how well the response demonstrates organization for immediate
+    application
+  definition: Measures how clearly a response is structured so a user can act on it
+    immediately, independent of length. Emphasizes scannability, sequencing, prioritization,
+    and labeling that reduce cognitive load and enable swift execution.
+  criteria:
+  - range:
+    - 0.0
+    - 0.9
+    label: Disorganized
+    indicators:
+    - Unstructured text with no logical sequence (no steps, headings, or lists).
+    - Critical actions are buried or mixed with background; the user must infer the
+      workflow.
+    - Ambiguities or undefined terms block immediate execution.
+  - range:
+    - 1.0
+    - 1.9
+    label: Minimally Organized
+    indicators:
+    - Some relevant points present but scattered; no clear order of operations.
+    - Long paragraphs or mixed topics without prioritization, labels, or separations.
+    - Requires substantial effort to extract steps, inputs, or outputs.
+  - range:
+    - 2.0
+    - 2.9
+    label: Partially Organized
+    indicators:
+    - Some structure (e.g., bullets or brief sections) but steps are incomplete, vague,
+      or out of order.
+    - Inputs, parameters, or prerequisites are mentioned but not clearly labeled or
+      grouped.
+    - Guidance is mixed with commentary; user must fill notable gaps to act.
+  - range:
+    - 3.0
+    - 3.9
+    label: Well Organized
+    indicators:
+    - Clear sequence of actionable steps (e.g., numbered list) with concise labels.
+    - Related information is grouped (prerequisites, commands/examples, alternatives)
+      and easy to scan.
+    - Minor omissions (e.g., edge cases or expected results) remain, but the user
+      can proceed immediately.
+  - range:
+    - 4.0
+    - 4.0
+    label: Optimized for Immediate Use
+    indicators:
+    - 'Task-ready layout: brief objective, prerequisites, and prioritized numbered
+      steps with labeled commands/placeholders.'
+    - Decision points and common pitfalls are called out; expected outcomes or verification
+      checks are included.
+    - Minimal cognitive load through consistent terminology and concise sections that
+      enable instant execution without rework.
+  guidelines:
+  - Uses ordered steps and clear sectioning (prerequisites, steps, verification)
+  - Labels parameters, inputs, and outputs for copy-paste readiness
+  - Prioritizes actions and highlights critical warnings or choices
+  score_range:
+  - 0.0
+  - 4.0
+  parent_id: helpsteer2-helpfulness-judge
+  dataset: helpsteer2
+  auto_generated: true
+  dimension: helpfulness

@@ -1,0 +1,62 @@
+[
+  {
+    "dimension": "helpfulness",
+    "baseline_r2": 0.31118453061096274,
+    "baseline_mae": 0.9555184179429922,
+    "iter0_r2": 0.31728445398871163,
+    "iter0_mae": 0.9476291195061128,
+    "final_r2": 0.30047316965015813,
+    "final_mae": 0.961926622285533,
+    "removed": "helpsteer2-helpfulness-judge-organization-for-immediate-application, helpsteer2-helpfulness-judge-context-tailoring-and-assumptions",
+    "final_judges": 3,
+    "selection_dir": "results/helpsteer2-baseline_20260112_102426/pruning_children/helpfulness/selection"
+  },
+  {
+    "dimension": "correctness",
+    "baseline_r2": 0.2722217093043957,
+    "baseline_mae": 0.9495392916477424,
+    "iter0_r2": 0.269985497209019,
+    "iter0_mae": 0.9539529817141098,
+    "final_r2": 0.2887419976656016,
+    "final_mae": 0.9513912602480167,
+    "removed": "helpsteer2-correctness-judge-uncertainty-handling, helpsteer2-correctness-judge-factual-accuracy",
+    "final_judges": 3,
+    "selection_dir": "results/helpsteer2-baseline_20260112_102426/pruning_children/correctness/selection"
+  },
+  {
+    "dimension": "coherence",
+    "baseline_r2": -0.004996104828934644,
+    "baseline_mae": 0.528475316593786,
+    "iter0_r2": -0.012686211238321476,
+    "iter0_mae": 0.5352409634609231,
+    "final_r2": 0.07832824023216811,
+    "final_mae": 0.5234823338339557,
+    "removed": "helpsteer2-coherence-judge-referential-clarity-and-terminology, helpsteer2-coherence-judge-internal-consistency",
+    "final_judges": 3,
+    "selection_dir": "results/helpsteer2-baseline_20260112_102426/pruning_children/coherence/selection"
+  },
+  {
+    "dimension": "complexity",
+    "baseline_r2": 0.2552403284971404,
+    "baseline_mae": 0.4419096626371608,
+    "iter0_r2": 0.1856751935714105,
+    "iter0_mae": 0.46119087410893783,
+    "final_r2": 0.16757749802496757,
+    "final_mae": 0.4614434127123359,
+    "removed": "helpsteer2-complexity-judge-syntactic-complexity, helpsteer2-complexity-judge-formalism-and-references",
+    "final_judges": 3,
+    "selection_dir": "results/helpsteer2-baseline_20260112_102426/pruning_children/complexity/selection"
+  },
+  {
+    "dimension": "verbosity",
+    "baseline_r2": 0.3234414388132876,
+    "baseline_mae": 0.46752092539041146,
+    "iter0_r2": 0.2511853004965222,
+    "iter0_mae": 0.47559988471590203,
+    "final_r2": 0.22882968472109988,
+    "final_mae": 0.48433821847072006,
+    "removed": "helpsteer2-verbosity-judge-framing-padding, helpsteer2-verbosity-judge-minimal-overage",
+    "final_judges": 3,
+    "selection_dir": "results/helpsteer2-baseline_20260112_102426/pruning_children/verbosity/selection"
+  }
+]

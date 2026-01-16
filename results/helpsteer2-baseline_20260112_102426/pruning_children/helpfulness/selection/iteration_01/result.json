@@ -1,0 +1,102 @@
+{
+  "iteration": 1,
+  "judge_names": [
+    "helpsteer2-helpfulness-judge-relevance-to-intent",
+    "helpsteer2-helpfulness-judge-actionability-and-specificity",
+    "helpsteer2-helpfulness-judge-completeness-of-solution",
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions"
+  ],
+  "n_judges": 4,
+  "train_metrics": {
+    "mse": 1.3345080587839329,
+    "mae": 0.917007243678374,
+    "r2": 0.1957092848442883,
+    "spearman_rho": 0.33300539743423907,
+    "kendall_tau": 0.25877303698618004,
+    "pearson_r": 0.44247245585829864
+  },
+  "test_metrics": {
+    "mse": 1.372976007045383,
+    "mae": 0.958316607587196,
+    "r2": 0.30390589786788524,
+    "spearman_rho": 0.4622461613127296,
+    "kendall_tau": 0.3504760871434257,
+    "pearson_r": 0.5658061310438274
+  },
+  "judge_set_metrics": {
+    "predictive_power": {
+      "r2": 0.30390589786788524,
+      "mse": 1.372976007045383,
+      "mae": 0.958316607587196,
+      "spearman_rho": 0.4622461613127296,
+      "kendall_tau": 0.35047608714342576,
+      "pearson_r": 0.5658061310438274
+    },
+    "coverage": {
+      "variance_explained": 0.34895055763181926,
+      "coverage_score": 0.34895055763181926
+    },
+    "redundancy": {
+      "mean_pairwise_correlation": 0.5784084844856003,
+      "max_pairwise_correlation": 0.7184057725365182,
+      "redundancy_score": 0.42159151551439966,
+      "highly_correlated_pairs": []
+    },
+    "diversity": {
+      "effective_dimensionality": 1.9533101254798888,
+      "diversity_index": 0.4883275313699722
+    },
+    "importance_distribution": {
+      "gini_coefficient": 0.4234178037453642,
+      "entropy": 0.7240413350339654
+    },
+    "composite_score": 0.3733362800503924
+  },
+  "importance_scores": {
+    "helpsteer2-helpfulness-judge-relevance-to-intent": 0.5054821123643358,
+    "helpsteer2-helpfulness-judge-actionability-and-specificity": 0.35479103314117444,
+    "helpsteer2-helpfulness-judge-completeness-of-solution": 1.0,
+    "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.0
+  },
+  "removed_judge": null,
+  "added_judge": null,
+  "gap_analysis": {
+    "patterns": [
+      {
+        "type": "high_variance",
+        "description": "High error variance when 'helpsteer2-helpfulness-judge-completeness-of-solution' scores are low",
+        "severity": 0.507220129695871,
+        "affected_samples": 69,
+        "characteristics": {
+          "judge": "helpsteer2-helpfulness-judge-completeness-of-solution",
+          "low_score_error_var": 1.9887820301880061,
+          "high_score_error_var": 0.9702361508111275
+        },
+        "suggested_dimension": "helpsteer2-helpfulness-judge-completeness-of-solution-specificity"
+      }
+    ],
+    "overall_error_stats": {
+      "mean_error": -0.054463977881985405,
+      "std_error": 1.1704741270778494,
+      "mean_abs_error": 0.958316607587196,
+      "median_abs_error": 0.8008164690131108,
+      "max_abs_error": 3.280231158423226,
+      "pct_high_error": 74.0,
+      "skewness": -0.5077976353615669,
+      "kurtosis": -0.29734896778095576
+    },
+    "judge_error_correlations": {
+      "helpsteer2-helpfulness-judge-relevance-to-intent": 0.16749242272887188,
+      "helpsteer2-helpfulness-judge-actionability-and-specificity": -0.007775321439618052,
+      "helpsteer2-helpfulness-judge-completeness-of-solution": 0.13427027163441044,
+      "helpsteer2-helpfulness-judge-context-tailoring-and-assumptions": 0.22779014573688816
+    },
+    "suggested_dimensions": [
+      "helpsteer2-helpfulness-judge-completeness-of-solution-specificity"
+    ],
+    "analysis_summary": "Gap Analysis Summary\n========================================\nOverall: 74.0% samples with error > 0.5\nMean absolute error: 0.958\nError skewness: -0.508\n\nIdentified 1 gap patterns:\n  1. [high_variance] High error variance when 'helpsteer2-helpfulness-judge-completeness-of-solution' scores are low\n     Severity: 0.51, Affected: 69 samples\n\nSuggested new dimensions: helpsteer2-helpfulness-judge-completeness-of-solution-specificity"
+  },
+  "improvement": -0.01337855612082639,
+  "should_stop": false,
+  "stop_reason": null
+}
