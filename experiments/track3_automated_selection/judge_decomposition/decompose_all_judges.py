@@ -8,6 +8,9 @@ Usage:
     python decompose_all_judges.py \
         --max-depth 1 \
         --output experiments/track3_automated_selection/generated_judges
+
+
+    python decompose_all_judges.py --judges task-response-judge coherence-cohesion-judge lexical-resource-judge grammatical-range-accuracy-judge --max-depth 1 --output experiments/track3_automated_selection/generated_judges_ielts
 """
 
 from __future__ import annotations

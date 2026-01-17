@@ -1,0 +1,1157 @@
+judges:
+- id: task-response-judge
+  name: Task Response
+  version: '1.0'
+  description: Evaluates the candidate's ability to address the writing task appropriately,
+    covering all key points and providing a clear, well-structured response
+  scoring_description: Score how well the candidate addresses the task requirements
+    and organizes their response
+  definition: '"Task Response" evaluates whether the candidate has fully addressed
+    all parts of the writing task,
+
+    presented a clear position throughout the response, developed ideas adequately
+    with relevant
+
+    examples and support, and maintained appropriate organization with introduction,
+    body, and conclusion.
+
+    '
+  criteria:
+  - range: [0.0, 1.5]
+    label: MINIMAL TASK RESPONSE
+    indicators:
+    - Fails to address the task or addresses it tangentially
+    - No clear position or structure
+    - Ideas are irrelevant or barely present
+  - range: [2.0, 3.5]
+    label: LIMITED TASK RESPONSE
+    indicators:
+    - Addresses the task only partially
+    - Position is unclear or inconsistent
+    - Ideas are underdeveloped with minimal support
+  - range: [4.0, 5.5]
+    label: ADEQUATE TASK RESPONSE
+    indicators:
+    - Addresses most parts of the task
+    - Position is generally clear
+    - Ideas are relevant but development may be uneven
+  - range: [6.0, 7.5]
+    label: STRONG TASK RESPONSE
+    indicators:
+    - Addresses all parts of the task appropriately
+    - Clear position maintained throughout
+    - Ideas are coherent and well-supported
+  - range: [8.0, 9.0]
+    label: EXEMPLARY TASK RESPONSE
+    indicators:
+    - Fully addresses all aspects with thorough coverage
+    - Position is clear, nuanced, and consistent
+    - Ideas are highly developed with compelling arguments
+  guidelines:
+  - Use 0.5 increments (e.g., 2.5, 6.0, 7.5).
+  - Consider coverage of all task requirements.
+  - Assess whether response type matches task expectations.
+  score_range: [0.0, 9.0]
+- id: task-response-judge-task_coverage
+  name: Task Coverage
+  version: '1.0'
+  description: This rubric assesses the extent to which the response thoroughly and
+    completely addresses all parts of the assigned task. It evaluates whether the
+    candidate covers each key element of the prompt with appropriate detail and depth,
+    ensuring no critical aspect is overlooked.
+  scoring_description: Score how well the response demonstrates task coverage
+  definition: This rubric assesses the extent to which the response thoroughly and
+    completely addresses all parts of the assigned task. It evaluates whether the
+    candidate covers each key element of the prompt with appropriate detail and depth,
+    ensuring no critical aspect is overlooked.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Minimal Coverage
+    indicators:
+    - Fails to address most parts of the task or addresses them superficially
+    - Key elements of the prompt are neglected or missing
+    - Response lacks coherence and completeness in covering the task
+  - range: [1.0, 1.9]
+    label: Limited Coverage
+    indicators:
+    - Addresses some parts of the task but omits or briefly mentions others
+    - Coverage of key elements is inconsistent or incomplete
+    - Response shows minimal effort to fully cover the prompt
+  - range: [2.0, 2.9]
+    label: Adequate Coverage
+    indicators:
+    - Addresses most parts of the task with sufficient detail
+    - All key elements are included but some may lack depth or full development
+    - Response demonstrates a general understanding of the prompt
+  - range: [3.0, 3.9]
+    label: Strong Coverage
+    indicators:
+    - Addresses all parts of the task thoroughly with relevant details
+    - Key elements are well-covered and integrated into the response
+    - Response demonstrates comprehensive understanding and coverage of the prompt
+  - range: [4.0, 4.0]
+    label: Exceptional Coverage
+    indicators:
+    - Fully and insightfully addresses every aspect of the task with nuanced understanding
+    - Includes detailed, relevant, and well-developed coverage of all key elements
+    - Response exhibits thoroughness, leaving no part of the prompt unaddressed
+  guidelines:
+  - Addresses all key points outlined in the prompt
+  - Includes relevant details for each part of the task
+  - No significant omissions
+  score_range: [0.0, 4.0]
+  parent_id: task-response-judge
+- id: task-response-judge-clarity_of_position
+  name: Clarity of Position
+  version: '1.0'
+  description: This rubric evaluates the extent to which the response clearly articulates
+    a central stance or viewpoint and maintains it consistently throughout the response.
+    It assesses the coherence and strength of the main argument as presented by the
+    candidate.
+  scoring_description: Score how well the response demonstrates clarity of position
+  definition: This rubric evaluates the extent to which the response clearly articulates
+    a central stance or viewpoint and maintains it consistently throughout the response.
+    It assesses the coherence and strength of the main argument as presented by the
+    candidate.
+  criteria:
+  - range: [0.0, 0.9]
+    label: No Clear Position
+    indicators:
+    - Fails to present a discernible main argument or stance
+    - Lacks coherence; ideas are scattered or unrelated
+    - Does not maintain a consistent viewpoint
+  - range: [1.0, 1.9]
+    label: Vague or Inconsistent Position
+    indicators:
+    - Attempts to state a position but it is unclear or poorly developed
+    - Inconsistencies or shifts in viewpoint are evident
+    - Main argument is weak or only partially articulated
+  - range: [2.0, 2.9]
+    label: Basic Clarity with Some Inconsistencies
+    indicators:
+    - States a clear main position but may have minor lapses in consistency
+    - Generally maintains the stance but occasionally drifts from it
+    - Main argument is understandable but not strongly reinforced
+  - range: [3.0, 3.9]
+    label: Clear and Consistent Position
+    indicators:
+    - Clearly articulates a main stance that is maintained throughout the response
+    - Supports the position with relevant ideas and evidence
+    - Few, if any, lapses in consistency or clarity
+  - range: [4.0, 4.0]
+    label: Highly Clear and Well Maintained Position
+    indicators:
+    - Articulates a nuanced and compelling main argument
+    - Maintains a consistent stance with logical progression
+    - Effectively reinforces the position throughout the response with relevant support
+  guidelines:
+  - States a clear position early and maintains it throughout
+  - Avoids ambiguity or contradictions regarding the stance
+  - Position is explicitly articulated
+  score_range: [0.0, 4.0]
+  parent_id: task-response-judge
+- id: task-response-judge-idea_development
+  name: Idea Development
+  version: '1.0'
+  description: This rubric assesses the extent to which ideas are thoroughly elaborated
+    with relevant explanations, examples, and supporting details. It measures critical
+    thinking, depth of reasoning, and the clarity of development within the response.
+  scoring_description: Score how well the response demonstrates idea development
+  definition: This rubric assesses the extent to which ideas are thoroughly elaborated
+    with relevant explanations, examples, and supporting details. It measures critical
+    thinking, depth of reasoning, and the clarity of development within the response.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Minimal Elaboration
+    indicators:
+    - Ideas are undeveloped or absent, with little to no explanation or support.
+    - Lacks relevant examples or details to clarify points.
+    - Demonstrates minimal effort in elaborating ideas.
+  - range: [1.0, 1.9]
+    label: Limited Elaboration
+    indicators:
+    - Ideas are briefly mentioned but lack sufficient explanation or support.
+    - Examples or details are minimal or only marginally relevant.
+    - Development of ideas is superficial or inconsistent.
+  - range: [2.0, 2.9]
+    label: Adequate Elaboration
+    indicators:
+    - Ideas are generally explained with some relevant details or examples.
+    - Support is present but may lack depth or variety.
+    - Development shows some critical thinking but remains uneven.
+  - range: [3.0, 3.9]
+    label: Strong Elaboration
+    indicators:
+    - Ideas are well-explained with relevant, detailed examples and support.
+    - Demonstrates clear reasoning and critical thinking.
+    - Development is coherent and enhances understanding.
+  - range: [4.0, 4.0]
+    label: Exceptional Elaboration
+    indicators:
+    - Ideas are thoroughly elaborated with insightful explanations and compelling
+      examples.
+    - Support is detailed, varied, and demonstrates deep understanding.
+    - Development reflects critical analysis and enhances the overall quality of the
+      response.
+  guidelines:
+  - Provides specific examples or evidence to support claims
+  - Develops ideas with sufficient depth and explanation
+  - Avoids superficial or vague statements
+  score_range: [0.0, 4.0]
+  parent_id: task-response-judge
+- id: task-response-judge-organization_coherence
+  name: Organization and Coherence
+  version: '1.0'
+  description: This rubric assesses the clarity and logical flow of the response,
+    ensuring ideas are well-structured, connected, and easy to follow. It evaluates
+    how effectively the response maintains coherence from introduction to conclusion.
+  scoring_description: Score how well the response demonstrates organization and coherence
+  definition: This rubric assesses the clarity and logical flow of the response, ensuring
+    ideas are well-structured, connected, and easy to follow. It evaluates how effectively
+    the response maintains coherence from introduction to conclusion.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Response lacks clear organization; ideas are disjointed or randomly arranged.
+    - Transitions are absent or confusing, making it difficult to follow the argument.
+    - Overall coherence is missing, with no discernible structure.
+  - range: [1.0, 1.9]
+    label: Weak
+    indicators:
+    - Response shows limited organization; some ideas are grouped but overall flow
+      is inconsistent.
+    - Transitions are minimal or awkward, causing frequent disruptions in understanding.
+    - The structure is recognizable but lacks logical progression.
+  - range: [2.0, 2.9]
+    label: Adequate
+    indicators:
+    - Response has a basic organizational structure with introduction, body, and conclusion.
+    - Ideas generally follow a logical sequence, with some effective transitions.
+    - Flow is understandable but may have moments of awkwardness or uneven coherence.
+  - range: [3.0, 3.9]
+    label: Strong
+    indicators:
+    - Response demonstrates clear and logical organization, with well-structured paragraphs.
+    - Transitions effectively connect ideas, supporting smooth flow throughout.
+    - Overall coherence is maintained, making the response easy to follow.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Response exhibits highly effective organization with a clear, logical progression
+      of ideas.
+    - Transitions are seamless, enhancing the coherence and readability of the response.
+    - Ideas are coherently linked, and the overall structure enhances the clarity
+      and persuasiveness.
+  guidelines:
+  - Uses clear paragraph structure with introductions, bodies, and conclusions
+  - Transitions between ideas are smooth and logical
+  - Overall response has a coherent progression
+  score_range: [0.0, 4.0]
+  parent_id: task-response-judge
+- id: task-response-judge-relevance_and_focus
+  name: Relevance and Focus
+  version: '1.0'
+  description: This rubric evaluates the extent to which the response remains on-topic
+    and consistently addresses the prompt. It assesses whether the candidate maintains
+    focus throughout and avoids irrelevant or off-task information.
+  scoring_description: Score how well the response demonstrates relevance and focus
+  definition: This rubric evaluates the extent to which the response remains on-topic
+    and consistently addresses the prompt. It assesses whether the candidate maintains
+    focus throughout and avoids irrelevant or off-task information.
+  criteria:
+  - range: [0.0, 0.9]
+    label: No Relevance
+    indicators:
+    - Response is entirely off-topic or unrelated to the prompt
+    - Contains mostly irrelevant information with no discernible focus
+    - Fails to address any part of the task
+  - range: [1.0, 1.9]
+    label: Minimal Relevance
+    indicators:
+    - Response is mostly off-topic with some attempt to address the prompt
+    - Includes significant irrelevant information that distracts from the main focus
+    - Lacks clear focus or contains many off-topic ideas
+  - range: [2.0, 2.9]
+    label: Limited Focus
+    indicators:
+    - Addresses the prompt but includes some off-topic or tangential information
+    - Maintains focus on the main idea for the most part but occasionally diverges
+    - Relevance is inconsistent, with some irrelevant details
+  - range: [3.0, 3.9]
+    label: Mostly Focused
+    indicators:
+    - Generally stays on-topic with minor lapses
+    - Addresses the prompt and maintains relevance throughout most of the response
+    - Some minor tangents or off-topic details are present but do not significantly
+      detract
+  - range: [4.0, 4.0]
+    label: Consistently Focused
+    indicators:
+    - Response remains fully on-topic and directly addresses all aspects of the prompt
+    - Avoids irrelevant information, maintaining clear focus throughout
+    - Ideas are tightly aligned with the task requirements
+  guidelines:
+  - Stays on topic throughout the response
+  - Avoids tangential or irrelevant details
+  - Maintains a consistent focus aligned with the task requirements
+  score_range: [0.0, 4.0]
+  parent_id: task-response-judge
+- id: coherence-cohesion-judge
+  name: Coherence and Cohesion
+  version: '1.0'
+  description: Evaluates how well the candidate organizes ideas and information, ensuring
+    logical progression and effective use of cohesive devices
+  scoring_description: Score the logical organization and flow of ideas throughout
+    the essay
+  definition: '"Coherence and Cohesion" evaluates the logical organization of information
+    and ideas,
+
+    the clarity of progression throughout the text, and the effective use of cohesive
+    devices
+
+    (linking words, pronouns, conjunctions) to connect sentences and paragraphs.
+
+    '
+  criteria:
+  - range: [0.0, 1.5]
+    label: INCOHERENT
+    indicators:
+    - Ideas are disconnected with no discernible structure
+    - No use or severe misuse of cohesive devices
+    - Reader cannot follow the intended meaning
+  - range: [2.0, 3.5]
+    label: POORLY ORGANIZED
+    indicators:
+    - Weak organization with unclear progression
+    - Limited or inappropriate use of cohesive devices
+    - Frequent jumps in logic
+  - range: [4.0, 5.5]
+    label: ADEQUATELY ORGANIZED
+    indicators:
+    - Basic organization evident but may be mechanical
+    - Some cohesive devices used but may be repetitive
+    - Generally followable but lacks natural flow
+  - range: [6.0, 7.5]
+    label: WELL-ORGANIZED
+    indicators:
+    - Clear and logical organization throughout
+    - Smooth transitions between sentences and paragraphs
+    - Effective use of cohesive devices
+  - range: [8.0, 9.0]
+    label: EXEMPLARY COHERENCE
+    indicators:
+    - Seamless organization with sophisticated progression
+    - Masterful transitions that enhance comprehension
+    - Varied and precise use of cohesive devices
+  guidelines:
+  - Use 0.5 increments (e.g., 2.5, 6.0, 7.5).
+  - Evaluate both macro-level structure and micro-level cohesion.
+  - Consider whether cohesive devices enhance comprehension.
+  score_range: [0.0, 9.0]
+- id: coherence-cohesion-judge-macro-structure
+  name: Macro-level Organization
+  version: '1.0'
+  description: This rubric assesses the overall logical structure and sequencing of
+    ideas within the text. It evaluates how well the major sections are arranged to
+    support understanding and the coherence of the overall flow of information.
+  scoring_description: Score how well the response demonstrates macro-level organization
+  definition: This rubric assesses the overall logical structure and sequencing of
+    ideas within the text. It evaluates how well the major sections are arranged to
+    support understanding and the coherence of the overall flow of information.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Incoherent
+    indicators:
+    - Ideas and sections are disorganized or disconnected, making the overall structure
+      confusing.
+    - There is no clear sequence or logical progression of ideas.
+    - Reader struggles to understand the main points due to poor structural organization.
+  - range: [1.0, 1.9]
+    label: Poorly Organized
+    indicators:
+    - Some attempt at structuring the content exists but is weak or inconsistent.
+    - Major ideas may be presented out of order or without clear relationships.
+    - Transitions between sections are unclear, causing difficulty in following the
+      argument.
+  - range: [2.0, 2.9]
+    label: Adequately Organized
+    indicators:
+    - Basic structure is present with a recognizable sequence of ideas.
+    - Some logical grouping of related ideas, but transitions may be mechanical or
+      somewhat abrupt.
+    - Overall flow supports understanding but lacks smoothness or sophistication.
+  - range: [3.0, 3.9]
+    label: Well-Organized
+    indicators:
+    - Ideas are logically ordered with clear major sections supporting the main argument.
+    - Transitions between sections and ideas are smooth and facilitate comprehension.
+    - The overall structure effectively guides the reader through the content.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - The text exhibits a highly coherent and logical structure that enhances understanding.
+    - Sections are well-organized with seamless transitions that create a natural
+      flow.
+    - The overall organization clearly emphasizes key points and supports the development
+      of ideas in a sophisticated manner.
+  guidelines:
+  - Presence of a clear introduction, body, and conclusion
+  - Logical progression of ideas from one paragraph to the next
+  - Appropriate ordering of arguments or points
+  score_range: [0.0, 4.0]
+  parent_id: coherence-cohesion-judge
+- id: coherence-cohesion-judge-micro-cohesion
+  name: Micro-level Cohesion
+  version: '1.0'
+  description: This rubric assesses the effectiveness of cohesive devices within sentences
+    and paragraphs, such as conjunctions, pronouns, and transitional phrases, that
+    facilitate smooth and logical connections between ideas. It evaluates how well
+    these devices enhance readability and comprehension at the micro-level.
+  scoring_description: Score how well the response demonstrates micro-level cohesion
+  definition: This rubric assesses the effectiveness of cohesive devices within sentences
+    and paragraphs, such as conjunctions, pronouns, and transitional phrases, that
+    facilitate smooth and logical connections between ideas. It evaluates how well
+    these devices enhance readability and comprehension at the micro-level.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Absent or Severely Inappropriate Use
+    indicators:
+    - Lacks cohesive devices within sentences and paragraphs
+    - Connections between ideas are unclear or nonexistent
+    - Reader struggles to follow the flow of ideas
+  - range: [1.0, 1.9]
+    label: Limited and Inconsistent Cohesion
+    indicators:
+    - Uses few cohesive devices, often inappropriately or incorrectly
+    - Connections between ideas are weak or awkward
+    - Some sentences or paragraphs lack logical links, hindering readability
+  - range: [2.0, 2.9]
+    label: Basic Cohesion with Repetitive Devices
+    indicators:
+    - Employs basic cohesive devices such as simple pronouns and conjunctions
+    - Some repetition or overuse of certain devices reduces variation
+    - Connections generally facilitate understanding but lack sophistication
+  - range: [3.0, 3.9]
+    label: Effective and Varied Cohesion
+    indicators:
+    - Uses a range of cohesive devices appropriately within sentences and paragraphs
+    - Creates smooth and logical connections that enhance readability
+    - Transitions are generally natural and support the flow of ideas
+  - range: [4.0, 4.0]
+    label: Highly Sophisticated and Seamless Cohesion
+    indicators:
+    - Employs a wide variety of cohesive devices with precision and skill
+    - Connections between ideas are seamless, enhancing overall coherence
+    - Transitions and references contribute to a polished and fluid reading experience
+  guidelines:
+  - Appropriate use of pronouns, conjunctions, and linking words
+  - Consistent referencing and substitution to avoid repetition
+  - Use of transitional phrases to connect sentences and ideas
+  score_range: [0.0, 4.0]
+  parent_id: coherence-cohesion-judge
+- id: coherence-cohesion-judge-transitional fluidity
+  name: Transition and Flow
+  version: '1.0'
+  description: This rubric assesses the smoothness and natural progression of ideas,
+    sentences, and paragraphs within the text. It evaluates how effectively transitions
+    facilitate understanding and guide the reader through the argument or narrative.
+  scoring_description: Score how well the response demonstrates transition and flow
+  definition: This rubric assesses the smoothness and natural progression of ideas,
+    sentences, and paragraphs within the text. It evaluates how effectively transitions
+    facilitate understanding and guide the reader through the argument or narrative.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Absent or Disruptive Transitions
+    indicators:
+    - Transitions are missing or severely hinder the flow of ideas
+    - Reader struggles to follow the progression of thoughts
+    - Ideas appear disconnected or abrupt
+  - range: [1.0, 1.9]
+    label: Minimal and Inconsistent Transitions
+    indicators:
+    - Few transitions are present and often awkward or inappropriate
+    - Flow is uneven, causing frequent disruptions in understanding
+    - Transitions do not reliably connect ideas or paragraphs
+  - range: [2.0, 2.9]
+    label: Basic but Mechanical Transitions
+    indicators:
+    - Some transitions are used, but they may be formulaic or repetitive
+    - Flow generally follows a logical sequence but lacks sophistication
+    - Transitions occasionally disrupt the natural flow
+  - range: [3.0, 3.9]
+    label: Effective and Smooth Transitions
+    indicators:
+    - Transitions are used appropriately to connect ideas and paragraphs
+    - Flow is generally smooth, guiding the reader logically
+    - Transitions enhance readability without overusing devices
+  - range: [4.0, 4.0]
+    label: Exceptional and Seamless Flow
+    indicators:
+    - Transitions are varied, precise, and enhance the overall coherence
+    - Ideas flow effortlessly with natural and sophisticated progression
+    - Reader experiences a seamless reading experience with clear connections
+  guidelines:
+  - Use of varied transition words and phrases
+  - Transitions accurately reflect the relationship between ideas
+  - Absence of abrupt or confusing jumps in logic
+  score_range: [0.0, 4.0]
+  parent_id: coherence-cohesion-judge
+- id: coherence-cohesion-judge-clarity of progression
+  name: Clarity of Idea Development
+  version: '1.0'
+  description: This rubric assesses how clearly and logically ideas and arguments
+    are developed throughout the text. It evaluates the transparency of reasoning
+    and the ease with which the reader can follow the progression of ideas.
+  scoring_description: Score how well the response demonstrates clarity of idea development
+  definition: This rubric assesses how clearly and logically ideas and arguments are
+    developed throughout the text. It evaluates the transparency of reasoning and
+    the ease with which the reader can follow the progression of ideas.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Poor
+    indicators:
+    - Ideas are disorganized or completely undeveloped, making comprehension impossible.
+    - Logical connections between ideas are absent or severely flawed.
+    - Reader cannot discern any coherent argument or progression.
+  - range: [1.0, 1.9]
+    label: Poor
+    indicators:
+    - Ideas are minimally developed with significant gaps in reasoning.
+    - Connections between ideas are weak or unclear, causing confusion.
+    - The overall progression is difficult to follow due to lack of clarity.
+  - range: [2.0, 2.9]
+    label: Adequate
+    indicators:
+    - Ideas are generally developed with some logical connections, but development
+      may lack depth.
+    - Progression of ideas is somewhat clear but occasionally awkward or incomplete.
+    - Reader can follow the main argument with effort, though transitions may be mechanical.
+  - range: [3.0, 3.9]
+    label: Good
+    indicators:
+    - Ideas are clearly developed with logical connections that support understanding.
+    - Progression of ideas is straightforward and mostly transparent.
+    - Transitions and reasoning are coherent, aiding reader comprehension.
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Ideas are thoroughly developed with clear, logical, and insightful connections.
+    - Progression of ideas is seamless, making reasoning transparent and intuitive.
+    - Transitions and argumentation are precise, enhancing overall clarity and understanding.
+  guidelines:
+  - Clear topic sentences and supporting details
+  - Logical sequence of points within paragraphs
+  - Explicit links between ideas to show progression
+  score_range: [0.0, 4.0]
+  parent_id: coherence-cohesion-judge
+- id: coherence-cohesion-judge-cohesive device appropriateness
+  name: Use of Cohesive Devices
+  version: '1.0'
+  description: This rubric assesses the appropriateness, variety, and effectiveness
+    of cohesive devices used to connect ideas and sentences within the text. It evaluates
+    how well these devices enhance clarity, flow, and logical progression throughout
+    the writing.
+  scoring_description: Score how well the response demonstrates use of cohesive devices
+  definition: This rubric assesses the appropriateness, variety, and effectiveness
+    of cohesive devices used to connect ideas and sentences within the text. It evaluates
+    how well these devices enhance clarity, flow, and logical progression throughout
+    the writing.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Inadequate
+    indicators:
+    - Minimal or no use of cohesive devices; frequent errors or misuse that hinder
+      understanding
+    - Devices used are inappropriate or confusing, disrupting the flow
+    - Lack of variety, resulting in repetitive or mechanical connections
+  - range: [1.0, 1.9]
+    label: Limited
+    indicators:
+    - Few cohesive devices used, with frequent incorrect or awkward application
+    - Some devices are inappropriate or do not effectively connect ideas
+    - Limited variety, leading to choppy or disjointed flow
+  - range: [2.0, 2.9]
+    label: Adequate
+    indicators:
+    - Basic use of cohesive devices that generally connect ideas appropriately
+    - Some variety in devices, but occasional repetition or mechanical use
+    - Devices mostly contribute to clarity, with minor lapses in effectiveness
+  - range: [3.0, 3.9]
+    label: Effective
+    indicators:
+    - Appropriate and varied use of cohesive devices that enhance flow and clarity
+    - Devices are correctly applied and contribute to smooth transitions
+    - Some sophistication in the choice and placement of devices
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Highly appropriate, diverse, and skillful use of cohesive devices
+    - Devices seamlessly connect ideas, significantly enhancing coherence and flow
+    - Masterful use of a wide range of devices that elevate the overall quality of
+      the text
+  guidelines:
+  - Variety of linking words and phrases used appropriately
+  - Cohesive devices enhance understanding without redundancy
+  - Precise use of pronouns and reference words to avoid ambiguity
+  score_range: [0.0, 4.0]
+  parent_id: coherence-cohesion-judge
+- id: lexical-resource-judge
+  name: Lexical Resource
+  version: '1.0'
+  description: Evaluates the range and accuracy of vocabulary used, including appropriate
+    terminology and expressions
+  scoring_description: Score the breadth, precision, and appropriateness of vocabulary
+    usage
+  definition: '"Lexical Resource" evaluates the range of vocabulary employed, the
+    precision and appropriateness
+
+    of word choice, the ability to use less common vocabulary effectively, and the
+    accuracy
+
+    of spelling and word formation.
+
+    '
+  criteria:
+  - range: [0.0, 1.5]
+    label: SEVERELY LIMITED VOCABULARY
+    indicators:
+    - Extremely limited, repetitive, or inappropriate vocabulary
+    - Frequent errors that obscure meaning
+    - Pervasive spelling errors
+  - range: [2.0, 3.5]
+    label: LIMITED VOCABULARY
+    indicators:
+    - Basic and repetitive vocabulary
+    - Frequent errors in word choice and collocation
+    - Multiple spelling errors affecting clarity
+  - range: [4.0, 5.5]
+    label: ADEQUATE VOCABULARY
+    indicators:
+    - Adequate vocabulary but limited range
+    - Some word repetition and inaccurate usage
+    - Occasional spelling errors
+  - range: [6.0, 7.5]
+    label: STRONG VOCABULARY
+    indicators:
+    - Good range of vocabulary appropriate for task
+    - Generally accurate word choice
+    - Some sophisticated vocabulary used effectively
+  - range: [8.0, 9.0]
+    label: EXEMPLARY VOCABULARY
+    indicators:
+    - Wide and sophisticated range used with precision
+    - Skillful use of less common expressions
+    - Rare or no errors in spelling
+  guidelines:
+  - Use 0.5 increments (e.g., 2.5, 6.0, 7.5).
+  - Assess both range and accuracy of vocabulary.
+  - Sophisticated vocabulary with errors may score lower than simpler accurate usage.
+  score_range: [0.0, 9.0]
+- id: lexical-resource-judge-vocabulary_range
+  name: Vocabulary Range
+  version: '1.0'
+  description: This rubric assesses the variety and richness of vocabulary used in
+    the response, focusing on the breadth of words, including both common and less
+    common terms, and how appropriately they are employed. It evaluates the extent
+    to which the vocabulary demonstrates diversity, sophistication, and suitability
+    for the task.
+  scoring_description: Score how well the response demonstrates vocabulary range
+  definition: This rubric assesses the variety and richness of vocabulary used in
+    the response, focusing on the breadth of words, including both common and less
+    common terms, and how appropriately they are employed. It evaluates the extent
+    to which the vocabulary demonstrates diversity, sophistication, and suitability
+    for the task.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Severely Limited
+    indicators:
+    - Uses extremely limited and repetitive vocabulary with little to no variation
+    - Relies on basic, often incorrect or inappropriate words that hinder clarity
+    - Fails to demonstrate any attempt at lexical variety
+  - range: [1.0, 1.9]
+    label: Limited
+    indicators:
+    - Uses basic vocabulary predominantly with minimal variety
+    - Occasional attempts at variety are unsuccessful or awkward
+    - Limited use of less common or precise words, with frequent repetition
+  - range: [2.0, 2.9]
+    label: Adequate
+    indicators:
+    - Displays a reasonable range of vocabulary appropriate for the task
+    - Includes some less common words, but with limited variety or depth
+    - Vocabulary choices are generally suitable but may lack sophistication
+  - range: [3.0, 3.9]
+    label: Strong
+    indicators:
+    - Demonstrates a good range of vocabulary with appropriate variety
+    - Uses some less common and precise words effectively
+    - Shows awareness of lexical richness suitable for the task
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Exhibits a wide and diverse vocabulary with excellent lexical variety
+    - Skillfully employs less common, precise, and sophisticated words
+    - Vocabularly enhances clarity and expressiveness, demonstrating lexical mastery
+  guidelines:
+  - Use of a variety of words and expressions
+  - Inclusion of less common or sophisticated vocabulary
+  - Avoidance of repetitive word choices
+  score_range: [0.0, 4.0]
+  parent_id: lexical-resource-judge
+- id: lexical-resource-judge-word_precision
+  name: Word Precision
+  version: '1.0'
+  description: This rubric assesses the accuracy and appropriateness of word choice
+    within context. It measures how well the vocabulary used conveys intended meanings
+    without ambiguity or misinterpretation, ensuring clarity and specificity.
+  scoring_description: Score how well the response demonstrates word precision
+  definition: This rubric assesses the accuracy and appropriateness of word choice
+    within context. It measures how well the vocabulary used conveys intended meanings
+    without ambiguity or misinterpretation, ensuring clarity and specificity.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Inaccurate or Misleading
+    indicators:
+    - Frequent use of incorrect or inappropriate words that distort meaning
+    - Misleading or confusing word choices that hinder understanding
+    - Persistent ambiguity due to imprecise vocabulary
+  - range: [1.0, 1.9]
+    label: Limited Precision
+    indicators:
+    - Occasional use of words that are somewhat imprecise or slightly misaligned with
+      context
+    - Some ambiguity or vagueness affecting clarity
+    - Inconsistent word choice that may cause minor confusion
+  - range: [2.0, 2.9]
+    label: Adequate Precision
+    indicators:
+    - Generally appropriate and accurate word choice with few errors
+    - Minor instances where word selection could be more precise
+    - Mostly clear communication with occasional ambiguity
+  - range: [3.0, 3.9]
+    label: Highly Precise
+    indicators:
+    - Consistently accurate and contextually appropriate word choice
+    - Effective use of words to convey specific meanings clearly
+    - Rare minor lapses that do not impact overall clarity
+  - range: [4.0, 4.0]
+    label: Exceptional Precision
+    indicators:
+    - Exceptional accuracy and appropriateness of vocabulary
+    - Words precisely match intended meanings, avoiding ambiguity
+    - Effective and nuanced use of vocabulary that enhances clarity and expression
+  guidelines:
+  - Correct use of words in context
+  - Appropriate collocations and idiomatic expressions
+  - Minimal misused or awkward words
+  score_range: [0.0, 4.0]
+  parent_id: lexical-resource-judge
+- id: lexical-resource-judge-spelling_and_word_formation
+  name: Spelling and Word Formation
+  version: '1.0'
+  description: This rubric assesses the accuracy and correctness of spelling, morphological
+    structures, and word formation in the response. It ensures that words are written
+    correctly, properly formed, and contribute to clear and professional communication.
+  scoring_description: Score how well the response demonstrates spelling and word
+    formation
+  definition: This rubric assesses the accuracy and correctness of spelling, morphological
+    structures, and word formation in the response. It ensures that words are written
+    correctly, properly formed, and contribute to clear and professional communication.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Unacceptable
+    indicators:
+    - Frequent and pervasive spelling errors that obscure meaning
+    - Incorrect or inconsistent word formation and morphology throughout
+    - Severely impairs readability and professionalism
+  - range: [1.0, 1.9]
+    label: Limited
+    indicators:
+    - Numerous spelling errors that occasionally hinder understanding
+    - Inconsistent or incorrect word formation and morphology in multiple instances
+    - Requires significant editing for clarity
+  - range: [2.0, 2.9]
+    label: Developing
+    indicators:
+    - Some spelling errors, mostly minor and not affecting overall comprehension
+    - Occasional incorrect word formation or morphological errors
+    - Minor issues with clarity or professionalism
+  - range: [3.0, 3.9]
+    label: Proficient
+    indicators:
+    - Few spelling errors, mostly correct with minor lapses
+    - Proper word formation and morphology used consistently
+    - Clear and professional presentation with minimal errors
+  - range: [4.0, 4.0]
+    label: Excellent
+    indicators:
+    - Accurate spelling throughout with no errors
+    - Correct and sophisticated use of word formation and morphology
+    - Enhances clarity, professionalism, and overall quality of the response
+  guidelines:
+  - Few or no spelling errors
+  - Correct use of prefixes, suffixes, and compound words
+  - Proper word inflections and grammatical forms
+  score_range: [0.0, 4.0]
+  parent_id: lexical-resource-judge
+- id: lexical-resource-judge-lexical appropriateness
+  name: Lexical Appropriateness
+  version: '1.0'
+  description: This rubric evaluates the suitability and relevance of vocabulary choices
+    in relation to the task, audience, and context. It considers how well the vocabulary
+    aligns with the purpose and tone, contributing to the overall coherence and effectiveness
+    of the response.
+  scoring_description: Score how well the response demonstrates lexical appropriateness
+  definition: This rubric evaluates the suitability and relevance of vocabulary choices
+    in relation to the task, audience, and context. It considers how well the vocabulary
+    aligns with the purpose and tone, contributing to the overall coherence and effectiveness
+    of the response.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Inappropriate or Misaligned Vocabulary
+    indicators:
+    - Vocabulary choices are largely unsuitable for the task, audience, or context,
+      causing confusion or misinterpretation.
+    - Uses inappropriate or overly informal/colloquial language that detracts from
+      the response's purpose.
+    - Vocabulary does not support the tone or style required.
+  - range: [1.0, 1.9]
+    label: Limited and Occasionally Inappropriate Vocabulary
+    indicators:
+    - Vocabulary is somewhat relevant but often limited or simplistic, reducing clarity
+      or engagement.
+    - Some word choices are slightly mismatched with the context or tone.
+    - Occasional lapses in appropriateness that slightly hinder coherence.
+  - range: [2.0, 2.9]
+    label: Generally Appropriate Vocabulary
+    indicators:
+    - Vocabulary generally aligns with the task, audience, and context, supporting
+      clarity.
+    - Uses suitable language with minor lapses or awkward choices that do not significantly
+      affect understanding.
+    - Tone and style are appropriate but may lack sophistication or nuance.
+  - range: [3.0, 3.9]
+    label: Appropriate and Well-Suited Vocabulary
+    indicators:
+    - Vocabulary choices are appropriate and enhance the coherence and tone of the
+      response.
+    - Uses varied and precise language that fits well with the purpose and audience.
+    - Tone is consistent and supports the overall effectiveness of the response.
+  - range: [4.0, 4.0]
+    label: Highly Suitable and Contextually Nuanced Vocabulary
+    indicators:
+    - Vocabulary is expertly tailored to the task, audience, and context, significantly
+      enhancing clarity and engagement.
+    - Employs precise, varied, and contextually nuanced language that elevates the
+      response.
+    - Tone and style are perfectly aligned, demonstrating a sophisticated understanding
+      of appropriate lexical choices.
+  guidelines:
+  - Use of formal or informal language as appropriate
+  - Selection of terminology relevant to the subject matter
+  - Avoidance of overly casual or inappropriate words
+  score_range: [0.0, 4.0]
+  parent_id: lexical-resource-judge
+- id: grammatical-range-accuracy-judge
+  name: Grammatical Range and Accuracy
+  version: '1.0'
+  description: Evaluates control of sentence structure, verb tenses, and overall grammatical
+    accuracy
+  scoring_description: Score the variety of grammatical structures and the accuracy
+    of their use
+  definition: '"Grammatical Range and Accuracy" evaluates the variety of sentence
+    structures used,
+
+    the control of complex grammatical forms, the accuracy of verb tenses and agreement,
+
+    and the frequency and severity of grammatical errors.
+
+    '
+  criteria:
+  - range: [0.0, 1.5]
+    label: MINIMAL CONTROL
+    indicators:
+    - Only simple structures attempted, often with errors
+    - Pervasive errors that severely impede communication
+    - Little control of verb tenses or agreement
+  - range: [2.0, 3.5]
+    label: LIMITED RANGE
+    indicators:
+    - Predominantly simple structures with frequent errors
+    - Attempts at complex structures result in errors
+    - Errors often impede meaning
+  - range: [4.0, 5.5]
+    label: ADEQUATE RANGE
+    indicators:
+    - Mix of simple and complex sentences with noticeable errors
+    - Some variety though complex forms may be awkward
+    - Errors present but generally don't impede communication
+  - range: [6.0, 7.5]
+    label: STRONG RANGE AND ACCURACY
+    indicators:
+    - Good range of grammatical structures
+    - Complex sentences well-constructed and punctuated
+    - Minor errors don't affect clarity
+  - range: [8.0, 9.0]
+    label: EXEMPLARY GRAMMAR
+    indicators:
+    - Wide range of sophisticated structures with full control
+    - Virtually error-free with only rare slips
+    - Complex forms used naturally and accurately
+  guidelines:
+  - Use 0.5 increments (e.g., 2.5, 6.0, 7.5).
+  - Consider both range and accuracy of structures.
+  - Assess whether errors affect comprehension.
+  score_range: [0.0, 9.0]
+- id: grammatical-range-accuracy-judge-sentence-structure-variety
+  name: Range of Sentence Structures
+  version: '1.0'
+  description: This rubric evaluates the variety and complexity of sentence types
+    used in the response. It considers the presence of simple, compound, and complex
+    sentences, as well as the appropriate use of varied grammatical constructions
+    to demonstrate syntactic diversity.
+  scoring_description: Score how well the response demonstrates range of sentence
+    structures
+  definition: This rubric evaluates the variety and complexity of sentence types used
+    in the response. It considers the presence of simple, compound, and complex sentences,
+    as well as the appropriate use of varied grammatical constructions to demonstrate
+    syntactic diversity.
+  criteria:
+  - range: [0.0, 0.9]
+    label: No variety
+    indicators:
+    - Uses only simple sentences with little to no variation
+    - Lacks complexity, relying on repetitive sentence patterns
+    - Rarely or never employs compound or complex structures
+  - range: [1.0, 1.9]
+    label: Limited variety
+    indicators:
+    - Predominantly simple sentences with occasional attempts at compound sentences
+    - Minimal use of complex or varied structures
+    - Limited syntactic diversity, with frequent repetition
+  - range: [2.0, 2.9]
+    label: Basic variety
+    indicators:
+    - Uses a mix of simple and compound sentences with some variety
+    - Occasionally employs complex sentences, though not consistently
+    - Some attempt at syntactic diversity, but structures may be basic or awkward
+  - range: [3.0, 3.9]
+    label: Good variety
+    indicators:
+    - Uses a range of simple, compound, and some complex sentences effectively
+    - Displays awareness of different sentence structures to enhance clarity
+    - Complex sentences are used appropriately and with some sophistication
+  - range: [4.0, 4.0]
+    label: Excellent variety
+    indicators:
+    - Demonstrates a wide and sophisticated range of sentence structures
+    - Effectively employs simple, compound, and complex sentences to enhance expression
+    - Uses varied grammatical constructions seamlessly, contributing to a nuanced
+      and engaging response
+  guidelines:
+  - Use of simple, compound, and complex sentences
+  - Inclusion of varied sentence starters and forms
+  - Use of complex grammatical constructions such as relative clauses or conditionals
+  score_range: [0.0, 4.0]
+  parent_id: grammatical-range-accuracy-judge
+- id: grammatical-range-accuracy-judge-verb-tense-control
+  name: Verb Tense and Agreement Accuracy
+  version: '1.0'
+  description: This rubric assesses the precision and consistency of verb tense usage
+    and subject-verb agreement throughout the writing. It evaluates the extent to
+    which the writer correctly applies tense forms and maintains agreement to ensure
+    clarity and grammatical correctness.
+  scoring_description: Score how well the response demonstrates verb tense and agreement
+    accuracy
+  definition: This rubric assesses the precision and consistency of verb tense usage
+    and subject-verb agreement throughout the writing. It evaluates the extent to
+    which the writer correctly applies tense forms and maintains agreement to ensure
+    clarity and grammatical correctness.
+  criteria:
+  - range: [0.0, 0.9]
+    label: No Control
+    indicators:
+    - Frequent and severe errors in verb tense and agreement that hinder understanding
+    - Inconsistent or incorrect tense usage throughout the text
+    - Subject-verb agreement errors are pervasive and impede communication
+  - range: [1.0, 1.9]
+    label: Limited Control
+    indicators:
+    - Many errors in tense consistency and agreement, affecting clarity
+    - Occasional correct tense use but often inconsistent or incorrect
+    - Subject-verb agreement errors are common and sometimes confusing
+  - range: [2.0, 2.9]
+    label: Basic Control
+    indicators:
+    - Some correct tense and agreement usage, but with frequent errors
+    - Inconsistencies may occasionally cause confusion, but overall meaning is clear
+    - Errors are noticeable but do not severely impede understanding
+  - range: [3.0, 3.9]
+    label: Good Control
+    indicators:
+    - Mostly correct tense and agreement usage with occasional minor errors
+    - Tense consistency is maintained in most parts of the text
+    - Errors rarely affect clarity or comprehension
+  - range: [4.0, 4.0]
+    label: Excellent Control
+    indicators:
+    - Consistent and accurate use of verb tenses and subject-verb agreement throughout
+    - No noticeable errors, demonstrating strong grammatical control
+    - Tense and agreement are used precisely to enhance clarity and style
+  guidelines:
+  - Correct use of past, present, and future tenses
+  - Proper subject-verb agreement in all sentences
+  - Minimal tense shifts or agreement errors
+  score_range: [0.0, 4.0]
+  parent_id: grammatical-range-accuracy-judge
+- id: grammatical-range-accuracy-judge-grammatical-error-severity
+  name: Severity and Frequency of Errors
+  version: '1.0'
+  description: This rubric assesses the presence, severity, and frequency of grammatical
+    errors within a response. It evaluates how these errors impact overall readability,
+    comprehension, and the ability to communicate ideas effectively.
+  scoring_description: Score how well the response demonstrates severity and frequency
+    of errors
+  definition: This rubric assesses the presence, severity, and frequency of grammatical
+    errors within a response. It evaluates how these errors impact overall readability,
+    comprehension, and the ability to communicate ideas effectively.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Severe Errors Dominant
+    indicators:
+    - Frequent and severe grammatical errors that significantly hinder understanding
+    - Errors often obscure meaning, requiring substantial effort to interpret
+    - Very little control over basic grammar, with pervasive mistakes
+  - range: [1.0, 1.9]
+    label: Major Errors Present
+    indicators:
+    - Multiple errors that occasionally impede comprehension
+    - Errors are noticeable and sometimes distract from the message
+    - Limited control of grammar, with errors affecting clarity at times
+  - range: [2.0, 2.9]
+    label: Moderate Errors
+    indicators:
+    - Some grammatical errors that are infrequent and do not severely obstruct understanding
+    - Errors may require rereading or interpretation but overall message remains clear
+    - Basic control with occasional lapses that do not significantly hinder communication
+  - range: [3.0, 3.9]
+    label: Minor Errors
+    indicators:
+    - Few grammatical errors, mostly minor and not affecting overall clarity
+    - Errors are rare and do not interfere with understanding
+    - Good control of grammar with only isolated slips
+  - range: [4.0, 4.0]
+    label: Minimal or No Errors
+    indicators:
+    - Virtually error-free with exceptional grammatical accuracy
+    - Errors, if any, are extremely rare and do not impact readability
+    - Consistently accurate grammar that enhances clarity and professionalism
+  guidelines:
+  - Number of errors per sentence
+  - Errors that cause confusion or misinterpretation
+  - Type of errors, from minor slips to major grammatical mistakes
+  score_range: [0.0, 4.0]
+  parent_id: grammatical-range-accuracy-judge
+- id: grammatical-range-accuracy-judge-complexity-control
+  name: Control of Complex Structures
+  version: '1.0'
+  description: This rubric evaluates the ability to accurately and effectively utilize
+    complex grammatical forms, such as subordinate clauses, relative clauses, and
+    advanced syntax. It assesses both the mastery and correctness of these structures
+    within the language use.
+  scoring_description: Score how well the response demonstrates control of complex
+    structures
+  definition: This rubric evaluates the ability to accurately and effectively utilize
+    complex grammatical forms, such as subordinate clauses, relative clauses, and
+    advanced syntax. It assesses both the mastery and correctness of these structures
+    within the language use.
+  criteria:
+  - range: [0.0, 0.9]
+    label: No Control
+    indicators:
+    - Fails to use or attempt complex grammatical structures
+    - Frequent errors or ungrammatical constructions when attempting complex forms
+    - Complex sentences are absent or severely flawed, impeding understanding
+  - range: [1.0, 1.9]
+    label: Limited Control
+    indicators:
+    - Attempts some complex structures but with frequent errors
+    - Errors often interfere with clarity and understanding
+    - Use of complex forms is inconsistent and often awkward
+  - range: [2.0, 2.9]
+    label: Basic Control
+    indicators:
+    - Uses some complex structures correctly with occasional errors
+    - Demonstrates an emerging ability to integrate complex forms
+    - Errors are present but generally do not impede overall comprehension
+  - range: [3.0, 3.9]
+    label: Proficient Control
+    indicators:
+    - Consistently uses complex grammatical forms accurately and effectively
+    - Complex sentences are well-constructed and enhance clarity
+    - Minor errors may occur but do not detract from overall correctness
+  - range: [4.0, 4.0]
+    label: Excellent Control
+    indicators:
+    - Masterfully employs a wide range of complex structures with full accuracy
+    - Complex sentences are natural, varied, and enhance the sophistication of the
+      language
+    - Errors are rare or nonexistent, demonstrating high-level grammatical mastery
+  guidelines:
+  - Correct embedding of clauses
+  - Use of advanced grammatical forms without errors
+  - Complex structures enhance clarity rather than hinder it
+  score_range: [0.0, 4.0]
+  parent_id: grammatical-range-accuracy-judge
+- id: grammatical-range-accuracy-judge-grammatical-accuracy-consistency
+  name: Consistency of Grammatical Accuracy
+  version: '1.0'
+  description: This rubric assesses the degree to which grammatical correctness is
+    maintained consistently throughout the response, regardless of sentence complexity
+    or variety. It considers the reliability of grammatical control across the entire
+    text, not just isolated instances.
+  scoring_description: Score how well the response demonstrates consistency of grammatical
+    accuracy
+  definition: This rubric assesses the degree to which grammatical correctness is
+    maintained consistently throughout the response, regardless of sentence complexity
+    or variety. It considers the reliability of grammatical control across the entire
+    text, not just isolated instances.
+  criteria:
+  - range: [0.0, 0.9]
+    label: Very Inconsistent
+    indicators:
+    - Frequent and severe grammatical errors appear randomly, disrupting overall understanding
+    - No noticeable consistency in grammatical control across sentences or paragraphs
+    - Errors often change the meaning or make comprehension difficult
+  - range: [1.0, 1.9]
+    label: Inconsistent
+    indicators:
+    - Multiple grammatical errors scattered throughout the response
+    - Some sections are clearer than others, with errors occasionally impeding understanding
+    - Inconsistent control of basic grammatical features, especially in complex sentences
+  - range: [2.0, 2.9]
+    label: Moderately Consistent
+    indicators:
+    - Most of the response maintains grammatical correctness, with occasional errors
+    - Errors are generally minor and do not significantly hinder comprehension
+    - Some lapses in accuracy occur, especially in more complex sentence structures
+  - range: [3.0, 3.9]
+    label: Mostly Consistent
+    indicators:
+    - Grammatical accuracy is maintained throughout most of the response
+    - Errors are rare and usually minor, with little impact on overall clarity
+    - Some minor lapses may occur in complex structures but are not frequent
+  - range: [4.0, 4.0]
+    label: Highly Consistent
+    indicators:
+    - Grammatical correctness is reliably maintained throughout the entire response
+    - Errors are very rare, minor, and do not affect understanding
+    - Demonstrates strong control of grammar across simple and complex sentences with
+      consistent accuracy
+  guidelines:
+  - Consistent correct use of grammar across sentences
+  - Few to no slips or lapses in grammatical accuracy
+  - Steady control of grammatical forms in different contexts
+  score_range: [0.0, 4.0]
+  parent_id: grammatical-range-accuracy-judge
