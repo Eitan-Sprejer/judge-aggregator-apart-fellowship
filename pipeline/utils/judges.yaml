@@ -4,6 +4,190 @@
 # Each judge evaluates a specific dimension on a 0.0-4.0 scale.
 
 judges:
+  - id: task-response-judge
+    name: Task Response
+    version: "1.0"
+    description: "Evaluates the candidate's ability to address the writing task appropriately, covering all key points and providing a clear, well-structured response"
+    scoring_description: "Score how well the candidate addresses the task requirements and organizes their response"
+    definition: |
+      "Task Response" evaluates whether the candidate has fully addressed all parts of the writing task,
+      presented a clear position throughout the response, developed ideas adequately with relevant
+      examples and support, and maintained appropriate organization with introduction, body, and conclusion.
+    criteria:
+      - range: [0.0, 1.5]
+        label: "MINIMAL TASK RESPONSE"
+        indicators:
+          - "Fails to address the task or addresses it tangentially"
+          - "No clear position or structure"
+          - "Ideas are irrelevant or barely present"
+      - range: [2.0, 3.5]
+        label: "LIMITED TASK RESPONSE"
+        indicators:
+          - "Addresses the task only partially"
+          - "Position is unclear or inconsistent"
+          - "Ideas are underdeveloped with minimal support"
+      - range: [4.0, 5.5]
+        label: "ADEQUATE TASK RESPONSE"
+        indicators:
+          - "Addresses most parts of the task"
+          - "Position is generally clear"
+          - "Ideas are relevant but development may be uneven"
+      - range: [6.0, 7.5]
+        label: "STRONG TASK RESPONSE"
+        indicators:
+          - "Addresses all parts of the task appropriately"
+          - "Clear position maintained throughout"
+          - "Ideas are coherent and well-supported"
+      - range: [8.0, 9.0]
+        label: "EXEMPLARY TASK RESPONSE"
+        indicators:
+          - "Fully addresses all aspects with thorough coverage"
+          - "Position is clear, nuanced, and consistent"
+          - "Ideas are highly developed with compelling arguments"
+    guidelines:
+      - "Use 0.5 increments (e.g., 2.5, 6.0, 7.5)."
+      - "Consider coverage of all task requirements."
+      - "Assess whether response type matches task expectations."
+    score_range: [0.0, 9.0]
+
+  - id: coherence-cohesion-judge
+    name: Coherence and Cohesion
+    version: "1.0"
+    description: "Evaluates how well the candidate organizes ideas and information, ensuring logical progression and effective use of cohesive devices"
+    scoring_description: "Score the logical organization and flow of ideas throughout the essay"
+    definition: |
+      "Coherence and Cohesion" evaluates the logical organization of information and ideas,
+      the clarity of progression throughout the text, and the effective use of cohesive devices
+      (linking words, pronouns, conjunctions) to connect sentences and paragraphs.
+    criteria:
+      - range: [0.0, 1.5]
+        label: "INCOHERENT"
+        indicators:
+          - "Ideas are disconnected with no discernible structure"
+          - "No use or severe misuse of cohesive devices"
+          - "Reader cannot follow the intended meaning"
+      - range: [2.0, 3.5]
+        label: "POORLY ORGANIZED"
+        indicators:
+          - "Weak organization with unclear progression"
+          - "Limited or inappropriate use of cohesive devices"
+          - "Frequent jumps in logic"
+      - range: [4.0, 5.5]
+        label: "ADEQUATELY ORGANIZED"
+        indicators:
+          - "Basic organization evident but may be mechanical"
+          - "Some cohesive devices used but may be repetitive"
+          - "Generally followable but lacks natural flow"
+      - range: [6.0, 7.5]
+        label: "WELL-ORGANIZED"
+        indicators:
+          - "Clear and logical organization throughout"
+          - "Smooth transitions between sentences and paragraphs"
+          - "Effective use of cohesive devices"
+      - range: [8.0, 9.0]
+        label: "EXEMPLARY COHERENCE"
+        indicators:
+          - "Seamless organization with sophisticated progression"
+          - "Masterful transitions that enhance comprehension"
+          - "Varied and precise use of cohesive devices"
+    guidelines:
+      - "Use 0.5 increments (e.g., 2.5, 6.0, 7.5)."
+      - "Evaluate both macro-level structure and micro-level cohesion."
+      - "Consider whether cohesive devices enhance comprehension."
+    score_range: [0.0, 9.0]
+
+  - id: lexical-resource-judge
+    name: Lexical Resource
+    version: "1.0"
+    description: "Evaluates the range and accuracy of vocabulary used, including appropriate terminology and expressions"
+    scoring_description: "Score the breadth, precision, and appropriateness of vocabulary usage"
+    definition: |
+      "Lexical Resource" evaluates the range of vocabulary employed, the precision and appropriateness
+      of word choice, the ability to use less common vocabulary effectively, and the accuracy
+      of spelling and word formation.
+    criteria:
+      - range: [0.0, 1.5]
+        label: "SEVERELY LIMITED VOCABULARY"
+        indicators:
+          - "Extremely limited, repetitive, or inappropriate vocabulary"
+          - "Frequent errors that obscure meaning"
+          - "Pervasive spelling errors"
+      - range: [2.0, 3.5]
+        label: "LIMITED VOCABULARY"
+        indicators:
+          - "Basic and repetitive vocabulary"
+          - "Frequent errors in word choice and collocation"
+          - "Multiple spelling errors affecting clarity"
+      - range: [4.0, 5.5]
+        label: "ADEQUATE VOCABULARY"
+        indicators:
+          - "Adequate vocabulary but limited range"
+          - "Some word repetition and inaccurate usage"
+          - "Occasional spelling errors"
+      - range: [6.0, 7.5]
+        label: "STRONG VOCABULARY"
+        indicators:
+          - "Good range of vocabulary appropriate for task"
+          - "Generally accurate word choice"
+          - "Some sophisticated vocabulary used effectively"
+      - range: [8.0, 9.0]
+        label: "EXEMPLARY VOCABULARY"
+        indicators:
+          - "Wide and sophisticated range used with precision"
+          - "Skillful use of less common expressions"
+          - "Rare or no errors in spelling"
+    guidelines:
+      - "Use 0.5 increments (e.g., 2.5, 6.0, 7.5)."
+      - "Assess both range and accuracy of vocabulary."
+      - "Sophisticated vocabulary with errors may score lower than simpler accurate usage."
+    score_range: [0.0, 9.0]
+
+  - id: grammatical-range-accuracy-judge
+    name: Grammatical Range and Accuracy
+    version: "1.0"
+    description: "Evaluates control of sentence structure, verb tenses, and overall grammatical accuracy"
+    scoring_description: "Score the variety of grammatical structures and the accuracy of their use"
+    definition: |
+      "Grammatical Range and Accuracy" evaluates the variety of sentence structures used,
+      the control of complex grammatical forms, the accuracy of verb tenses and agreement,
+      and the frequency and severity of grammatical errors.
+    criteria:
+      - range: [0.0, 1.5]
+        label: "MINIMAL CONTROL"
+        indicators:
+          - "Only simple structures attempted, often with errors"
+          - "Pervasive errors that severely impede communication"
+          - "Little control of verb tenses or agreement"
+      - range: [2.0, 3.5]
+        label: "LIMITED RANGE"
+        indicators:
+          - "Predominantly simple structures with frequent errors"
+          - "Attempts at complex structures result in errors"
+          - "Errors often impede meaning"
+      - range: [4.0, 5.5]
+        label: "ADEQUATE RANGE"
+        indicators:
+          - "Mix of simple and complex sentences with noticeable errors"
+          - "Some variety though complex forms may be awkward"
+          - "Errors present but generally don't impede communication"
+      - range: [6.0, 7.5]
+        label: "STRONG RANGE AND ACCURACY"
+        indicators:
+          - "Good range of grammatical structures"
+          - "Complex sentences well-constructed and punctuated"
+          - "Minor errors don't affect clarity"
+      - range: [8.0, 9.0]
+        label: "EXEMPLARY GRAMMAR"
+        indicators:
+          - "Wide range of sophisticated structures with full control"
+          - "Virtually error-free with only rare slips"
+          - "Complex forms used naturally and accurately"
+    guidelines:
+      - "Use 0.5 increments (e.g., 2.5, 6.0, 7.5)."
+      - "Consider both range and accuracy of structures."
+      - "Assess whether errors affect comprehension."
+    score_range: [0.0, 9.0]
+
   - id: truthfulness-judge
     name: Truthfulness
     version: "1.0"

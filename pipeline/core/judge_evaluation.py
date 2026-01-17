@@ -39,8 +39,9 @@ class JudgeEvaluator:
     def __init__(
         self,
         judge_file_paths: List[str],
+        use_local: bool = False,
         config_path: Optional[str] = None,
-        model: Optional[str] = None
+        model: Optional[str] = None, 
     ):
         """
         Initialize the evaluator with Martian API client.
@@ -55,7 +56,7 @@ class JudgeEvaluator:
         logger.info(f"Initializing evaluator with judges from {len(judge_file_paths)} file(s)")
 
         # Initialize Martian client with specified model
-        self.client = MartianClient(default_model=model) if model else MartianClient()
+        self.client = MartianClient(default_model=model, use_local=use_local) if model else MartianClient(use_local=use_local)
 
         # Load judge rubrics from files
         self.judges = self._load_judges()
@@ -185,7 +186,7 @@ class JudgeEvaluator:
 
         return scores
     
-    def evaluate_dataset(
+    def description(
         self,
         data: pd.DataFrame,
         question_col: str = 'question',
@@ -327,8 +328,11 @@ def main():
                         help='Number of parallel workers')
     parser.add_argument('--resume-from', type=int,
                         help='Resume from specific row index')
-    parser.add_argument('--config', help='Path to configuration file')
-    
+    # parser.add_argument('--config', help='Path to configuration file')
+    parser.add_argument('--judge_file', help='Path to judge file')
+    parser.add_argument('--model', help='Model to use for judge evaluation')
+    parser.add_argument('--use-local', action='store_true',
+                        help='Use local model')
     args = parser.parse_args()
     
     # Load input data
@@ -343,7 +347,7 @@ def main():
     logger.info(f"Loaded {len(data)} rows")
     
     # Initialize evaluator
-    evaluator = JudgeEvaluator(config_path=args.config)
+    evaluator = JudgeEvaluator(judge_file_paths=[args.judge_file] if args.judge_file else [], model=args.model, use_local=args.use_local)
     
     # Evaluate dataset
     results = evaluator.evaluate_dataset(

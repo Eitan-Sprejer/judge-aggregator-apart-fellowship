@@ -69,7 +69,9 @@ class MartianClient:
         max_retries: int = 5,
         initial_retry_delay: float = 1.0,
         max_retry_delay: float = 60.0,
-        timeout: float = 60.0
+        timeout: float = 60.0,
+        use_local: bool = False,
+        # local_repo: Optional[str] = None
     ):
         """
         Initialize Martian client.
@@ -83,14 +85,18 @@ class MartianClient:
             initial_retry_delay: Initial delay in seconds for exponential backoff
             max_retry_delay: Maximum delay between retries
             timeout: Request timeout in seconds
+            use_local: Whether to use a local API endpoint
+            local_repo: Local model repository to use if use_local is True
         """
         self.api_key = api_key or os.getenv("MARTIAN_API_KEY")
-        if not self.api_key:
+        if not self.api_key and not use_local:
             raise ValueError(
                 "MARTIAN_API_KEY not found. Set it in .env or pass explicitly."
             )
 
-        self.base_url = base_url
+        self.use_local = use_local
+        self.local_repo = default_model if use_local else None
+        self.base_url = base_url if not use_local else "http://localhost:8000/v1"
         self.default_model = default_model
         self.temperature = temperature
         self.max_retries = max_retries
@@ -98,13 +104,14 @@ class MartianClient:
         self.max_retry_delay = max_retry_delay
         self.timeout = timeout
 
-        self.client = OpenAI(
-            api_key=self.api_key,
-            base_url=self.base_url,
-            timeout=timeout
-        )
+        if not use_local:
+            self.client = OpenAI(
+                api_key=self.api_key,
+                base_url=self.base_url,
+                timeout=timeout
+            )
 
-        logger.info(f"Initialized Martian client with base_url: {base_url}")
+        logger.info(f"Initialized Martian client with base_url: {self.base_url}")
 
     def _calculate_retry_delay(self, attempt: int, base_delay: Optional[float] = None) -> float:
         """
@@ -152,6 +159,22 @@ Response to Evaluate:
 {answer}
 
 Provide your evaluation following the rubric criteria."""
+
+        if self.use_local:
+            import requests
+            payload = {
+                "prompt": user_message,
+                "model": self.local_repo or model,
+                "temperature": self.temperature,
+                "max_tokens": 1
+            }
+            response = requests.post(
+                f"{self.base_url}/completions",
+                json=payload,
+                timeout=self.timeout
+            )
+            response.raise_for_status()
+            return response.json()
 
         last_exception = None
         is_gpt5 = "gpt-5" in model.lower()
