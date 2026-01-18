@@ -23,6 +23,14 @@ from pipeline.utils.martian_client import MartianClient
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+import sys
+from pathlib import Path
+
+# Add the root directory to the Python path
+ROOT_DIR = Path(__file__).resolve().parents[2]  # Adjust the number based on your file's location
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
+
 # Default configuration
 DEFAULT_MAX_WORKERS = 10  # Maximum parallel workers (will use min of this and number of judges)
 DEFAULT_CHECKPOINT_INTERVAL = 100
@@ -102,7 +110,7 @@ class JudgeEvaluator:
             question=question,
             answer=answer
         )
-
+        print(result)
         return result["score"]
     
     def _evaluate_with_retry(
@@ -186,7 +194,7 @@ class JudgeEvaluator:
 
         return scores
     
-    def description(
+    def evaluate_dataset(
         self,
         data: pd.DataFrame,
         question_col: str = 'question',

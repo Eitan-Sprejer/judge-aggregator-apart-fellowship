@@ -6,7 +6,7 @@ it into more specific, granular sub-judges through an iterative LLM-guided proce
 1. DecompositionAgent analyzes the judge and suggests dimension breakdowns
    (e.g., helpfulness → clarity, conciseness, depth, relevance).
 2. For each dimension, BrainstormAgent creates concrete judge rubrics.
-3. ValidationAgent checks that rubrics don't overlap and collectively cover the parent.
+3. ValidationAgent checks that rubrics collectively cover the parent.
 4. Repeat until stopping criteria met (e.g., max depth, sufficient coverage).
 
 Usage:
@@ -213,8 +213,10 @@ class DecompositionAgent:
         self._client = client
         self._system_prompt = (
             "You are JudgeDecomposer, an expert in breaking down high-level evaluation criteria "
-            "into granular sub-dimensions. You propose orthogonal dimensions that collectively "
-            "cover the parent concept without overlap. Always respond with valid JSON only."
+            "into granular sub-dimensions. You propose broad dimensions that are important factors "
+            "while considering the parent judge. These dimensions can overlap but should each "
+            "represent a unique aspect of judgment, closely aligning with how human annotators think. "
+            "Always respond with valid JSON only."
         )
 
     def decompose(self, judge: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -224,8 +226,7 @@ class DecompositionAgent:
 Judge to decompose (YAML):
 {base_yaml}
 
-Task: Identify 3-5 specific, orthogonal sub-dimensions that collectively capture the essence
-of the judge "{judge.get('name', 'Unknown')}". Each dimension should be concrete and measurable.
+Task: Identify 3-5 broad sub-dimensions that are important factors while considering the judge "{judge.get('name', 'Unknown')}". Each dimension should represent a unique aspect of judgment, even if they overlap.
 
 For each dimension, provide:
   * dimension_id: kebab-case identifier (e.g., "clarity", "depth", "relevance")
@@ -332,8 +333,9 @@ class ValidationAgent:
         self._client = client
         self._system_prompt = (
             "You are RubricValidator, a meticulous reviewer of judge decompositions. "
-            "You assess whether child rubrics collectively cover the parent without significant overlap. "
-            "Always respond with valid JSON only."
+            "You assess whether child rubrics collectively cover the parent judge's scope. "
+            "Overlap between dimensions is acceptable as long as each dimension represents "
+            "a unique and important aspect of judgment. Always respond with valid JSON only."
         )
 
     def validate(
@@ -354,14 +356,13 @@ Proposed child rubrics (YAML):
 
 Task: Assess whether the child rubrics:
   1. Collectively cover the parent judge's scope
-  2. Have minimal overlap
+  2. Represent unique and important aspects of judgment
   3. Are each sufficiently specific and measurable
 
 Respond with JSON:
 {{
     "is_valid": true/false,
     "coverage_score": 0.0-1.0,
-    "overlap_score": 0.0-1.0,
     "strengths": ["..."],
     "gaps": ["..."],
     "recommendations": ["..."]

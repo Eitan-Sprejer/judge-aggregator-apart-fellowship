@@ -3,6 +3,16 @@ Martian API Client Wrapper
 
 Wrapper around OpenAI SDK configured for Martian's API endpoint.
 Handles judge evaluation with structured JSON responses, retry logic, and rate limit handling.
+
+Query for local inference:
+python -m pipeline.core.judge_evaluation \
+  --input pipeline/core/ielts_task2_evaluation.pkl \
+  --output ielts_task2_judges.pkl \
+  --checkpoint-dir temp \
+  --judge_file experiments/track3_automated_selection/judge_decomposition/experiments/track3_automated_selection/generated_judges_ielts/all-judges-decomposed-20260117T100927Z.yaml \
+  --model meta-llama/Meta-Llama-3.1-70B-Instruct \
+  --use-local
+
 """
 
 import os
@@ -13,7 +23,7 @@ from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field, ConfigDict
 from openai import OpenAI, APIError, RateLimitError, APITimeoutError, APIConnectionError
 from dotenv import load_dotenv
-
+import json
 # Load environment variables from .env file
 env_path = Path(__file__).parents[2] / ".env"
 load_dotenv(env_path)
@@ -163,18 +173,39 @@ Provide your evaluation following the rubric criteria."""
         if self.use_local:
             import requests
             payload = {
-                "prompt": user_message,
-                "model": self.local_repo or model,
-                "temperature": self.temperature,
-                "max_tokens": 1
+            "model": self.local_repo or model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": rubric  # your rubric instruction
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+            "temperature": self.temperature,
+            "max_tokens": 512,
+
+            # vLLM schema enforcement
+            "extra_body": {
+                "guided_json": {
+                    "type": "object",
+                    "properties": {
+                        "score": {"type": "number"},
+                        "explanation": {"type": "string"}
+                    },
+                    "required": ["score", "explanation"]
+                }
             }
+        }
             response = requests.post(
                 f"{self.base_url}/completions",
                 json=payload,
                 timeout=self.timeout
             )
             response.raise_for_status()
-            return response.json()
+            return json.loads(response.json()["choices"][0]["message"]["content"])
 
         last_exception = None
         is_gpt5 = "gpt-5" in model.lower()
