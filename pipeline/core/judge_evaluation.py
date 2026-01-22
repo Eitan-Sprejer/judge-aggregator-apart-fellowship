@@ -19,9 +19,22 @@ from pipeline.utils import judge_rubrics
 from pipeline.utils.judge_rubrics import JUDGE_RUBRICS
 from pipeline.utils.martian_client import MartianClient
 
-# Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Set up logging - INFO to console, DEBUG to file only
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.propagate = False  # Don't propagate to root logger (prevents duplicate output)
+
+# Console handler - INFO and above only
+_console_handler = logging.StreamHandler()
+_console_handler.setLevel(logging.INFO)
+_console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(_console_handler)
+
+# File handler - DEBUG level (captures LLM outputs)
+_file_handler = logging.FileHandler('judge_evaluation_debug.log', mode='w')
+_file_handler.setLevel(logging.DEBUG)
+_file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(_file_handler)
 
 import sys
 from pathlib import Path
@@ -32,7 +45,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.append(str(ROOT_DIR))
 
 # Default configuration
-DEFAULT_MAX_WORKERS = 10  # Maximum parallel workers (will use min of this and number of judges)
+DEFAULT_MAX_WORKERS = 50  # Maximum parallel workers (50 workers × 5 judges = 250 concurrent)
 DEFAULT_CHECKPOINT_INTERVAL = 100
 DEFAULT_MAX_RETRIES = 5
 DEFAULT_INITIAL_DELAY = 1.0
@@ -110,7 +123,7 @@ class JudgeEvaluator:
             question=question,
             answer=answer
         )
-        print(result)
+        logger.debug(result)
         return result["score"]
     
     def _evaluate_with_retry(

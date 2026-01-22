@@ -79,7 +79,7 @@ class MartianClient:
         max_retries: int = 5,
         initial_retry_delay: float = 1.0,
         max_retry_delay: float = 60.0,
-        timeout: float = 60.0,
+        timeout: float = 30.0,  # Reduced from 60s for faster failure detection
         use_local: bool = False,
         # local_repo: Optional[str] = None
     ):
@@ -106,7 +106,20 @@ class MartianClient:
 
         self.use_local = use_local
         self.local_repo = default_model if use_local else None
-        self.base_url = base_url if not use_local else "http://localhost:8000/v1"
+        
+        # Support multiple local endpoints for load balancing
+        if use_local:
+            self.local_endpoints = [
+                "http://localhost:8000/v1",
+                "http://localhost:8001/v1",
+            ]
+            self._endpoint_index = 0
+            self._endpoint_lock = __import__('threading').Lock()
+            self.base_url = self.local_endpoints[0]  # Default for logging
+        else:
+            self.local_endpoints = None
+            self.base_url = base_url
+            
         self.default_model = default_model
         self.temperature = temperature
         self.max_retries = max_retries
@@ -121,7 +134,8 @@ class MartianClient:
                 timeout=timeout
             )
 
-        logger.info(f"Initialized Martian client with base_url: {self.base_url}")
+        logger.info(f"Initialized Martian client with base_url: {self.base_url}" + 
+                   (f" (load balancing across {len(self.local_endpoints)} endpoints)" if self.local_endpoints else ""))
 
     def _calculate_retry_delay(self, attempt: int, base_delay: Optional[float] = None) -> float:
         """
@@ -142,6 +156,16 @@ class MartianClient:
         # Add jitter (±25%)
         jitter = delay * 0.25 * (2 * random.random() - 1)
         return delay + jitter
+
+    def _get_next_endpoint(self) -> str:
+        """Get next local endpoint using round-robin load balancing."""
+        if not self.local_endpoints:
+            return self.base_url
+        
+        with self._endpoint_lock:
+            endpoint = self.local_endpoints[self._endpoint_index]
+            self._endpoint_index = (self._endpoint_index + 1) % len(self.local_endpoints)
+        return endpoint
 
     def evaluate_with_rubric(
         self,
@@ -173,6 +197,10 @@ Provide your evaluation following the rubric criteria."""
         if self.use_local:
             import requests
             import re
+            
+            # Get next endpoint for load balancing
+            endpoint = self._get_next_endpoint()
+            
             payload = {
                 "model": self.local_repo or model,
                 "messages": [
@@ -198,7 +226,7 @@ Provide your evaluation following the rubric criteria."""
                 }
             }
             response = requests.post(
-                f"{self.base_url}/chat/completions",
+                f"{endpoint}/chat/completions",
                 json=payload,
                 timeout=self.timeout
             )
@@ -299,7 +327,7 @@ Provide your evaluation following the rubric criteria."""
         evaluations: List[Dict[str, str]],
         dataset: Optional[str] = None,
         model: Optional[str] = None,
-        max_workers: int = 5
+        max_workers: int = 16
     ) -> List[Dict[str, Any]]:
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
