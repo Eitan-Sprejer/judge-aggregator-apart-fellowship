@@ -172,23 +172,22 @@ Provide your evaluation following the rubric criteria."""
 
         if self.use_local:
             import requests
+            import re
             payload = {
-            "model": self.local_repo or model,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": rubric  # your rubric instruction
-                },
-                {
-                    "role": "user",
-                    "content": user_message
-                }
-            ],
-            "temperature": self.temperature,
-            "max_tokens": 512,
-
-            # vLLM schema enforcement
-            "extra_body": {
+                "model": self.local_repo or model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": rubric + "\n\nYou MUST respond with ONLY a valid JSON object in this exact format: {\"score\": <number>, \"explanation\": \"<string>\"}\nDo not include any text before or after the JSON."
+                    },
+                    {
+                        "role": "user",
+                        "content": user_message
+                    }
+                ],
+                "temperature": self.temperature,
+                "max_tokens": 512,
+                # vLLM schema enforcement (must be top-level for vLLM API)
                 "guided_json": {
                     "type": "object",
                     "properties": {
@@ -198,14 +197,33 @@ Provide your evaluation following the rubric criteria."""
                     "required": ["score", "explanation"]
                 }
             }
-        }
             response = requests.post(
-                f"{self.base_url}/completions",
+                f"{self.base_url}/chat/completions",
                 json=payload,
                 timeout=self.timeout
             )
             response.raise_for_status()
-            return json.loads(response.json()["choices"][0]["message"]["content"])
+            content = response.json()["choices"][0]["message"]["content"]
+            
+            # Try to extract JSON even if there's extra text
+            try:
+                return json.loads(content)
+            except json.JSONDecodeError:
+                # Try to find JSON object in the response
+                json_match = re.search(r'\{[^{}]*"score"\s*:\s*[\d.]+[^{}]*"explanation"\s*:\s*"[^"]*"[^{}]*\}', content, re.DOTALL)
+                if not json_match:
+                    # Try alternate order
+                    json_match = re.search(r'\{[^{}]*"explanation"\s*:\s*"[^"]*"[^{}]*"score"\s*:\s*[\d.]+[^{}]*\}', content, re.DOTALL)
+                if json_match:
+                    return json.loads(json_match.group())
+                # Last resort: try to find any JSON-like structure
+                json_match = re.search(r'\{.*?\}', content, re.DOTALL)
+                if json_match:
+                    try:
+                        return json.loads(json_match.group())
+                    except json.JSONDecodeError:
+                        pass
+                raise ValueError(f"Could not parse JSON from response: {content[:200]}")
 
         last_exception = None
         is_gpt5 = "gpt-5" in model.lower()
