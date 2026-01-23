@@ -13,16 +13,18 @@
 ## Planned Experiments
 
 ### 4.1 Synthetic Preference Decomposition
+
 - **Status**: Planned
 - **Methodology**:
   1. Create synthetic ground truth: `human_score = 0.3*truthfulness + 0.5*helpfulness + 0.2*clarity`
   2. Generate dataset with known aggregation recipe
-  3. Train GAM/MLP aggregators
+  3. Train GAM aggregators
   4. Compare learned weights to ground truth
 - **Directory**: `4.1_synthetic_decomposition/`
 - **Validation**: Can aggregators recover the 0.3/0.5/0.2 weights?
 
 ### 4.2 Persona Preference Recovery
+
 - **Status**: Planned
 - **Dataset**: Persona simulation data (from Track 1.1)
 - **Analysis**: Reverse-engineer each persona's internal weighting
@@ -32,12 +34,14 @@
 ## Key Contribution
 
 Validates that judge importance measures are meaningful, not artifacts:
+
 - If aggregators can't recover known preferences → importance scores unreliable
 - If aggregators succeed → confidence in Track 2 interpretability results
 
 ## Methodology
 
 **Synthetic Ground Truth**:
+
 ```python
 # Generate data with known recipe
 def generate_ground_truth(judge_scores):
@@ -52,12 +56,14 @@ def generate_ground_truth(judge_scores):
 ```
 
 **Persona Analysis**:
+
 - Train separate aggregator per persona
 - Extract judge importance for each
 - Compare to persona definitions (from `pipeline/core/persona_simulation.py`)
 - Expected: "Professor" → high logical consistency, "Child" → high clarity
 
 **Failure Mode Analysis**:
+
 - Test ambiguous cases: Can aggregators distinguish 0.5X + 0.5Y from 0.3X + 0.7Y?
 - Identify when multiple aggregation recipes fit data equally well
 - Characterize identifiability limits
@@ -80,11 +86,13 @@ def generate_ground_truth(judge_scores):
 ## Technical Notes
 
 **Validation Metrics**:
+
 - Weight recovery error: `|learned_weight - true_weight|`
 - Rank correlation: Do top judges match ground truth top judges?
 - Prediction accuracy: R² on held-out synthetic data
 
 **Failure Criteria**:
+
 - If weight recovery error > 0.15 → aggregator unreliable
 - If rank correlation < 0.7 → importance rankings questionable
 - Informs confidence in Track 2 conclusions
