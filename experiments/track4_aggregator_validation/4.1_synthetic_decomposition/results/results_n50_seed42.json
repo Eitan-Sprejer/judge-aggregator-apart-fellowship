@@ -1,0 +1,25 @@
+{
+  "n_samples": 50,
+  "seed": 42,
+  "true_weights": {
+    "Truthfulness": 0.3,
+    "Helpfulness": 0.5,
+    "Clarity": 0.2
+  },
+  "learned_weights": {
+    "Truthfulness": 0.279674553525677,
+    "Helpfulness": 0.41641935509924555,
+    "Clarity": 0.30390609137507746
+  },
+  "weight_errors": {
+    "Truthfulness": 0.020325446474322995,
+    "Helpfulness": 0.08358064490075445,
+    "Clarity": 0.10390609137507745
+  },
+  "mean_absolute_error": 0.06927072758338497,
+  "max_absolute_error": 0.10390609137507745,
+  "rank_correlation": 0.5,
+  "rank_correlation_pval": 0.6666666666666667,
+  "test_r2": 0.3249928235210502,
+  "test_mse": 1.8048177677628803
+}
