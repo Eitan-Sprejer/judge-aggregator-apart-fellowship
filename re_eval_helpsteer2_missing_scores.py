@@ -9,7 +9,7 @@ import pickle
 import sys
 import time
 from pathlib import Path
-from typing import Iterable, List, Tuple, Dict, Optional
+from typing import Iterable, List, Tuple, Dict, Optional, Set
 
 import pandas as pd
 
@@ -93,13 +93,20 @@ def _build_missing_tasks(
     treat_nan: bool,
     only_judges: Optional[set],
     max_missing: Optional[int],
+    recompute_all: bool,
+    completed_keys: Optional[Set[int]],
 ) -> List[Tuple[int, int]]:
     tasks: List[Tuple[int, int]] = []
+    judge_count = len(judge_ids)
     for row_idx, row_scores in enumerate(scores_list):
         for j_idx, (jid, score) in enumerate(zip(judge_ids, row_scores)):
             if only_judges and jid not in only_judges:
                 continue
-            if _is_missing(score, treat_zero, treat_nan):
+            if recompute_all or _is_missing(score, treat_zero, treat_nan):
+                if completed_keys is not None:
+                    key = row_idx * judge_count + j_idx
+                    if key in completed_keys:
+                        continue
                 tasks.append((row_idx, j_idx))
                 if max_missing and len(tasks) >= max_missing:
                     return tasks
@@ -134,6 +141,15 @@ def main() -> int:
         help="Only re-evaluate these judge IDs",
     )
     parser.add_argument("--max-missing", type=int, help="Limit number of missing scores to re-run")
+    parser.add_argument(
+        "--recompute-all",
+        action="store_true",
+        help="Re-evaluate all scores, ignoring missing detection",
+    )
+    parser.add_argument(
+        "--progress-path",
+        help="Path to progress file for resume (defaults to <output>.progress.pkl when recomputing)",
+    )
     parser.add_argument(
         "--keep-zero",
         action="store_true",
@@ -183,6 +199,19 @@ def main() -> int:
     treat_nan = not args.skip_nan
     only_judges = set(args.only_judges) if args.only_judges else None
 
+    progress_path = None
+    completed_keys: Optional[Set[int]] = None
+    if args.recompute_all or args.progress_path:
+        progress_path = Path(args.progress_path) if args.progress_path else output_path.with_suffix(".progress.pkl")
+        if args.resume and progress_path.exists():
+            with progress_path.open("rb") as f:
+                completed_keys = pickle.load(f)
+            print(f"Loaded progress from {progress_path} ({len(completed_keys)} completed)")
+        elif args.resume:
+            print(f"Resume requested but no progress file found at {progress_path}; starting fresh")
+        else:
+            completed_keys = set()
+
     tasks = _build_missing_tasks(
         scores_list,
         judge_ids,
@@ -190,10 +219,13 @@ def main() -> int:
         treat_nan=treat_nan,
         only_judges=only_judges,
         max_missing=args.max_missing,
+        recompute_all=args.recompute_all,
+        completed_keys=completed_keys,
     )
 
+    mode = "all scores" if args.recompute_all else "missing scores"
     print(
-        f"Found {len(tasks)} missing scores across {len(df)} rows "
+        f"Found {len(tasks)} evaluations for {mode} across {len(df)} rows "
         f"and {len(judge_ids)} judges"
     )
 
@@ -211,6 +243,7 @@ def main() -> int:
     failures: List[Tuple[int, int, str]] = []
     completed = 0
     start_time = time.time()
+    judge_count = len(judge_ids)
 
     def evaluate_task(task: Tuple[int, int]) -> Tuple[int, int, Optional[float], Optional[str]]:
         row_idx, j_idx = task
@@ -243,6 +276,8 @@ def main() -> int:
             row_idx, j_idx, score, err = future.result()
             if score is not None:
                 scores_list[row_idx][j_idx] = score
+                if completed_keys is not None:
+                    completed_keys.add(row_idx * judge_count + j_idx)
             else:
                 failures.append((row_idx, j_idx, err or "unknown error"))
 
@@ -256,10 +291,18 @@ def main() -> int:
                 df[args.scores_col] = scores_list
                 _save_df(df, output_path)
                 print(f"Checkpoint saved to {output_path}")
+                if completed_keys is not None and progress_path is not None:
+                    with progress_path.open("wb") as f:
+                        pickle.dump(completed_keys, f)
+                    print(f"Progress saved to {progress_path}")
 
     df[args.scores_col] = scores_list
     _save_df(df, output_path)
     print(f"Saved repaired dataset to {output_path}")
+    if completed_keys is not None and progress_path is not None:
+        with progress_path.open("wb") as f:
+            pickle.dump(completed_keys, f)
+        print(f"Progress saved to {progress_path}")
 
     if failures:
         print(f"{len(failures)} evaluations failed after retries")
