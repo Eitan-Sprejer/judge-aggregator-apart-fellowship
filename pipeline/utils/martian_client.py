@@ -111,7 +111,7 @@ class MartianClient:
         if use_local:
             self.local_endpoints = [
                 "http://localhost:8000/v1",
-                "http://localhost:8001/v1",
+                # "http://localhost:8001/v1",
             ]
             self._endpoint_index = 0
             self._endpoint_lock = __import__('threading').Lock()
@@ -216,111 +216,94 @@ Provide your evaluation following the rubric criteria."""
                 "temperature": self.temperature,
                 "max_tokens": 512,
                 # vLLM schema enforcement (must be top-level for vLLM API)
-                "guided_json": {
-                    "type": "object",
-                    "properties": {
-                        "score": {"type": "number"},
-                        "explanation": {"type": "string"}
-                    },
-                    "required": ["score", "explanation"]
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                      "name": "score_output",
+                      "schema": schema.model_json_schema()
+                    }
+                  }
                 }
-            }
+
+            
             response = requests.post(
                 f"{endpoint}/chat/completions",
                 json=payload,
-                timeout=self.timeout
+                timeout=120
             )
             response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"]
+
+            return json.loads(response.json()["choices"][0]["message"]["content"])
             
-            # Try to extract JSON even if there's extra text
-            try:
-                return json.loads(content)
-            except json.JSONDecodeError:
-                # Try to find JSON object in the response
-                json_match = re.search(r'\{[^{}]*"score"\s*:\s*[\d.]+[^{}]*"explanation"\s*:\s*"[^"]*"[^{}]*\}', content, re.DOTALL)
-                if not json_match:
-                    # Try alternate order
-                    json_match = re.search(r'\{[^{}]*"explanation"\s*:\s*"[^"]*"[^{}]*"score"\s*:\s*[\d.]+[^{}]*\}', content, re.DOTALL)
-                if json_match:
-                    return json.loads(json_match.group())
-                # Last resort: try to find any JSON-like structure
-                json_match = re.search(r'\{.*?\}', content, re.DOTALL)
-                if json_match:
-                    try:
-                        return json.loads(json_match.group())
-                    except json.JSONDecodeError:
-                        pass
-                raise ValueError(f"Could not parse JSON from response: {content[:200]}")
+           
+        # last_exception = None
+        # is_gpt5 = "gpt-5" in model.lower()
 
-        last_exception = None
-        is_gpt5 = "gpt-5" in model.lower()
+        # for attempt in range(self.max_retries):
+        #     try:
+        #         request_params = {
+        #             "model": model,
+        #             "input": [
+        #                 {"role": "system", "content": rubric},
+        #                 {"role": "user", "content": user_message}
+        #             ],
+        #             "text_format": schema
+        #         }
 
-        for attempt in range(self.max_retries):
-            try:
-                request_params = {
-                    "model": model,
-                    "input": [
-                        {"role": "system", "content": rubric},
-                        {"role": "user", "content": user_message}
-                    ],
-                    "text_format": schema
-                }
+        #         if not is_gpt5:
+        #             request_params["temperature"] = self.temperature
+        #         else:
+        #             # For gpt-5 models, reduce reasoning effort for simple judge evaluations
+        #             request_params["reasoning"] = {"effort": "low"}
 
-                if not is_gpt5:
-                    request_params["temperature"] = self.temperature
-                else:
-                    # For gpt-5 models, reduce reasoning effort for simple judge evaluations
-                    request_params["reasoning"] = {"effort": "low"}
+        #         response = self.client.responses.parse(**request_params)
+        #         return response.output_parsed.model_dump()
 
-                response = self.client.responses.parse(**request_params)
-                return response.output_parsed.model_dump()
+        #     except RateLimitError as e:
+        #         last_exception = e
+        #         if attempt < self.max_retries - 1:
+        #             retry_after = getattr(e, 'retry_after', None)
+        #             if retry_after:
+        #                 delay = float(retry_after)
+        #                 logger.warning(f"Rate limited. Waiting {delay}s (from Retry-After header)")
+        #             else:
+        #                 delay = self._calculate_retry_delay(attempt)
+        #                 logger.warning(f"Rate limited. Waiting {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
+        #             time.sleep(delay)
+        #             continue
 
-            except RateLimitError as e:
-                last_exception = e
-                if attempt < self.max_retries - 1:
-                    retry_after = getattr(e, 'retry_after', None)
-                    if retry_after:
-                        delay = float(retry_after)
-                        logger.warning(f"Rate limited. Waiting {delay}s (from Retry-After header)")
-                    else:
-                        delay = self._calculate_retry_delay(attempt)
-                        logger.warning(f"Rate limited. Waiting {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
-                    time.sleep(delay)
-                    continue
+        #     except (APITimeoutError, APIConnectionError) as e:
+        #         last_exception = e
+        #         if attempt < self.max_retries - 1:
+        #             delay = self._calculate_retry_delay(attempt)
+        #             logger.warning(f"Connection/timeout error: {e}. Retrying in {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
+        #             time.sleep(delay)
+        #             continue
 
-            except (APITimeoutError, APIConnectionError) as e:
-                last_exception = e
-                if attempt < self.max_retries - 1:
-                    delay = self._calculate_retry_delay(attempt)
-                    logger.warning(f"Connection/timeout error: {e}. Retrying in {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
-                    time.sleep(delay)
-                    continue
+        #     except APIError as e:
+        #         last_exception = e
+        #         if hasattr(e, 'status_code') and 500 <= e.status_code < 600:
+        #             if attempt < self.max_retries - 1:
+        #                 delay = self._calculate_retry_delay(attempt)
+        #                 logger.warning(f"Server error {e.status_code}. Retrying in {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
+        #                 time.sleep(delay)
+        #                 continue
+        #         raise
 
-            except APIError as e:
-                last_exception = e
-                if hasattr(e, 'status_code') and 500 <= e.status_code < 600:
-                    if attempt < self.max_retries - 1:
-                        delay = self._calculate_retry_delay(attempt)
-                        logger.warning(f"Server error {e.status_code}. Retrying in {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
-                        time.sleep(delay)
-                        continue
-                raise
+        #     except Exception as e:
+        #         last_exception = e
+        #         if attempt < self.max_retries - 1:
+        #             delay = self._calculate_retry_delay(attempt)
+        #             logger.warning(f"Unexpected error: {e}. Retrying in {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
+        #             time.sleep(delay)
+        #             continue
+        #         raise
 
-            except Exception as e:
-                last_exception = e
-                if attempt < self.max_retries - 1:
-                    delay = self._calculate_retry_delay(attempt)
-                    logger.warning(f"Unexpected error: {e}. Retrying in {delay:.2f}s (attempt {attempt + 1}/{self.max_retries})")
-                    time.sleep(delay)
-                    continue
-                raise
-
-        logger.error(f"Evaluation failed after {self.max_retries} attempts")
-        if last_exception:
-            raise last_exception
-        else:
-            raise RuntimeError(f"Evaluation failed after {self.max_retries} attempts with unknown error")
+        # logger.error(f"Evaluation failed after {self.max_retries} attempts")
+        # if last_exception:
+        #     raise last_exception
+        # else:
+        #     raise RuntimeError(f"Evaluation failed after {self.max_retries} attempts with unknown error")
 
     def evaluate_batch(
         self,

@@ -116,7 +116,7 @@ class JudgeEvaluator:
 
         # Get judge rubric
         rubric = self.judges[judge_id]
-
+        # print(rubric)
         # Evaluate using Martian client
         result = self.client.evaluate_with_rubric(
             rubric=rubric,
@@ -145,22 +145,22 @@ class JudgeEvaluator:
         """
         question, answer, judge_id = args
         judge_index = self.judge_ids.index(judge_id)
-
+        assert self.judge_ids[judge_index] == judge_id
         delay = initial_delay
-        for attempt in range(max_retries):
-            try:
-                score = self.evaluate_single(question, answer, judge_id)
-                return (judge_index, score)
-            except Exception as e:
-                if attempt == max_retries - 1:
-                    logger.error(f"Failed to evaluate with {judge_id} after {max_retries} attempts: {e}")
-                    raise
-                logger.warning(f"Attempt {attempt + 1} failed for {judge_id}, retrying in {delay}s...")
-                time.sleep(delay)
-                delay *= 2
+        # for attempt in range(max_retries):
+            # try:
+        score = self.evaluate_single(question, answer, judge_id)
+        return (judge_index, score)
+            # except Exception as e:
+        #         if attempt == max_retries - 1:
+        #             logger.error(f"Failed to evaluate with {judge_id} after {max_retries} attempts: {e}")
+        #             raise
+        #         logger.warning(f"Attempt {attempt + 1} failed for {judge_id}, retrying in {delay}s...")
+        #         time.sleep(delay)
+        #         delay *= 2
 
-        # Should not reach here
-        raise RuntimeError(f"Failed to evaluate with {judge_id}")
+        # # Should not reach here
+        # raise RuntimeError(f"Failed to evaluate with {judge_id}")
     
     def evaluate_parallel(
         self,
@@ -197,6 +197,8 @@ class JudgeEvaluator:
                 try:
                     judge_index, score = future.result()
                     scores[judge_index] = score
+                    
+
                 except Exception as e:
                     args = future_to_args[future]
                     logger.error(f"Failed to evaluate with {args[2]}: {e}")
