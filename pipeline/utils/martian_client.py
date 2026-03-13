@@ -183,16 +183,24 @@ class MartianClient:
             schema = DATASET_SCHEMAS[dataset]
         else:
             schema = SingleDimensionScore
+        if question == answer: 
+            user_message = f"""Evaluate the following assistant responses in the follow human-assistant interacions:
 
-        user_message = f"""Evaluate the following response:
-
-Question/Instruction:
+Human-Assistant interaction:
 {question}
 
-Response to Evaluate:
-{answer}
 
 Provide your evaluation following the rubric criteria."""
+        else: 
+            user_message = f"""Evaluate the following response:
+    
+    Question/Instruction:
+    {question}
+    
+    Response to Evaluate:
+    {answer}
+    
+    Provide your evaluation following the rubric criteria."""
 
         if self.use_local:
             import requests
