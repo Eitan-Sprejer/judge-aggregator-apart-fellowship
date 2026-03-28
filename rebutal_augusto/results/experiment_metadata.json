@@ -1,0 +1,28 @@
+{
+  "start_time": "2026-03-28T01:45:53.880042",
+  "n_runs": 5,
+  "run_ids": [
+    2
+  ],
+  "n_samples": 500,
+  "model": "meta-llama/llama-3.3-70b-instruct",
+  "api_base": "https://api.withmartian.com/v1",
+  "temperature": 0.7,
+  "concurrency": 10,
+  "personas": [
+    "Professor",
+    "CEO",
+    "Parent",
+    "Student",
+    "Data Scientist",
+    "Therapist",
+    "Child",
+    "Ethicist",
+    "Privacy Advocate",
+    "Skeptic",
+    "Engineer",
+    "Novelist",
+    "Non-native Speaker",
+    "Lawyer"
+  ]
+}
