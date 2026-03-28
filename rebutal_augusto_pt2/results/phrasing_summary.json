@@ -1,0 +1,568 @@
+{
+  "n_variants": 5,
+  "aggregate_mean_shift_abs": 0.44096428571428575,
+  "aggregate_spearman": 0.820393553542985,
+  "aggregate_exact_match": 56.30714285714286,
+  "stats_by_persona_and_variant": [
+    {
+      "persona": "Professor",
+      "variant": "v1",
+      "base_mean": 6.428,
+      "variant_mean": 6.582,
+      "mean_shift": 0.15399999999999991,
+      "pearson": 0.9129170847862329,
+      "spearman": 0.8672563296282405,
+      "exact_match_pct": 67.0
+    },
+    {
+      "persona": "CEO",
+      "variant": "v1",
+      "base_mean": 6.684,
+      "variant_mean": 6.074,
+      "mean_shift": -0.6100000000000003,
+      "pearson": 0.8982387436691484,
+      "spearman": 0.8531297559092067,
+      "exact_match_pct": 51.0
+    },
+    {
+      "persona": "Parent",
+      "variant": "v1",
+      "base_mean": 7.07,
+      "variant_mean": 6.7,
+      "mean_shift": -0.3700000000000001,
+      "pearson": 0.8843543313168364,
+      "spearman": 0.8106891882073632,
+      "exact_match_pct": 58.4
+    },
+    {
+      "persona": "Student",
+      "variant": "v1",
+      "base_mean": 6.836,
+      "variant_mean": 6.9,
+      "mean_shift": 0.06400000000000006,
+      "pearson": 0.9182596441413897,
+      "spearman": 0.8864366647292454,
+      "exact_match_pct": 76.6
+    },
+    {
+      "persona": "Data Scientist",
+      "variant": "v1",
+      "base_mean": 5.856,
+      "variant_mean": 5.236,
+      "mean_shift": -0.6200000000000001,
+      "pearson": 0.8865306525071377,
+      "spearman": 0.8788559546021936,
+      "exact_match_pct": 52.2
+    },
+    {
+      "persona": "Therapist",
+      "variant": "v1",
+      "base_mean": 6.984,
+      "variant_mean": 7.122,
+      "mean_shift": 0.1379999999999999,
+      "pearson": 0.8956122180003535,
+      "spearman": 0.809160143965117,
+      "exact_match_pct": 63.4
+    },
+    {
+      "persona": "Child",
+      "variant": "v1",
+      "base_mean": 5.094,
+      "variant_mean": 5.916,
+      "mean_shift": 0.8220000000000001,
+      "pearson": 0.785637655720732,
+      "spearman": 0.8190684849329574,
+      "exact_match_pct": 44.0
+    },
+    {
+      "persona": "Ethicist",
+      "variant": "v1",
+      "base_mean": 6.576,
+      "variant_mean": 6.674,
+      "mean_shift": 0.09800000000000075,
+      "pearson": 0.8961762548148555,
+      "spearman": 0.8373637204420985,
+      "exact_match_pct": 63.800000000000004
+    },
+    {
+      "persona": "Privacy Advocate",
+      "variant": "v1",
+      "base_mean": 6.068,
+      "variant_mean": 5.81,
+      "mean_shift": -0.258,
+      "pearson": 0.8326346370688352,
+      "spearman": 0.8304790262156483,
+      "exact_match_pct": 58.4
+    },
+    {
+      "persona": "Skeptic",
+      "variant": "v1",
+      "base_mean": 5.3,
+      "variant_mean": 5.23,
+      "mean_shift": -0.0699999999999994,
+      "pearson": 0.9134277228882564,
+      "spearman": 0.8870744107268912,
+      "exact_match_pct": 61.199999999999996
+    },
+    {
+      "persona": "Engineer",
+      "variant": "v1",
+      "base_mean": 6.056,
+      "variant_mean": 6.34,
+      "mean_shift": 0.2839999999999998,
+      "pearson": 0.9265158983895084,
+      "spearman": 0.8952818486784857,
+      "exact_match_pct": 62.0
+    },
+    {
+      "persona": "Novelist",
+      "variant": "v1",
+      "base_mean": 5.538,
+      "variant_mean": 5.578,
+      "mean_shift": 0.040000000000000036,
+      "pearson": 0.888945776456002,
+      "spearman": 0.8539065024802772,
+      "exact_match_pct": 65.8
+    },
+    {
+      "persona": "Non-native Speaker",
+      "variant": "v1",
+      "base_mean": 6.494,
+      "variant_mean": 7.018,
+      "mean_shift": 0.524,
+      "pearson": 0.8764532740034876,
+      "spearman": 0.8147522281846759,
+      "exact_match_pct": 55.400000000000006
+    },
+    {
+      "persona": "Lawyer",
+      "variant": "v1",
+      "base_mean": 6.136,
+      "variant_mean": 5.576,
+      "mean_shift": -0.5600000000000005,
+      "pearson": 0.891093125787402,
+      "spearman": 0.8583832724558952,
+      "exact_match_pct": 55.800000000000004
+    },
+    {
+      "persona": "Professor",
+      "variant": "v2",
+      "base_mean": 6.428,
+      "variant_mean": 6.82,
+      "mean_shift": 0.39200000000000035,
+      "pearson": 0.8925087524336199,
+      "spearman": 0.8425669535423205,
+      "exact_match_pct": 63.4
+    },
+    {
+      "persona": "CEO",
+      "variant": "v2",
+      "base_mean": 6.684,
+      "variant_mean": 6.912,
+      "mean_shift": 0.22799999999999976,
+      "pearson": 0.8896460762406024,
+      "spearman": 0.8242942254052397,
+      "exact_match_pct": 57.4
+    },
+    {
+      "persona": "Parent",
+      "variant": "v2",
+      "base_mean": 7.07,
+      "variant_mean": 7.034,
+      "mean_shift": -0.036000000000000476,
+      "pearson": 0.9126435936912962,
+      "spearman": 0.8506000259654749,
+      "exact_match_pct": 68.2
+    },
+    {
+      "persona": "Student",
+      "variant": "v2",
+      "base_mean": 6.836,
+      "variant_mean": 6.824,
+      "mean_shift": -0.012000000000000455,
+      "pearson": 0.9192915891522855,
+      "spearman": 0.8852764096486673,
+      "exact_match_pct": 73.8
+    },
+    {
+      "persona": "Data Scientist",
+      "variant": "v2",
+      "base_mean": 5.856,
+      "variant_mean": 6.348,
+      "mean_shift": 0.492,
+      "pearson": 0.8888545817926407,
+      "spearman": 0.8582075945443293,
+      "exact_match_pct": 60.199999999999996
+    },
+    {
+      "persona": "Therapist",
+      "variant": "v2",
+      "base_mean": 6.984,
+      "variant_mean": 7.036,
+      "mean_shift": 0.0519999999999996,
+      "pearson": 0.8553847418538363,
+      "spearman": 0.772604466065088,
+      "exact_match_pct": 59.4
+    },
+    {
+      "persona": "Child",
+      "variant": "v2",
+      "base_mean": 5.094,
+      "variant_mean": 6.554,
+      "mean_shift": 1.46,
+      "pearson": 0.7097145615857361,
+      "spearman": 0.7343703535636233,
+      "exact_match_pct": 33.0
+    },
+    {
+      "persona": "Ethicist",
+      "variant": "v2",
+      "base_mean": 6.576,
+      "variant_mean": 6.946,
+      "mean_shift": 0.3700000000000001,
+      "pearson": 0.897497319138013,
+      "spearman": 0.8397665052919892,
+      "exact_match_pct": 62.4
+    },
+    {
+      "persona": "Privacy Advocate",
+      "variant": "v2",
+      "base_mean": 6.068,
+      "variant_mean": 6.424,
+      "mean_shift": 0.35600000000000076,
+      "pearson": 0.7719820522063391,
+      "spearman": 0.7215352459136847,
+      "exact_match_pct": 45.6
+    },
+    {
+      "persona": "Skeptic",
+      "variant": "v2",
+      "base_mean": 5.3,
+      "variant_mean": 5.746,
+      "mean_shift": 0.4460000000000006,
+      "pearson": 0.8936173278930901,
+      "spearman": 0.8641781098888152,
+      "exact_match_pct": 55.60000000000001
+    },
+    {
+      "persona": "Engineer",
+      "variant": "v2",
+      "base_mean": 6.056,
+      "variant_mean": 6.754,
+      "mean_shift": 0.6979999999999995,
+      "pearson": 0.8962110027273716,
+      "spearman": 0.8396734013441151,
+      "exact_match_pct": 56.99999999999999
+    },
+    {
+      "persona": "Novelist",
+      "variant": "v2",
+      "base_mean": 5.538,
+      "variant_mean": 6.51,
+      "mean_shift": 0.9719999999999995,
+      "pearson": 0.8341987706690281,
+      "spearman": 0.7720910221609777,
+      "exact_match_pct": 42.4
+    },
+    {
+      "persona": "Non-native Speaker",
+      "variant": "v2",
+      "base_mean": 6.494,
+      "variant_mean": 6.924,
+      "mean_shift": 0.4300000000000006,
+      "pearson": 0.8256013340077752,
+      "spearman": 0.6882261190601004,
+      "exact_match_pct": 46.800000000000004
+    },
+    {
+      "persona": "Lawyer",
+      "variant": "v2",
+      "base_mean": 6.136,
+      "variant_mean": 6.686,
+      "mean_shift": 0.5499999999999998,
+      "pearson": 0.8774849858049805,
+      "spearman": 0.8150455139890177,
+      "exact_match_pct": 47.4
+    },
+    {
+      "persona": "Professor",
+      "variant": "v3",
+      "base_mean": 6.428,
+      "variant_mean": 6.44,
+      "mean_shift": 0.012000000000000455,
+      "pearson": 0.8925517882158177,
+      "spearman": 0.8589273922969537,
+      "exact_match_pct": 64.2
+    },
+    {
+      "persona": "CEO",
+      "variant": "v3",
+      "base_mean": 6.684,
+      "variant_mean": 6.84,
+      "mean_shift": 0.1559999999999997,
+      "pearson": 0.9178082530840046,
+      "spearman": 0.8422015533453053,
+      "exact_match_pct": 61.199999999999996
+    },
+    {
+      "persona": "Parent",
+      "variant": "v3",
+      "base_mean": 7.07,
+      "variant_mean": 6.84,
+      "mean_shift": -0.23000000000000043,
+      "pearson": 0.9189369503675633,
+      "spearman": 0.8248812970153847,
+      "exact_match_pct": 65.4
+    },
+    {
+      "persona": "Student",
+      "variant": "v3",
+      "base_mean": 6.836,
+      "variant_mean": 6.698,
+      "mean_shift": -0.1379999999999999,
+      "pearson": 0.9239009562696878,
+      "spearman": 0.8669320015676214,
+      "exact_match_pct": 70.6
+    },
+    {
+      "persona": "Data Scientist",
+      "variant": "v3",
+      "base_mean": 5.856,
+      "variant_mean": 5.052,
+      "mean_shift": -0.8040000000000003,
+      "pearson": 0.8393352099206757,
+      "spearman": 0.8410751649763338,
+      "exact_match_pct": 48.199999999999996
+    },
+    {
+      "persona": "Therapist",
+      "variant": "v3",
+      "base_mean": 6.984,
+      "variant_mean": 7.144,
+      "mean_shift": 0.16000000000000014,
+      "pearson": 0.8556515290550987,
+      "spearman": 0.7718595715796037,
+      "exact_match_pct": 61.199999999999996
+    },
+    {
+      "persona": "Child",
+      "variant": "v3",
+      "base_mean": 5.094,
+      "variant_mean": 6.792,
+      "mean_shift": 1.6979999999999995,
+      "pearson": 0.5926178911858724,
+      "spearman": 0.5684614116607,
+      "exact_match_pct": 26.0
+    },
+    {
+      "persona": "Ethicist",
+      "variant": "v3",
+      "base_mean": 6.576,
+      "variant_mean": 6.924,
+      "mean_shift": 0.34800000000000075,
+      "pearson": 0.8673132387581233,
+      "spearman": 0.8055669005976878,
+      "exact_match_pct": 59.599999999999994
+    },
+    {
+      "persona": "Privacy Advocate",
+      "variant": "v3",
+      "base_mean": 6.068,
+      "variant_mean": 5.154,
+      "mean_shift": -0.9139999999999997,
+      "pearson": 0.7654107959627201,
+      "spearman": 0.7813044578030941,
+      "exact_match_pct": 45.6
+    },
+    {
+      "persona": "Skeptic",
+      "variant": "v3",
+      "base_mean": 5.3,
+      "variant_mean": 6.006,
+      "mean_shift": 0.7060000000000004,
+      "pearson": 0.8938658562688033,
+      "spearman": 0.8568346344283739,
+      "exact_match_pct": 50.6
+    },
+    {
+      "persona": "Engineer",
+      "variant": "v3",
+      "base_mean": 6.056,
+      "variant_mean": 5.524,
+      "mean_shift": -0.532,
+      "pearson": 0.8661893157538652,
+      "spearman": 0.83465073575126,
+      "exact_match_pct": 55.400000000000006
+    },
+    {
+      "persona": "Novelist",
+      "variant": "v3",
+      "base_mean": 5.538,
+      "variant_mean": 6.83,
+      "mean_shift": 1.2919999999999998,
+      "pearson": 0.7903203916695059,
+      "spearman": 0.6840412899757652,
+      "exact_match_pct": 31.8
+    },
+    {
+      "persona": "Non-native Speaker",
+      "variant": "v3",
+      "base_mean": 6.494,
+      "variant_mean": 6.832,
+      "mean_shift": 0.3380000000000001,
+      "pearson": 0.8260453623632106,
+      "spearman": 0.6987629066150203,
+      "exact_match_pct": 48.0
+    },
+    {
+      "persona": "Lawyer",
+      "variant": "v3",
+      "base_mean": 6.136,
+      "variant_mean": 6.668,
+      "mean_shift": 0.532,
+      "pearson": 0.8754693572888509,
+      "spearman": 0.8022819593022298,
+      "exact_match_pct": 44.4
+    },
+    {
+      "persona": "Professor",
+      "variant": "v4",
+      "base_mean": 6.428,
+      "variant_mean": 6.778,
+      "mean_shift": 0.34999999999999964,
+      "pearson": 0.921682783290687,
+      "spearman": 0.8526611596933266,
+      "exact_match_pct": 64.2
+    },
+    {
+      "persona": "CEO",
+      "variant": "v4",
+      "base_mean": 6.684,
+      "variant_mean": 5.984,
+      "mean_shift": -0.7000000000000002,
+      "pearson": 0.8864303562812228,
+      "spearman": 0.8532706534885555,
+      "exact_match_pct": 48.6
+    },
+    {
+      "persona": "Parent",
+      "variant": "v4",
+      "base_mean": 7.07,
+      "variant_mean": 7.018,
+      "mean_shift": -0.05200000000000049,
+      "pearson": 0.9076472375080892,
+      "spearman": 0.8375656736919681,
+      "exact_match_pct": 68.0
+    },
+    {
+      "persona": "Student",
+      "variant": "v4",
+      "base_mean": 6.836,
+      "variant_mean": 6.998,
+      "mean_shift": 0.16199999999999992,
+      "pearson": 0.9240896594179344,
+      "spearman": 0.9029408438460715,
+      "exact_match_pct": 76.4
+    },
+    {
+      "persona": "Data Scientist",
+      "variant": "v4",
+      "base_mean": 5.856,
+      "variant_mean": 5.3,
+      "mean_shift": -0.556,
+      "pearson": 0.8785319076162832,
+      "spearman": 0.8613510425838956,
+      "exact_match_pct": 56.8
+    },
+    {
+      "persona": "Therapist",
+      "variant": "v4",
+      "base_mean": 6.984,
+      "variant_mean": 7.282,
+      "mean_shift": 0.29800000000000004,
+      "pearson": 0.8864638709442436,
+      "spearman": 0.8061943743102624,
+      "exact_match_pct": 63.0
+    },
+    {
+      "persona": "Child",
+      "variant": "v4",
+      "base_mean": 5.094,
+      "variant_mean": 6.622,
+      "mean_shift": 1.5279999999999996,
+      "pearson": 0.6731660277010576,
+      "spearman": 0.714817932761675,
+      "exact_match_pct": 31.0
+    },
+    {
+      "persona": "Ethicist",
+      "variant": "v4",
+      "base_mean": 6.576,
+      "variant_mean": 6.956,
+      "mean_shift": 0.3800000000000008,
+      "pearson": 0.8799621207299975,
+      "spearman": 0.8245302116310615,
+      "exact_match_pct": 61.4
+    },
+    {
+      "persona": "Privacy Advocate",
+      "variant": "v4",
+      "base_mean": 6.068,
+      "variant_mean": 6.07,
+      "mean_shift": 0.002000000000000668,
+      "pearson": 0.8218198788610929,
+      "spearman": 0.7921803362778336,
+      "exact_match_pct": 52.2
+    },
+    {
+      "persona": "Skeptic",
+      "variant": "v4",
+      "base_mean": 5.3,
+      "variant_mean": 5.116,
+      "mean_shift": -0.18400000000000016,
+      "pearson": 0.9165062847300043,
+      "spearman": 0.897244439945176,
+      "exact_match_pct": 61.6
+    },
+    {
+      "persona": "Engineer",
+      "variant": "v4",
+      "base_mean": 6.056,
+      "variant_mean": 6.494,
+      "mean_shift": 0.4379999999999997,
+      "pearson": 0.9338207092462929,
+      "spearman": 0.8885973207411917,
+      "exact_match_pct": 62.6
+    },
+    {
+      "persona": "Novelist",
+      "variant": "v4",
+      "base_mean": 5.538,
+      "variant_mean": 5.208,
+      "mean_shift": -0.33000000000000007,
+      "pearson": 0.8521257972747786,
+      "spearman": 0.8135308186094123,
+      "exact_match_pct": 60.4
+    },
+    {
+      "persona": "Non-native Speaker",
+      "variant": "v4",
+      "base_mean": 6.494,
+      "variant_mean": 7.092,
+      "mean_shift": 0.5979999999999999,
+      "pearson": 0.8850688399639812,
+      "spearman": 0.7863892324667118,
+      "exact_match_pct": 52.400000000000006
+    },
+    {
+      "persona": "Lawyer",
+      "variant": "v4",
+      "base_mean": 6.136,
+      "variant_mean": 6.286,
+      "mean_shift": 0.14999999999999947,
+      "pearson": 0.9031392225484256,
+      "spearman": 0.8627102039029502,
+      "exact_match_pct": 54.800000000000004
+    }
+  ]
+}
