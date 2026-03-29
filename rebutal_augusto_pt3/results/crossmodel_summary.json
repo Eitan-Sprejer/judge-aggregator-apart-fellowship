@@ -1,0 +1,161 @@
+{
+  "n_models": 4,
+  "n_samples": 500,
+  "models": [
+    {
+      "run_id": 1,
+      "model": "meta-llama/llama-3.3-70b-instruct",
+      "short": "Llama 3.3 70B"
+    },
+    {
+      "run_id": 2,
+      "model": "deepseek/deepseek-v3.2",
+      "short": "DeepSeek V3.2"
+    },
+    {
+      "run_id": 3,
+      "model": "meta-llama/llama-4-maverick",
+      "short": "Llama 4 Maverick"
+    },
+    {
+      "run_id": 4,
+      "model": "mistralai/mixtral-8x7b-instruct",
+      "short": "Mixtral 8x7B"
+    }
+  ],
+  "temperature": 0.7,
+  "per_sample": {
+    "mean_std": 1.0228119029436415,
+    "median_std": 0.8992448379470264,
+    "mean_range": 2.615142857142857,
+    "pct_zero_variance": 0.4
+  },
+  "score_changes": {
+    "mean_abs_diff": 1.4351674758471873,
+    "median_abs_diff": 1.0714285714285712,
+    "pct_diff_ge_1": 53.82766906968761,
+    "pct_diff_ge_2": 24.81977342945417,
+    "pct_exact_same": 2.8492962581531067,
+    "mean_range": 2.615142857142857,
+    "median_range": 2.2857142857142856,
+    "pct_zero_range": 0.4
+  },
+  "correlations": {
+    "pearson_mean": 0.7818521507235671,
+    "spearman_mean": 0.7292923027774799
+  },
+  "persona_stats": [
+    {
+      "persona": "Professor",
+      "mean_score": 5.816844241501776,
+      "mean_std_across_models": 1.3842951483461416,
+      "mean_range_across_models": 3.442,
+      "exact_agreement_pct": 3.5999999999999996,
+      "max_range": 10.0
+    },
+    {
+      "persona": "CEO",
+      "mean_score": 6.051243023845764,
+      "mean_std_across_models": 1.3876481823014197,
+      "mean_range_across_models": 3.446,
+      "exact_agreement_pct": 3.5999999999999996,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Parent",
+      "mean_score": 6.645357686453577,
+      "mean_std_across_models": 1.1939582650534726,
+      "mean_range_across_models": 2.942,
+      "exact_agreement_pct": 6.0,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Student",
+      "mean_score": 6.28259766615931,
+      "mean_std_across_models": 1.2671584472190178,
+      "mean_range_across_models": 3.15,
+      "exact_agreement_pct": 7.6,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Data Scientist",
+      "mean_score": 5.6955859969558595,
+      "mean_std_across_models": 1.453089671394279,
+      "mean_range_across_models": 3.622,
+      "exact_agreement_pct": 5.2,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Therapist",
+      "mean_score": 6.3302891933028915,
+      "mean_std_across_models": 1.4926412507902538,
+      "mean_range_across_models": 3.696,
+      "exact_agreement_pct": 2.0,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Child",
+      "mean_score": 5.235413495687468,
+      "mean_std_across_models": 1.4613564451850138,
+      "mean_range_across_models": 3.66,
+      "exact_agreement_pct": 2.1999999999999997,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Ethicist",
+      "mean_score": 5.9837645865043125,
+      "mean_std_across_models": 1.4284741819211453,
+      "mean_range_across_models": 3.554,
+      "exact_agreement_pct": 4.3999999999999995,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Privacy Advocate",
+      "mean_score": 5.619989852866565,
+      "mean_std_across_models": 1.7223805986091152,
+      "mean_range_across_models": 4.302,
+      "exact_agreement_pct": 2.8000000000000003,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Skeptic",
+      "mean_score": 5.269406392694064,
+      "mean_std_across_models": 1.3253100311241164,
+      "mean_range_across_models": 3.286,
+      "exact_agreement_pct": 5.800000000000001,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Engineer",
+      "mean_score": 5.577879249112126,
+      "mean_std_across_models": 1.3404594269159253,
+      "mean_range_across_models": 3.328,
+      "exact_agreement_pct": 5.0,
+      "max_range": 14.0
+    },
+    {
+      "persona": "Novelist",
+      "mean_score": 5.2212075088787415,
+      "mean_std_across_models": 1.288063393640718,
+      "mean_range_across_models": 3.21,
+      "exact_agreement_pct": 3.5999999999999996,
+      "max_range": 9.0
+    },
+    {
+      "persona": "Non-native Speaker",
+      "mean_score": 6.617960426179605,
+      "mean_std_across_models": 1.227078980974466,
+      "mean_range_across_models": 3.016,
+      "exact_agreement_pct": 4.8,
+      "max_range": 10.0
+    },
+    {
+      "persona": "Lawyer",
+      "mean_score": 5.69457128361238,
+      "mean_std_across_models": 1.4301483371134898,
+      "mean_range_across_models": 3.574,
+      "exact_agreement_pct": 2.8000000000000003,
+      "max_range": 10.0
+    }
+  ]
+}
